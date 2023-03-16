@@ -1,0 +1,44 @@
+version: '3.7'
+services:
+  free-unity-mat-service:
+    build: .
+    container_name: free-unity-mat-con
+    environment:
+      XDEBUG_SESSION: "PHPSTORM"
+    volumes:
+      - ./dist:/var/www/html/dist
+      - ./public:/var/www/html/public
+      - ./src:/var/www/html/src
+    ports:
+      - "8000:80"
+      - "80:80"
+    extra_hosts:
+      - "host.internal.docker:host-gateway"
+  phpmyadmin:
+    container_name: FUM-admin
+    image: phpmyadmin
+    restart: always
+    depends_on:
+      - FUM-database-service
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=FUM-database-service
+      - PMA_PORT:3306
+  FUM-database-service:
+    container_name: FUM-database
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "PrimaryDatabase"
+      MYSQL_USER: "admin"
+      MYSQL_PASSWORD: "admin"
+    ports:
+      - "9906:3306"
+networks:
+  default:
+    external:
+      name: free-unity-mat-network
+      #docker network create free-unity-mat-network
