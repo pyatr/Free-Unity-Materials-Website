@@ -9,6 +9,7 @@ services:
       - ./dist:/var/www/html/dist
       - ./public:/var/www/html/public
       - ./src:/var/www/html/src
+      - ./server:/var/www/html/server
     ports:
       - "8000:80"
       - "80:80"

@@ -15,7 +15,7 @@ RUN apt-get install -y php-mbstring
 RUN apt-get install -y php-xdebug
 
 #Для пингования одного контейнера другим (по имени)
-#Примерно так: docker exec -it get-city-time ping time-database
+#Примерно так: docker exec -it free-unity-mat-con ping FUM-database
 
 RUN apt-get install -y iputils-ping
 
@@ -33,6 +33,8 @@ RUN rm -rfv ./config/*.conf
 
 RUN a2dissite 000-default.conf
 RUN a2ensite freeunmat.conf
+#Для CORS и связи сайта с сервером
+RUN a2enmod headers
 RUN a2enmod rewrite
 
 CMD apachectl -D FOREGROUND
