@@ -1,7 +1,5 @@
 import axios from 'axios';
 
-export {ServerConnection as ServerConnection};
-
 class ServerConnection {
     private serverConnection: string;
 
@@ -24,4 +22,34 @@ class ServerConnection {
             }
         }
     }
+
+    public async tryLogin(email: string, password: string) {
+        axios.post(this.serverConnection, {
+            action: "trylogin",
+            email,
+            password
+        })
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+    public async createNewUser(name: string, email: string, password: string) {
+        axios.post(this.serverConnection, {
+            name,
+            email,
+            password
+        })
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
 }
+
+export default ServerConnection;
