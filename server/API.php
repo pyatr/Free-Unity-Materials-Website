@@ -13,13 +13,51 @@ class API
         $this->Database = new Database();
     }
 
-    public function tryLogin(string $email, string $password): bool
+    public function parseRequest(array $data): void
     {
-        return $this->Database->tryLogin($email, $password);
+        foreach ($data as $key => $value) {
+            //echo "$key = $value ";
+            switch ($key) {
+                case "action":
+                    $this->performAction($value, $data);
+                    break;
+
+                default:
+                    break;
+            }
+        }
     }
 
-    function respond(string $data): void
+    private function tryGetValue($array, $key)
     {
+        return (array_key_exists($key, $array)) ? $array[$key] : null;
+    }
+
+
+    private function performAction(string $actionName, array $data)
+    {
+        switch ($actionName) {
+            case "trylogin":
+                $email = $this->tryGetValue($data, "email");
+                $password = $this->tryGetValue($data, "password");
+                $loginStatus = $this->tryLogin($email, $password);
+                $response = $loginStatus ? "logged in" : "could not log in";
+                $this->respond("Response is $response");
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private function tryLogin(string $email, string $password): bool
+    {
+        return $this->Database->elementWithParametersExists("USERS", ["EMAIL", "PASSWORD"], [$email, $password]);
+    }
+
+    private function respond(
+        string $data
+    ): void {
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($data);
     }

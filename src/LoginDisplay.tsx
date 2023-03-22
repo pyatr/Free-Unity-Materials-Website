@@ -13,9 +13,6 @@ import ServerConnection from "./ServerConnection";
 
 const SERVER_URL = "http://fumserver.test";
 
-//scon.sendTestRequest();
-//scon.tryLogin("admin", "admin");
-
 function Login() {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();

@@ -42,26 +42,34 @@ class Database
 
     public function tryLogin(string $email, string $password): bool
     {
-        return $this->DBConn->query(
-                "SELECT COUNT(1) FROM " . $this::TABLE_USERS . " WHERE " . $this::ENTRY_EMAIL . " = $email AND " . $this::ENTRY_PASSWORD . " = $password"
-            ) > 0;
+        $query = "SELECT COUNT(1) FROM " . $this::TABLE_USERS . " WHERE " . $this::ENTRY_EMAIL . " = '$email' AND " . $this::ENTRY_PASSWORD . " = '$password';";
+
+        $result = $this->DBConn->query(
+            $query
+        );
+        return (int)$result->fetchColumn() > 0;
     }
 
-    public function elementWithParametersExists(string $tableName, $parameters, $values): bool
-    {
-        if (!$parameters . is_array() || !$values . is_array()) {
+    public function elementWithParametersExists(
+        string $tableName,
+        $parameters,
+        $values
+    ): bool {
+        if (!is_array($parameters) || !is_array($values)) {
             return false;
         }
-        $paramCount = $parameters . count();
-        $valuesCount = $values . count();
+        $paramCount = count($parameters);
+        $valuesCount = count($values);
         if ($paramCount != $valuesCount || $paramCount == 0 || $valuesCount == 0) {
             return false;
         }
-        $query = "SELECT COUNT(1) FROM $tableName WHERE $parameters[0] = $values[0]";
+        $query = "SELECT COUNT(1) FROM $tableName WHERE $parameters[0] = '$values[0]'";
         for ($i = 1; $i < $paramCount; $i++) {
-            $query += " AND $parameters[i] = $values[i]";
+            $query = $query . " AND $parameters[$i] = '$values[$i]'";
         }
-        return $this->DBConn->query($query) > 0;
+
+        $result = $this->DBConn->query($query);
+        return (int)$result->fetchColumn() > 0;
     }
 
     private
