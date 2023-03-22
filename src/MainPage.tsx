@@ -1,37 +1,46 @@
 import React from "react";
-import {BrowserRouter, Routes, Route, Link} from "react-router-dom";
+import {BrowserRouter, Routes, Route} from "react-router-dom";
 
 import MainPageProfileLayout from "./MainPageProfileLayout";
 
 import "./MainPage.css";
+import Login from "./LoginDisplay";
+import {
+    AppBar,
+    Box,
+    Toolbar,
+    Button,
+    Avatar,
+    Container,
+    Link as MuiLink
+} from "@mui/material";
+import SiteAppBar from "./SiteAppBar";
 
 function MainPage() {
     return (
         <BrowserRouter>
-            <div><img src="./assets/logo.png" alt="logo" className="Logo"/></div>
-            <div className="Generic-link" >
+            <SiteAppBar/>
             <Routes>
-                <Route path="/" element={<MainPageProfileLayout/>}>
-                    <Route path="login" element={<LoginLink/>}/>
-                    <Route path="register" element={<RegisterLink/>}/>
-                    <Route path="*" element={<NoPage/>}/>
-                </Route>
+                <Route path="/"
+                       element={<MainPageProfileLayout/>}/>
+                <Route path="login" element={<Login/>}/>
+                <Route path="register" element={<Login/>}/>
+                <Route path="assets" element={<MainPage/>}/>
+                <Route path="articles" element={<Articles/>}/>
+                <Route path="scripts" element={<Scripts/>}/>
+                <Route path="*" element={<NoPage/>}/>
             </Routes>
-            </div>
         </BrowserRouter>
     );
-
 }
 
-function LoginLink() {
-    return (<div><Link className="Generic-link" to="/login">Login</Link>
-    </div>);
-}
+function Articles() {
+    return <h1>Articles</h1>;
+};
 
-function RegisterLink() {
-    return (<div><Link className="Generic-link" to="/register">Register</Link>
-    </div>);
-}
+function Scripts() {
+    return <h1>Scripts</h1>;
+};
 
 function NoPage() {
     return <h1>404</h1>;

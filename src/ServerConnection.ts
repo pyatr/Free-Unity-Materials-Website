@@ -26,8 +26,8 @@ class ServerConnection {
     public async tryLogin(email: string, password: string) {
         axios.post(this.serverConnection, {
             action: "trylogin",
-            email,
-            password
+            email: email,
+            password: password
         })
             .then(function (response) {
                 console.log(response);

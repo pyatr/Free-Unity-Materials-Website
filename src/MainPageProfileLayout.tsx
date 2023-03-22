@@ -1,4 +1,4 @@
-import {Outlet, Link} from "react-router-dom";
+import {Link} from "react-router-dom";
 
 function MainPageProfileLayout() {
     return (
@@ -6,10 +6,13 @@ function MainPageProfileLayout() {
             <nav>
                 <ul>
                     <li>
-                        <Link to="/login">Login</Link>
+                        <Link to="/index">Assets</Link>
                     </li>
                     <li>
-                        <Link to="/register">Register</Link>
+                        <Link to="/articles">Articles</Link>
+                    </li>
+                    <li>
+                        <Link to="/scripts">Scripts</Link>
                     </li>
                 </ul>
             </nav>
