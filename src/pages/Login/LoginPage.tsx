@@ -1,5 +1,5 @@
 import React from "react";
-import "./LoginDisplay.css";
+import "../../assets/LoginPage.css";
 
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -9,27 +9,39 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 
-import ServerConnection from "./ServerConnection";
+import ServerConnection from "../../utils/ServerConnection";
 
+//TODO: Replace with site IP detection
 const SERVER_URL = "http://fumserver.test";
 
-function Login() {
+export default function LoginPage() {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        let email: string;
-        // @ts-ignore: Object is possibly 'null'.
-        email = data.get("email").toString();
-        let password: string;
-        // @ts-ignore: Object is possibly 'null'.
-        password = data.get("password").toString();
-        let scon: ServerConnection;
-        scon = new ServerConnection(SERVER_URL);
-        scon.tryLogin(email, password).then(() => {
-            console.log("login successful");
-        }, () => {
-            console.log("login failed");
-        });
+        let email;
+        let emdata = data.get("email");
+        if (emdata != null) {
+            email = emdata.toString();
+        }
+        let password;
+        let pdata = data.get("password");
+        if (pdata != null) {
+            password = pdata.toString();
+        }
+        if (email != null && password != null) {
+            let scon: ServerConnection;
+            scon = new ServerConnection(SERVER_URL);
+
+            const params = {
+                email: email,
+                password: password
+            };
+            scon.sendRequest("login", params).then(() => {
+                console.log("login successful");
+            }, () => {
+                console.log("login failed");
+            });
+        }
     };
 
     return (
@@ -72,6 +84,3 @@ function Login() {
         </Container>
     );
 }
-
-
-export default Login;
