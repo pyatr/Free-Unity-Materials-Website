@@ -5,12 +5,13 @@ import {
     AppBar,
     Box,
     Toolbar,
-    Button,
     Avatar,
-    Container, CssBaseline, Grid, Typography
+    CssBaseline,
+    Typography,
+    Grid
 } from "@mui/material";
 
-function SiteAppBar() {
+export default function SiteAppBar() {
     return (
         <Box sx={{flexGrow: 1}}>
             <AppBar position="static" color="default">
@@ -45,5 +46,3 @@ function SiteAppBar() {
         </Box>
     );
 }
-
-export default SiteAppBar;
