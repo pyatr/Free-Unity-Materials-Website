@@ -4,8 +4,6 @@ require_once("./Database.php");
 
 class API
 {
-    private const FRONT_SITE_NAME = "freeunitymaterials.test";
-
     private Database $Database;
 
     function __construct()
@@ -15,16 +13,24 @@ class API
 
     public function parseRequest(array $data): void
     {
-        foreach ($data as $key => $value) {
-            //echo "$key = $value ";
-            switch ($key) {
-                case "action":
-                    $this->performAction($value, $data);
+        $request = $data["request"];
+        $params = (array)$data["params"];
+        if ($request != null && $params != null) {
+            switch ($request) {
+                case "login":
+                    $email = $this->tryGetValue($params, "email");
+                    $password = $this->tryGetValue($params, "password");
+                    if ($email != null && $password != null) {
+                        $loginStatus = $this->tryLogin($email, $password);
+                        $response = $loginStatus ? "logged in" : "could not log in";
+                        $this->respond("Response is $response");
+                    }
                     break;
-
                 default:
                     break;
             }
+        } else {
+            $this->respond("Invalid request: $data");
         }
     }
 
@@ -33,31 +39,17 @@ class API
         return (array_key_exists($key, $array)) ? $array[$key] : null;
     }
 
-
-    private function performAction(string $actionName, array $data)
-    {
-        switch ($actionName) {
-            case "trylogin":
-                $email = $this->tryGetValue($data, "email");
-                $password = $this->tryGetValue($data, "password");
-                $loginStatus = $this->tryLogin($email, $password);
-                $response = $loginStatus ? "logged in" : "could not log in";
-                $this->respond("Response is $response");
-                break;
-
-            default:
-                break;
-        }
-    }
-
     private function tryLogin(string $email, string $password): bool
     {
-        return $this->Database->elementWithParametersExists("USERS", ["EMAIL", "PASSWORD"], [$email, $password]);
+        return $this->Database->elementWithParametersExists(
+            "USERS",
+            ["EMAIL", "PASSWORD"],
+            [$email, $password]
+        );
     }
 
-    private function respond(
-        string $data
-    ): void {
+    private function respond($data): void
+    {
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($data);
     }

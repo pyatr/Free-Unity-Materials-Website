@@ -10,7 +10,3 @@ $decodedData = (array)json_decode(file_get_contents("php://input"));
 $api = new API();
 
 $api->parseRequest($decodedData);
-
-//hash passwords
-//store cookies in hash so nobody can steal and use them for login
-//remember login

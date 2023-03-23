@@ -21,33 +21,18 @@ class Database
 
     private PDO $DBConn;
 
-    function __construct()
+    public function __construct()
     {
         $this->connect();
     }
 
-    function __destruct()
-    {
-        //$this->DBConn = null;
-    }
-
-    function connect(): void
+    private function connect(): void
     {
         $this->DBConn = new PDO(
             "mysql:host=" . $this::HOST_NAME . ";dbname=" . Database::DATABASE_NAME,
             "admin",
             "admin"
         );
-    }
-
-    public function tryLogin(string $email, string $password): bool
-    {
-        $query = "SELECT COUNT(1) FROM " . $this::TABLE_USERS . " WHERE " . $this::ENTRY_EMAIL . " = '$email' AND " . $this::ENTRY_PASSWORD . " = '$password';";
-
-        $result = $this->DBConn->query(
-            $query
-        );
-        return (int)$result->fetchColumn() > 0;
     }
 
     public function elementWithParametersExists(
@@ -72,8 +57,7 @@ class Database
         return (int)$result->fetchColumn() > 0;
     }
 
-    private
-    function getUserTableColumns(): string
+    private function getUserTableColumns(): string
     {
         return "(`" . Database::ENTRY_USERNAME .
             "`, `" . Database::ENTRY_PASSWORD .
@@ -81,8 +65,7 @@ class Database
             "`, `" . Database::ENTRY_ROLE . "`)";
     }
 
-    public
-    function doesUserExist(
+    public function doesUserExist(
         string $key
     ): bool {
         return $this->DBConn->query(
@@ -90,8 +73,7 @@ class Database
             ) > 0;
     }
 
-    public
-    function createNewUser(
+    public function createNewUser(
         string $newName,
         string $password,
         string $email
@@ -100,10 +82,8 @@ class Database
             $hashedPassword = hash($this::HASHING_ALGORITHM, $password);
             $this->performQuery();
             $this->DBConn->query(
-                "INSERT INTO " . Database::TABLE_USERS . " {$this::getUserTableColumns()} VALUES ($newName, $hashedPassword, $email, " . $this::ROLE_USER . ");"
+                "INSERT INTO " . Database::TABLE_USERS . " {$this::getUserTableColumns()} VALUES ('$newName', '$hashedPassword', '$email', '" . $this::ROLE_USER . "');"
             );
         }
     }
 }
-
-//🐘🐘🐘
