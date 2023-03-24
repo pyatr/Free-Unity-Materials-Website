@@ -11,11 +11,21 @@ import Container from '@mui/material/Container';
 
 import ServerConnection from "../../utils/ServerConnection";
 
-//TODO: Replace with site IP detection
+//This should be in server device /etc/hosts file as 127.0.0.1 fumserver.test
+//echo >> /etc/hosts 127.0.0.1 fumserver.test
 const SERVER_URL = "http://fumserver.test";
 
+function OnLoginResponse(response: string) {
+    localStorage.setItem("userLoginStatus", response);
+    let isLoggedIn = JSON.parse(response);
+    if (isLoggedIn) {
+        window.open(window.location.origin, "_self")
+    }
+}
+
+
 export default function LoginPage() {
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         let email;
@@ -36,11 +46,7 @@ export default function LoginPage() {
                 email: email,
                 password: password
             };
-            scon.sendRequest("login", params).then(() => {
-                console.log("login successful");
-            }, () => {
-                console.log("login failed");
-            });
+            await scon.sendRequest("login", params, OnLoginResponse);
         }
     };
 

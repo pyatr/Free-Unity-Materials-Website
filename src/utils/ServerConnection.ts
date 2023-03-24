@@ -7,13 +7,13 @@ export default class ServerConnection {
         this.serverConnection = connectionUrl;
     }
 
-    public async sendRequest(requestName: string, requestParams: {}) {
+    public async sendRequest(requestName: string, requestParams: {}, onRequestResponse: Function) {
         axios.post(this.serverConnection, {
             request: requestName,
             params: requestParams
         })
             .then(function (response) {
-                console.log(response);
+                onRequestResponse(response.data.toString());
             })
             .catch(function (error) {
                 console.log(error);
