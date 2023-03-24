@@ -1,14 +1,17 @@
 <?php
 
 require_once("./Database.php");
+require_once("./UserDatabase.php");
 
 class API
 {
-    private Database $Database;
+    private Database $database;
+    private UserDatabase $userDatabase;
 
     function __construct()
     {
-        $this->Database = new Database();
+        $this->database = new Database();
+        $this->userDatabase = new UserDatabase();
     }
 
     public function parseRequest(array $data): void
@@ -41,7 +44,7 @@ class API
 
     private function tryLogin(string $email, string $password): bool
     {
-        return $this->Database->elementWithParametersExists(
+        return $this->userDatabase->elementWithParametersExists(
             "USERS",
             ["EMAIL", "PASSWORD"],
             [$email, $password]

@@ -2,24 +2,12 @@
 
 class Database
 {
-    private const HOST_NAME = "FUM-database-service";
-    private const DATABASE_NAME = "PrimaryDatabase";
+    protected const HOST_NAME = "FUM-database-service";
+    protected const DATABASE_NAME = "PrimaryDatabase";
 
-    private const TABLE_USERS = "USERS";
-    private const TABLE_POSTS = "POSTS";
+    protected const HASHING_ALGORITHM = "md5";
 
-    private const ROLE_EDITOR = "EDITOR";
-    private const ROLE_ADMIN = "ADMIN";
-    private const ROLE_USER = "USER";
-
-    private const ENTRY_USERNAME = "USERNAME";
-    private const ENTRY_PASSWORD = "PASSWORD";
-    private const ENTRY_EMAIL = "EMAIL";
-    private const ENTRY_ROLE = "ROLE";
-
-    private const HASHING_ALGORITHM = "md5";
-
-    private PDO $DBConn;
+    protected PDO $DBConn;
 
     public function __construct()
     {
@@ -55,35 +43,5 @@ class Database
 
         $result = $this->DBConn->query($query);
         return (int)$result->fetchColumn() > 0;
-    }
-
-    private function getUserTableColumns(): string
-    {
-        return "(`" . Database::ENTRY_USERNAME .
-            "`, `" . Database::ENTRY_PASSWORD .
-            "`, `" . Database::ENTRY_EMAIL .
-            "`, `" . Database::ENTRY_ROLE . "`)";
-    }
-
-    public function doesUserExist(
-        string $key
-    ): bool {
-        return $this->DBConn->query(
-                "SELECT COUNT(1) FROM " . $this::TABLE_USERS . " WHERE unique_key = $key"
-            ) > 0;
-    }
-
-    public function createNewUser(
-        string $newName,
-        string $password,
-        string $email
-    ): void {
-        if (!$this->doesUserExist($email)) {
-            $hashedPassword = hash($this::HASHING_ALGORITHM, $password);
-            $this->performQuery();
-            $this->DBConn->query(
-                "INSERT INTO " . Database::TABLE_USERS . " {$this::getUserTableColumns()} VALUES ('$newName', '$hashedPassword', '$email', '" . $this::ROLE_USER . "');"
-            );
-        }
     }
 }
