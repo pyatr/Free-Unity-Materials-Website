@@ -25,8 +25,8 @@ class API
                     $password = $this->tryGetValue($params, "password");
                     if ($email != null && $password != null) {
                         $loginStatus = $this->tryLogin($email, $password);
-                        $response = $loginStatus ? "logged in" : "could not log in";
-                        $this->respond("Response is $response");
+                        $response = $loginStatus;
+                        $this->respond($response);
                     }
                     break;
                 default:
