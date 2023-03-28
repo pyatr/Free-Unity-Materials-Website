@@ -10,7 +10,7 @@ export default function NonExistentPage() {
                 p: 2,
                 //71+12+12+1.5+1.5+1+1 = 100%
                 width: '71%',
-                height: '100%',
+                height: '65vh',
                 border: 2,
                 borderColor: 'primary.main',
                 m: '0.5%',
