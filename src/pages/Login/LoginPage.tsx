@@ -12,8 +12,8 @@ import Container from '@mui/material/Container';
 import ServerConnection from "../../utils/ServerConnection";
 import {Link} from "react-router-dom";
 
-//This should be in server device /etc/hosts file as 127.0.0.1 fumserver.test
-//echo >> /etc/hosts 127.0.0.1 fumserver.test
+//This should be in server device /etc/hosts file as <remote IP> fumserver.test
+//echo >> /etc/hosts <remote IP> fumserver.test
 const SERVER_URL = "http://fumserver.test";
 
 function OnLoginResponse(response: string) {

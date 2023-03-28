@@ -38,6 +38,10 @@ services:
       MYSQL_PASSWORD: "admin"
     ports:
       - "9906:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+volumes:
+  dbdata:
 networks:
   default:
     external:
