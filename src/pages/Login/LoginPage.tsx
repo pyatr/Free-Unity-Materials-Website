@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 
 import ServerConnection from "../../utils/ServerConnection";
+import {Link} from "react-router-dom";
 
 //This should be in server device /etc/hosts file as 127.0.0.1 fumserver.test
 //echo >> /etc/hosts 127.0.0.1 fumserver.test
@@ -51,13 +52,15 @@ export default function LoginPage() {
     };
 
     return (
-        <Container component="main" maxWidth="xs">
-            <Box sx={{
-                marginTop: 8,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-            }}>
+        <Container component="main">
+            <Box
+                width="100%"
+                sx={{
+                    marginTop: 8,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}>
                 <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
                     <LockOutlinedIcon/>
                 </Avatar>
@@ -66,20 +69,22 @@ export default function LoginPage() {
                 </Typography>
                 <Box component="form"
                      onSubmit={handleSubmit}
+                     display='grid'
                      sx={{mt: 1}}>
                     <TextField id="email-field"
                                name="email"
                                label="Email"
                                variant="standard"
-                               fullWidth
-                               sx={{mt: 2}}/>
+                               sx={{mt: 2, minWidth: 300}}/>
                     <TextField id="password-field"
                                name="password"
                                label="Password"
                                variant="standard"
                                type="password"
                                fullWidth
-                               sx={{mt: 2}}/>
+                               sx={{mt: 2, minWidth: 300}}/>
+                    <Link to="" style={{marginTop: '16px'}}>Register</Link>
+                    <Link to="" style={{marginTop: '16px'}}>Forgot password?</Link>
                     <Button
                         variant="contained"
                         sx={{mt: 3, mb: 2}}

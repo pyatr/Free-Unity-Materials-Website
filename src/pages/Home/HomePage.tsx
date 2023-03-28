@@ -17,7 +17,6 @@ export default function HomePage() {
         <BrowserRouter>
             <SiteAppBar/>
             <Grid container margin="1%">
-                <CategoryMenu/>
                 <Routes>
                     <Route path="/" element={<AssetsPage/>}/>
                     <Route path="login" element={<LoginPage/>}/>
