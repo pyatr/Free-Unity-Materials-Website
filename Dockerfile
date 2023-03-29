@@ -25,7 +25,7 @@ RUN echo "xdebug.idekey=PHPSTORM" >>         /etc/php/8.1/apache2/conf.d/20-xdeb
 RUN echo "xdebug.client_host = 172.18.0.1">> /etc/php/8.1/apache2/conf.d/20-xdebug.ini
 
 COPY dist ./
-COPY .htaccess /etc/apache2/.htaccess
+COPY public/.htaccess /etc/apache2/.htaccess
 COPY apache2.conf /etc/apache2/apache2.conf
 COPY config /etc/apache2/sites-available
 
@@ -41,5 +41,7 @@ CMD apachectl -D FOREGROUND
 EXPOSE 80
 EXPOSE 8000
 EXPOSE 443
+EXPOSE 3306
+EXPOSE 9906
 
 #sudo docker exec -t -i free-unity-mat-con /bin/bash

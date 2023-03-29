@@ -12,13 +12,10 @@ import Container from '@mui/material/Container';
 import ServerConnection from "../../utils/ServerConnection";
 import {Link} from "react-router-dom";
 
-//This should be in server device /etc/hosts file as <remote IP> fumserver.test
-//echo >> /etc/hosts <remote IP> fumserver.test
-const SERVER_URL = "http://fumserver.test";
-
 function OnLoginResponse(response: string) {
-    localStorage.setItem("userLoginStatus", response);
-    let isLoggedIn = JSON.parse(response);
+    console.log("Response: " + response);
+    let isLoggedIn = JSON.parse(response) === "true" ? true : false;
+    localStorage.setItem("userLoginStatus", String(isLoggedIn));
     if (isLoggedIn) {
         window.open(window.location.origin, "_self")
     }
@@ -41,7 +38,7 @@ export default function LoginPage() {
         }
         if (email != null && password != null) {
             let scon: ServerConnection;
-            scon = new ServerConnection(SERVER_URL);
+            scon = new ServerConnection();
 
             const params = {
                 email: email,

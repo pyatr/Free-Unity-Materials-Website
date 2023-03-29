@@ -31,6 +31,7 @@ const config = {
             {
                 patterns: [
                     {from: "./public/assets", to: "assets"},
+                    {from: "./public/.htaccess"},
                     {from: "./public/manifest.json"},
                     {from: "./public/robots.txt"}
                 ]

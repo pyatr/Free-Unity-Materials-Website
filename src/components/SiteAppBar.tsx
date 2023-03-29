@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 
 export default function SiteAppBar() {
-    let isLoggedIn = localStorage.getItem("userLoginStatus");
+    let isLoggedIn = (localStorage.getItem("userLoginStatus") === "true");
     return (
         <Box sx={{flexGrow: 1}}>
             <AppBar position="static" color="default">

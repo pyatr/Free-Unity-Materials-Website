@@ -7,8 +7,6 @@ services:
       XDEBUG_SESSION: "PHPSTORM"
     volumes:
       - ./dist:/var/www/html/dist
-      - ./public:/var/www/html/public
-      - ./src:/var/www/html/src
       - ./server:/var/www/html/server
     ports:
       - "8000:80"

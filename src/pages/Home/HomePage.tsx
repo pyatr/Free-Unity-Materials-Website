@@ -5,7 +5,6 @@ import {Grid} from "@mui/material";
 import "../../assets/HomePage.css";
 import SiteAppBar from "../../components/SiteAppBar";
 import LoginPage from "../Login/LoginPage";
-import CategoryMenu from "../../components/CategoryMenu";
 import AssetsPage from "../AssetsPage/AssetsPage";
 import ArticlesPage from "../Articles/ArticlesPage";
 import ScriptsPage from "../Scripts/ScriptsPage";

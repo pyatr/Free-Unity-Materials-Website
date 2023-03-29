@@ -3,11 +3,12 @@ import axios from 'axios';
 export default class ServerConnection {
     private readonly serverConnection: string;
 
-    public constructor(connectionUrl: string) {
-        this.serverConnection = connectionUrl;
+    public constructor() {
+        this.serverConnection = window.location.host + ":3306";
     }
 
     public async sendRequest(requestName: string, requestParams: {}, onRequestResponse: Function) {
+        console.log("server connection is " + this.serverConnection);
         axios.post(this.serverConnection, {
             request: requestName,
             params: requestParams
