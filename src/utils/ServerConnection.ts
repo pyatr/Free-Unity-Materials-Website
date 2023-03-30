@@ -2,9 +2,10 @@ import axios from 'axios';
 
 export default class ServerConnection {
     private readonly serverConnection: string;
+    private readonly serverPort = "8000";
 
     public constructor() {
-        this.serverConnection = window.location.host + ":3306";
+        this.serverConnection = "http://" + window.location.host + ":" + this.serverPort;
     }
 
     public async sendRequest(requestName: string, requestParams: {}, onRequestResponse: Function) {

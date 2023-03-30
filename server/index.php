@@ -1,12 +1,18 @@
 <?php
+#header('Access-Control-Allow-Origin: *');
+#header("Access-Control-Allow-Headers: *");
+#header("Access-Control-Allow-Methods: *");
+#header("Allow: *");
 
-require_once("./API.php");
+echo "hello world";
 
-error_reporting(E_ALL);
-ini_set("display_errors", "1");
+#require_once("./API.php");
 
-$decodedData = (array)json_decode(file_get_contents("php://input"));
+#error_reporting(E_ALL);
+#ini_set("display_errors", "1");
 
-$api = new API();
+#$decodedData = (array)json_decode(file_get_contents("php://input"));
 
-$api->parseRequest($decodedData);
+#$api = new API();
+
+#$api->parseRequest($decodedData);

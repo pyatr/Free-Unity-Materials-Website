@@ -7,26 +7,32 @@ services:
       XDEBUG_SESSION: "PHPSTORM"
     volumes:
       - ./dist:/var/www/html/dist
-      - ./server:/var/www/html/server
     ports:
-      - "8000:80"
       - "80:80"
-    extra_hosts:
-      - "host.internal.docker:host-gateway"
   phpmyadmin:
-    container_name: FUM-admin
+    container_name: fum-admin
     image: phpmyadmin
     restart: always
     depends_on:
-      - FUM-database-service
+      - fum-db-service
     ports:
       - "8080:80"
     environment:
       - PMA_ARBITRARY=1
-      - PMA_HOST=FUM-database-service
-      - PMA_PORT:3306
-  FUM-database-service:
-    container_name: FUM-database
+      - PMA_HOST=fum-db-service
+  fum-server:
+    build: .
+    container_name: fum-server
+    restart: always
+    environment:
+      XDEBUG_SESSION: "PHPSTORM"
+    volumes:
+      - ./server:/var/www/html/server
+    ports:
+      - "8000:80"
+  fum-db-service:
+    build: .
+    container_name: fum-db
     image: mysql
     restart: always
     environment:

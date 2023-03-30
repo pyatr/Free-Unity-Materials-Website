@@ -13,6 +13,7 @@ RUN apt-get install -y php-json
 RUN apt-get install -y php-common 
 RUN apt-get install -y php-mbstring 
 RUN apt-get install -y php-xdebug
+RUN apt-get install -y nano
 
 #Для пингования одного контейнера другим (по имени)
 #Примерно так: docker exec -it free-unity-mat-con ping FUM-database
