@@ -14,6 +14,9 @@ RUN apt-get install -y php-common
 RUN apt-get install -y php-mbstring 
 RUN apt-get install -y php-xdebug
 RUN apt-get install -y nano
+RUN apt-get install -y lsof
+RUN apt-get install -y mysql-client
+RUN apt-get install -y mysql-server
 
 #Для пингования одного контейнера другим (по имени)
 #Примерно так: docker exec -it free-unity-mat-con ping FUM-database

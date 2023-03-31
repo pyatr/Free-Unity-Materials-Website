@@ -12,7 +12,6 @@ services:
   phpmyadmin:
     container_name: fum-admin
     image: phpmyadmin
-    restart: always
     depends_on:
       - fum-db-service
     ports:
@@ -24,9 +23,6 @@ services:
   fum-server:
     build: .
     container_name: fum-server
-    restart: always
-    environment:
-      XDEBUG_SESSION: "PHPSTORM"
     volumes:
       - ./server:/var/www/html/server
     ports:
@@ -39,8 +35,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "root"
       MYSQL_DATABASE: "PrimaryDatabase"
-      MYSQL_USER: "admin"
-      MYSQL_PASSWORD: "admin"
     ports:
       - "9906:3306"
 networks:

@@ -17,9 +17,9 @@ class Database
     private function connect(): void
     {
         $this->DBConn = new PDO(
-            "mysql:host=" . $this::HOST_NAME . ";dbname=" . Database::DATABASE_NAME,
-            "admin",
-            "admin"
+            "mysql:host=" . $this::HOST_NAME . ";port=3306;dbname=" . Database::DATABASE_NAME,
+            "root",
+            "root"
         );
     }
 
