@@ -14,10 +14,14 @@ import {Link} from "react-router-dom";
 
 function OnLoginResponse(response: string) {
     console.log("Response: " + response);
-    let isLoggedIn = JSON.parse(response) === "true" ? true : false;
-    localStorage.setItem("userLoginStatus", String(isLoggedIn));
-    if (isLoggedIn) {
-        window.open(window.location.origin, "_self")
+    try {
+        let isLoggedIn = JSON.parse(response) === "true" ? true : false;
+        localStorage.setItem("userLoginStatus", String(isLoggedIn));
+        if (isLoggedIn) {
+            window.open(window.location.origin, "_self")
+        }
+    } catch (e) {
+        console.log("Error when parsing login response: " + e);
     }
 }
 

@@ -20,6 +20,7 @@ services:
     environment:
       - PMA_ARBITRARY=1
       - PMA_HOST=fum-db-service
+      - PMA_PORT:3306
   fum-server:
     build: .
     container_name: fum-server
@@ -29,7 +30,7 @@ services:
     volumes:
       - ./server:/var/www/html/server
     ports:
-      - "8000:80"
+      - "8000:8000"
   fum-db-service:
     build: .
     container_name: fum-db

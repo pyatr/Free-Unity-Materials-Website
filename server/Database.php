@@ -2,7 +2,7 @@
 
 class Database
 {
-    protected const HOST_NAME = "FUM-database-service";
+    protected const HOST_NAME = "fum-db-service";
     protected const DATABASE_NAME = "PrimaryDatabase";
 
     protected const HASHING_ALGORITHM = "md5";
