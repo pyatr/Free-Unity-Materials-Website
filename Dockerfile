@@ -41,5 +41,3 @@ CMD apachectl -D FOREGROUND
 EXPOSE 80
 EXPOSE 8000
 EXPOSE 443
-
-#sudo docker exec -t -i free-unity-mat-con /bin/bash

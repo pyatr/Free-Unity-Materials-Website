@@ -43,12 +43,16 @@ services:
       MYSQL_PASSWORD: "admin"
     ports:
       - "9906:3306"
-    volumes:
-      - dbdata:/var/lib/mysql
-volumes:
-  dbdata:
 networks:
   default:
     external:
       name: free-unity-mat-network
       #docker network create free-unity-mat-network
+
+#sudo docker exec -t -i fum-db /bin/bash
+
+#sudo docker exec -t -i fum-server /bin/bash
+
+#sudo docker exec -t -i fum-admin /bin/bash
+
+#sudo docker exec -t -i free-unity-mat-con /bin/bash
