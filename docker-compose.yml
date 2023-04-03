@@ -1,52 +1,55 @@
 version: '3.7'
 services:
-  free-unity-mat-service:
-    build: .
-    container_name: free-unity-mat-con
-    environment:
-      XDEBUG_SESSION: "PHPSTORM"
+  fum-service:
+    #by default names are generated like projectname_servicename_number
+    container_name: fum-service
+    build:
+      context: .
+      dockerfile: ./dockerfiles/frontend/Dockerfile
+    tty: true
     volumes:
       - ./dist:/var/www/html/dist
+    environment:
+      XDEBUG_SESSION: "PHPSTORM"
     ports:
       - "80:80"
   phpmyadmin:
-    container_name: fum-admin
+    #container_name: phpmyadmin
+    #build:
+    #  context: .
+    #  dockerfile: ./dockerfiles/phpmyadmin/Dockerfile
+    tty: true
     image: phpmyadmin
     depends_on:
-      - fum-db-service
+      - fum-db
     ports:
       - "8080:80"
     environment:
       - PMA_ARBITRARY=1
-      - PMA_HOST=fum-db-service
+      - PMA_HOST=fum-db
       - PMA_PORT:3306
   fum-server:
-    build: .
     container_name: fum-server
+    build:
+      context: .
+      dockerfile: ./dockerfiles/server/Dockerfile
+    tty: true
     volumes:
       - ./server:/var/www/html/server
     ports:
       - "8000:8000"
-  fum-db-service:
-    build: .
+  fum-db:
     container_name: fum-db
-    image: mysql
+    build:
+      context: .
+      dockerfile: ./dockerfiles/database/Dockerfile
+    tty: true
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: "root"
-      MYSQL_DATABASE: "PrimaryDatabase"
     ports:
       - "9906:3306"
-networks:
-  default:
-    external:
-      name: free-unity-mat-network
-      #docker network create free-unity-mat-network
-
-#sudo docker exec -t -i fum-db /bin/bash
-
-#sudo docker exec -t -i fum-server /bin/bash
-
-#sudo docker exec -t -i fum-admin /bin/bash
-
-#sudo docker exec -t -i free-unity-mat-con /bin/bash
+    volumes:
+      - db:/var/lib/mysql
+    expose:
+      - "3306"
+volumes:
+  db:
