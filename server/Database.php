@@ -2,7 +2,7 @@
 
 class Database
 {
-    protected const HOST_NAME = "fum-db-service";
+    protected const HOST_NAME = "fum-db";
     protected const DATABASE_NAME = "PrimaryDatabase";
 
     protected const HASHING_ALGORITHM = "md5";
@@ -17,9 +17,9 @@ class Database
     private function connect(): void
     {
         $this->DBConn = new PDO(
-            "mysql:host=" . $this::HOST_NAME . ";port=3306;dbname=" . Database::DATABASE_NAME,
-            "root",
-            "root"
+            "mysql:host=" . $this::HOST_NAME . ";dbname=" . Database::DATABASE_NAME,
+            "admin",
+            "admin"
         );
     }
 
