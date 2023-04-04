@@ -15,7 +15,8 @@ import {Link} from "react-router-dom";
 function OnLoginResponse(response: string) {
     console.log("Response: " + response);
     try {
-        let isLoggedIn = JSON.parse(response) === "true" ? true : false;
+        let parsed = String(JSON.parse(response));
+        let isLoggedIn = parsed === "true" ? true : false;
         localStorage.setItem("userLoginStatus", String(isLoggedIn));
         if (isLoggedIn) {
             window.open(window.location.origin, "_self")
