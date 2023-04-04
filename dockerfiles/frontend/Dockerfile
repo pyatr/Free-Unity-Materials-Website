@@ -20,5 +20,3 @@ RUN a2enmod headers
 RUN a2enmod rewrite
 
 CMD apachectl -D FOREGROUND
-
-EXPOSE 80

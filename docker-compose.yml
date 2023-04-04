@@ -7,18 +7,19 @@ services:
       context: .
       dockerfile: ./dockerfiles/frontend/Dockerfile
     tty: true
+    restart: always
     volumes:
       - ./dist:/var/www/html/dist
     environment:
       XDEBUG_SESSION: "PHPSTORM"
     ports:
       - "80:80"
+    networks:
+      - fumnet
   phpmyadmin:
-    #container_name: phpmyadmin
-    #build:
-    #  context: .
-    #  dockerfile: ./dockerfiles/phpmyadmin/Dockerfile
+    container_name: phpmyadmin
     tty: true
+    restart: always
     image: phpmyadmin
     depends_on:
       - fum-db
@@ -28,16 +29,21 @@ services:
       - PMA_ARBITRARY=1
       - PMA_HOST=fum-db
       - PMA_PORT:3306
+    networks:
+      - fumnet
   fum-server:
     container_name: fum-server
     build:
       context: .
       dockerfile: ./dockerfiles/server/Dockerfile
     tty: true
+    restart: always
     volumes:
       - ./server:/var/www/html/server
     ports:
       - "8000:8000"
+    networks:
+      - fumnet
   fum-db:
     container_name: fum-db
     build:
@@ -45,11 +51,16 @@ services:
       dockerfile: ./dockerfiles/database/Dockerfile
     tty: true
     restart: always
+    #TODO: try use this to start mysql entrypoint: service mysql start
     ports:
       - "9906:3306"
     volumes:
       - db:/var/lib/mysql
-    expose:
-      - "3306"
+    networks:
+      - fumnet
 volumes:
   db:
+networks:
+  fumnet:
+    name: fumnet
+    external: true

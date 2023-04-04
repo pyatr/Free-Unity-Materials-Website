@@ -8,9 +8,12 @@ RUN apt-get install -y mysql-client
 RUN apt-get install -y mysql-server
 RUN apt-get install -y iputils-ping
 
-#CMD usermod -d /var/lib/mysql/ mysql
+RUN usermod -d /var/lib/mysql/ mysql
 
-#RUN service mysql start
+#TODO: complete database start with commented code
+#CMD service mysql start
+#alt
+#ENTRYPOINT ["service", "mysql", "start"]
 
 #RUN mysql -u root -p root
 #RUN mysql CREATE DATABASE PrimaryDatabase;
