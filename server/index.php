@@ -1,7 +1,5 @@
 <?php
-//Если будет падать сайт с CORS, возможно хедеры придется добавлять и здесь
-
-require_once("./API.php");
+include_once "Autoload.php";
 
 error_reporting(E_ALL);
 ini_set("display_errors", "1");
