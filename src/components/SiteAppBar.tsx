@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 
 import {Link} from "react-router-dom";
 import {
@@ -11,8 +11,37 @@ import {
     Grid
 } from "@mui/material";
 
-export default function SiteAppBar() {
+function AuthorizationLinksDisplay() {
+    return (<Grid
+        container
+        direction="column"
+        justifyContent="flex-end"
+        alignItems="left"
+        //TODO: разобраться откуда берутся -16px
+        marginTop="0px"
+        marginLeft="0px"
+        spacing={2}
+        sx={{
+            width: "20%"
+        }}>
+        <Link style={{fontSize: 18}} to="/login">Log in</Link>
+        <Link style={{fontSize: 18}} to="/register">Register</Link>
+    </Grid>);
+}
+
+function UserDisplay() {
+    return (<Typography>Logged in, congrats</Typography>);
+}
+
+function GetAuthorizationResult() {
     let isLoggedIn = (localStorage.getItem("userLoginStatus") === "true");
+    if (isLoggedIn)
+        return (<UserDisplay/>);
+    else
+        return (<AuthorizationLinksDisplay/>);
+}
+
+export default function SiteAppBar() {
     return (
         <Box sx={{flexGrow: 1}}>
             <AppBar position="static" color="default">
@@ -25,24 +54,11 @@ export default function SiteAppBar() {
                         component={Link}
                         to="/"
                         sx={{
-                            height: 169,
-                            width: 410
+                            width: "20%",
+                            height: "100%",
+                            margin: "0.5%"
                         }}/>
-
-                    {!isLoggedIn ?
-                        (<Grid
-                            container
-                            direction="column"
-                            justifyContent="flex-end"
-                            alignItems="left"
-                            spacing={2}
-                            sx={{
-                                width: 300
-                            }}>
-                            <Link to="/login"> Log in</Link>
-                            <Link to="/register">Register</Link>
-                        </Grid>)
-                        : (<Typography>Logged in, congrats</Typography>)}
+                    <GetAuthorizationResult/>
                 </Toolbar>
             </AppBar>
         </Box>

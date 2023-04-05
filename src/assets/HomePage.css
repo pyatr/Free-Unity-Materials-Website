@@ -8,23 +8,6 @@
     color: white;
 }
 
-.Logo {
-    position: relative;
-    top: 16px;
-    left: 16px;
-    width: 410px;
-    height: 169px;
-}
-
-.Generic-link {
-    align-items: start;
-    align-self: flex-end;
-    margin-top: -8px;
-    margin-right: -32px;
-    color: black;
-    font-size: calc(10px + 2vmin);
-}
-
 body {
     background-color: #F6F6F6;
     margin: 0;

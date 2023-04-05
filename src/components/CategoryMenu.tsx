@@ -2,35 +2,55 @@ import {Box, Button, Grid} from "@mui/material";
 import {Link} from "react-router-dom";
 
 export default function CategoryMenu() {
+    var buttonStyle = {
+        ':hover': {
+            border: 2,
+            borderColor: 'primary.main',
+            bgColor: 'default'
+        },
+        border: 2,
+        borderColor: 'primary.main',
+        display: 'block',
+        padding: "6px"
+    };
+    var menuStyleLandscape = {
+        p: 1,
+        height: 'fit-content',
+        alignSelf: "normal",
+        border: 2,
+        borderColor: 'primary.main',
+        m: '0.5%',
+        borderRadius: 1,
+        width: '14%'
+    };
+    var menuStylePortrait = {
+        p: 1,
+        height: 'fit-content',
+        alignSelf: "normal",
+        border: 2,
+        borderColor: 'primary.main',
+        m: '0.5%',
+        borderRadius: 1,
+        width: '25%'
+    };
+    let height = window.screen.height;
+    let width = window.screen.width;
+    const isPortrait = height > width;
+    var selectedStyle = isPortrait ? menuStylePortrait : menuStyleLandscape;
     return (
-        <Box sx={{p: 2, width: '12%', height: 'fit-content', alignSelf: "normal", border: 2, borderColor: 'primary.main', m: '0.5%', borderRadius: 1}}>
-            <Grid container spacing={2} justifyContent="stretch">
-                <Grid item xs={12} fontSize={20} justifySelf="stretch">
+        <Box sx={selectedStyle}>
+            <Grid container spacing={1.5} justifyContent="stretch">
+                <Grid item xs={12} justifySelf="stretch">
                     <Button variant="outlined" component={Link} to="/assets"
-                            sx={{
-                                ':hover': {border: 2, borderColor: 'primary.main', bgColor: 'default'},
-                                border: 2,
-                                borderColor: 'primary.main',
-                                display: 'block'
-                            }}>Assets</Button>
+                            sx={buttonStyle}>Assets</Button>
                 </Grid>
-                <Grid item xs={12} fontSize={20} justifySelf="stretch">
+                <Grid item xs={12} justifySelf="stretch">
                     <Button variant="outlined" component={Link} to="/articles"
-                            sx={{
-                                ':hover': {border: 2, borderColor: 'primary.main', bgColor: 'default'},
-                                border: 2,
-                                borderColor: 'primary.main',
-                                display: 'block'
-                            }}>Articles</Button>
+                            sx={buttonStyle}>Articles</Button>
                 </Grid>
-                <Grid item xs={12} fontSize={20} justifySelf="stretch">
+                <Grid item xs={12} justifySelf="stretch">
                     <Button variant="outlined" component={Link} to="/scripts"
-                            sx={{
-                                ':hover': {border: 2, borderColor: 'primary.main', bgColor: 'default'},
-                                border: 2,
-                                borderColor: 'primary.main',
-                                display: 'block'
-                            }}>Scripts</Button>
+                            sx={buttonStyle}>Scripts</Button>
                 </Grid>
             </Grid>
         </Box>
