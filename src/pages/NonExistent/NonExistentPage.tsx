@@ -1,25 +1,8 @@
-import {Box, Typography} from "@mui/material";
-import CategoryMenu from "../../components/CategoryMenu";
-import React, {Fragment} from "react";
+import {Typography} from "@mui/material";
+import React from "react";
 
 export default function NonExistentPage() {
     return (
-        <Fragment>
-            <CategoryMenu/>
-            <Box sx={{
-                p: 2,
-                //71+12+12+1.5+1.5+1+1 = 100%
-                width: '71%',
-                height: '65vh',
-                border: 2,
-                borderColor: 'primary.main',
-                m: '0.5%',
-                borderRadius: 1,
-                justifySelf: "stretch",
-                alignSelf: "stretch",
-            }}>
-                <Typography variant="h4">404</Typography>
-            </Box>
-        </Fragment>
+        <Typography variant="h4">404</Typography>
     );
 }
