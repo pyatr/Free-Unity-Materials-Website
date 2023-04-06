@@ -8,19 +8,28 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import Cookies from "universal-cookie";
 
 import ServerConnection from "../../utils/ServerConnection";
 import {Link} from "react-router-dom";
+import {AxiosResponse} from "axios";
 
-function OnLoginResponse(response: string) {
-    console.log("Response: " + response);
+function OnLoginResponse(response: AxiosResponse) {
     try {
-        let parsed = String(JSON.parse(response));
-        let isLoggedIn = parsed === "true" ? true : false;
-        localStorage.setItem("userLoginStatus", String(isLoggedIn));
-        if (isLoggedIn) {
-            window.open(window.location.origin, "_self")
+        let parsed = response.data.toString();
+        let split = parsed.split(',');
+        if (split.length <= 1) {
+            console.log("Login response broken: " + parsed + "/" + split);
+            return;
         }
+        if (split[0] !== "loginSuccess") {
+            return;
+        }
+        const cookies = new Cookies();
+        const date = Date.now();
+        const expirationDate = new Date(date + 1000 * 60 * 60 * 24);
+        cookies.set("userLogin", split[1], {expires: expirationDate});
+        window.open(window.location.host, "_self")
     } catch (e) {
         console.log("Error when parsing login response: " + e);
     }

@@ -2,6 +2,8 @@
 
 class API
 {
+    private const CIPHERING_METHOD = "AES-128-CTR";
+
     private Database $database;
     private UserDatabase $userDatabase;
 
@@ -16,15 +18,30 @@ class API
         $request = $data["request"];
         $params = (array)$data["params"];
         if ($request != null && $params != null) {
+            $crypt_iv = '3655362452454452';
             switch ($request) {
                 case "login":
                     $email = $this->tryGetValue($params, "email");
                     $password = $this->tryGetValue($params, "password");
                     if ($email != null && $password != null) {
                         $loginStatus = $this->tryLogin($email, $password);
-                        $response = $loginStatus;
-                        $this->respond($response);
+                        if ($loginStatus) {
+                            //Hash with User IP
+                            $hashedData = openssl_encrypt(
+                                json_encode([$email, $password]),
+                                self::CIPHERING_METHOD,
+                                json_encode($_SERVER["REMOTE_ADDR"]),
+                                0,
+                                $crypt_iv
+                            );
+                            $this->respond(array("loginSuccess", $hashedData));
+                        } else {
+                            $this->respond("failed");
+                        }
                     }
+                    break;
+                case "loginCookie":
+                    //$unhashed = openssl_decrypt()
                     break;
                 default:
                     break;

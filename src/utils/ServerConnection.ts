@@ -9,13 +9,12 @@ export default class ServerConnection {
     }
 
     public async sendRequest(requestName: string, requestParams: {}, onRequestResponse: Function) {
-        console.log("server connection is " + this.serverConnection);
         axios.post(this.serverConnection, {
             request: requestName,
             params: requestParams
         })
             .then(function (response) {
-                onRequestResponse(response.data.toString());
+                onRequestResponse(response);
             })
             .catch(function (error) {
                 console.log(error);

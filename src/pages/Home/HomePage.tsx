@@ -11,9 +11,19 @@ import ScriptsPage from "../Scripts/ScriptsPage";
 import NonExistentPage from "../NonExistent/NonExistentPage";
 import React, {Fragment} from "react";
 import CategoryMenu from "../../components/CategoryMenu";
+import Cookies from "universal-cookie";
+import ServerConnection from "../../utils/ServerConnection";
 
 export default function HomePage() {
     //TODO: fix page opening as hostname/assets/ and showing Index of assets instead of actual page
+    const cookie = new Cookies();
+    let loginCookie = cookie.get("userLogin");
+    if (loginCookie != null) {
+        let scon = new ServerConnection();
+        scon.sendRequest("loginCookie", loginCookie.toString(), () => {
+            //localStorage.setItem("userLoginStatus", "true");
+        });
+    }
     return (
         <BrowserRouter>
             <SiteAppBar/>
@@ -62,7 +72,7 @@ function MainContent() {
         window.addEventListener("resize", updateWidthAndHeight);
         return () => window.removeEventListener("resize", updateWidthAndHeight);
     });
-    var style ={
+    var style = {
         p: 2,
         //71+12+12+1.5+1.5+1+1 = 100%
         width: "71%",
