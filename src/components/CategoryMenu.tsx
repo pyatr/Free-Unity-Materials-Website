@@ -13,32 +13,24 @@ export default function CategoryMenu() {
         display: 'block',
         padding: "6px"
     };
-    var menuStyleLandscape = {
-        p: 1,
-        height: 'fit-content',
-        alignSelf: "normal",
-        border: 2,
-        borderColor: 'primary.main',
-        m: '0.5%',
-        borderRadius: 1,
-        width: '14%'
-    };
-    var menuStylePortrait = {
-        p: 1,
-        height: 'fit-content',
-        alignSelf: "normal",
-        border: 2,
-        borderColor: 'primary.main',
-        m: '0.5%',
-        borderRadius: 1,
-        width: '25%'
-    };
+    var landW = "14%";
+    var portW = "25%";
     let height = window.screen.height;
     let width = window.screen.width;
     const isPortrait = height > width;
-    var selectedStyle = isPortrait ? menuStylePortrait : menuStyleLandscape;
+    var selectedWidth = isPortrait ? portW : landW;
+    var style = {
+        p: 1,
+        height: 'fit-content',
+        alignSelf: "normal",
+        border: 2,
+        borderColor: 'primary.main',
+        m: '0.5%',
+        borderRadius: 1,
+        width: selectedWidth
+    };
     return (
-        <Box sx={selectedStyle}>
+        <Box sx={style}>
             <Grid container spacing={1.5} justifyContent="stretch">
                 <Grid item xs={12} justifySelf="stretch">
                     <Button variant="outlined" component={Link} to="/assets"

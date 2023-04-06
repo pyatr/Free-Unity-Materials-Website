@@ -50,10 +50,22 @@ function GetPage() {
 }
 
 function MainContent() {
-    var landscapeStyle ={
+    const [width, setWidth] = React.useState(window.innerWidth);
+    const [height, setHeight] = React.useState(window.innerHeight);
+
+    const updateWidthAndHeight = () => {
+        setWidth(window.innerWidth);
+        setHeight(window.innerHeight);
+    };
+
+    React.useEffect(() => {
+        window.addEventListener("resize", updateWidthAndHeight);
+        return () => window.removeEventListener("resize", updateWidthAndHeight);
+    });
+    var style ={
         p: 2,
         //71+12+12+1.5+1.5+1+1 = 100%
-        width: '71%',
+        width: "71%",
         height: '65vh',
         border: 2,
         borderColor: 'primary.main',
@@ -62,25 +74,10 @@ function MainContent() {
         justifySelf: "stretch",
         alignSelf: "stretch",
     }
-    var portraitStyle ={
-        p: 2,
-        width: '67%',
-        height: '65vh',
-        border: 2,
-        borderColor: 'primary.main',
-        m: '0.5%',
-        borderRadius: 1,
-        justifySelf: "stretch",
-        alignSelf: "stretch",
-    }
-    let height = window.screen.height;
-    let width = window.screen.width;
-    const isPortrait = height > width;
-    var selectedStyle = isPortrait ? portraitStyle : landscapeStyle;
     return (
         <Fragment>
             <CategoryMenu/>
-            <Box sx={selectedStyle}>
+            <Box sx={style}>
                 <GetPage/>
             </Box>
         </Fragment>);
