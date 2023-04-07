@@ -5,10 +5,11 @@ export default class ServerConnection {
     private readonly serverPort = "8000";
 
     public constructor() {
+        axios.defaults.withCredentials = true;
         this.serverConnection = "http://" + window.location.host + ":" + this.serverPort;
     }
 
-    public async sendRequest(requestName: string, requestParams: {}, onRequestResponse: Function) {
+    public async sendPostRequest(requestName: string, requestParams: {}, onRequestResponse: Function) {
         axios.post(this.serverConnection, {
             request: requestName,
             params: requestParams

@@ -14,7 +14,7 @@ import ServerConnection from "../../utils/ServerConnection";
 import {Link} from "react-router-dom";
 import {AxiosResponse} from "axios";
 
-function OnLoginResponse(response: AxiosResponse) {
+async function OnLoginResponse(response: AxiosResponse) {
     try {
         let parsed = response.data.toString();
         let split = parsed.split(',');
@@ -29,7 +29,8 @@ function OnLoginResponse(response: AxiosResponse) {
         const date = Date.now();
         const expirationDate = new Date(date + 1000 * 60 * 60 * 24);
         cookies.set("userLogin", split[1], {expires: expirationDate});
-        window.open(window.location.host, "_self")
+        localStorage.setItem("userLoginStatus", "true");
+        window.open(window.location.protocol + "//" + window.location.hostname, "_self");
     } catch (e) {
         console.log("Error when parsing login response: " + e);
     }
@@ -58,7 +59,7 @@ export default function LoginPage() {
                 email: email,
                 password: password
             };
-            await scon.sendRequest("login", params, OnLoginResponse);
+            await scon.sendPostRequest("login", params, OnLoginResponse);
         }
     };
 

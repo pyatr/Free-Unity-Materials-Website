@@ -17,8 +17,11 @@ class API
     {
         $request = $data["request"];
         $params = (array)$data["params"];
-        if ($request != null && $params != null) {
-            $crypt_iv = '3655362452454452';
+        if ($request != null) {
+            //TODO: make real IV
+            $iv = "1111111111111111";
+            //json_encode($_SERVER["REMOTE_ADDR"]) does not work
+            $cipher_code = "123";//more complex codes don't work... why?
             switch ($request) {
                 case "login":
                     $email = $this->tryGetValue($params, "email");
@@ -26,28 +29,48 @@ class API
                     if ($email != null && $password != null) {
                         $loginStatus = $this->tryLogin($email, $password);
                         if ($loginStatus) {
-                            //Hash with User IP
+                            //Should hash with User IP
                             $hashedData = openssl_encrypt(
                                 json_encode([$email, $password]),
                                 self::CIPHERING_METHOD,
-                                json_encode($_SERVER["REMOTE_ADDR"]),
-                                0,
-                                $crypt_iv
+                                $cipher_code,
+                                OPENSSL_ZERO_PADDING,
+                                $iv
                             );
                             $this->respond(array("loginSuccess", $hashedData));
-                        } else {
-                            $this->respond("failed");
                         }
                     }
                     break;
                 case "loginCookie":
-                    //$unhashed = openssl_decrypt()
+                    $cookies = explode(";", $_SERVER["HTTP_COOKIE"]);
+                    $cookie = null;
+                    foreach ($cookies as $kvp) {
+                        $result = explode("=", $kvp);
+                        if (count($result)) {
+                            if ($result[0] === "userLogin") {
+                                //Decode to add special symbols back
+                                $cookie = urldecode($result[1]);
+                            }
+                        }
+                    }
+                    if ($cookie != null) {
+                        $dehashed = openssl_decrypt(
+                            $cookie,
+                            self::CIPHERING_METHOD,
+                            $cipher_code,
+                            OPENSSL_ZERO_PADDING,
+                            $iv
+                        );
+                        $decoded = json_decode($dehashed);
+                        $loginStatus = $this->tryLogin($decoded[0], $decoded[1]);
+                        $this->respond($loginStatus);
+                    }
                     break;
                 default:
                     break;
             }
         } else {
-            $this->respond("Invalid request: $data");
+            $this->respond("Invalid request: " . json_encode($data));
         }
     }
 

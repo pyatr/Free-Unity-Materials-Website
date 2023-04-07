@@ -13,17 +13,31 @@ import React, {Fragment} from "react";
 import CategoryMenu from "../../components/CategoryMenu";
 import Cookies from "universal-cookie";
 import ServerConnection from "../../utils/ServerConnection";
+import {AxiosResponse} from "axios";
 
-export default function HomePage() {
-    //TODO: fix page opening as hostname/assets/ and showing Index of assets instead of actual page
+async function TryLogin() {
+    if (localStorage.getItem("userLoginStatus") === "true") {
+        return;
+    }
     const cookie = new Cookies();
     let loginCookie = cookie.get("userLogin");
     if (loginCookie != null) {
         let scon = new ServerConnection();
-        scon.sendRequest("loginCookie", loginCookie.toString(), () => {
-            //localStorage.setItem("userLoginStatus", "true");
-        });
+        await scon.sendPostRequest("loginCookie", {}, OnLoginResponse);
     }
+}
+
+function OnLoginResponse(response: AxiosResponse) {
+    var loginStatus = "false";
+    if (response.data.toString() === "true") {
+        loginStatus = "true";
+    }
+    localStorage.setItem("userLoginStatus", loginStatus);
+}
+
+export default function HomePage() {
+    //TODO: fix page opening as hostname/assets/ and showing Index of assets instead of actual page
+    TryLogin();
     return (
         <BrowserRouter>
             <SiteAppBar/>

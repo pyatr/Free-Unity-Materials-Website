@@ -10,6 +10,7 @@ import {
     Typography,
     Grid
 } from "@mui/material";
+import Cookies from "universal-cookie";
 
 function AuthorizationLinksDisplay() {
     return (<Grid
@@ -24,13 +25,34 @@ function AuthorizationLinksDisplay() {
         sx={{
             width: "20%"
         }}>
-        <Link style={{fontSize: 18}} to="/login">Log in</Link>
-        <Link style={{fontSize: 18}} to="/register">Register</Link>
+        <Link style={{fontSize: 18, color: "#000000"}} to="/login">Log in</Link>
+        <Link style={{fontSize: 18, color: "#000000"}} to="/register">Register</Link>
     </Grid>);
 }
 
 function UserDisplay() {
-    return (<Typography>Logged in, congrats</Typography>);
+    return (
+        <Grid
+            container
+            direction="column"
+            justifyContent="flex-end"
+            alignItems="left"
+            marginTop="0px"
+            marginLeft="0px"
+            spacing={2}
+            sx={{
+                width: "20%"
+            }}>
+            <Typography style={{fontSize: 18}}>You are logged in</Typography>
+            <Link style={{fontSize: 18, color: "#000000"}} to="/assets" onClick={LogOut}>Log out</Link>
+        </Grid>);
+}
+
+function LogOut() {
+    localStorage.removeItem("userLoginStatus");
+    const cookies = new Cookies();
+    cookies.remove("userLogin");
+    window.location.reload();
 }
 
 function GetAuthorizationResult() {
