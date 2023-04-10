@@ -9,35 +9,11 @@ import AssetsPage from "../AssetsPage/AssetsPage";
 import ArticlesPage from "../Articles/ArticlesPage";
 import ScriptsPage from "../Scripts/ScriptsPage";
 import NonExistentPage from "../NonExistent/NonExistentPage";
-import React, {Fragment} from "react";
+import React, {Fragment, useEffect, useState} from "react";
 import CategoryMenu from "../../components/CategoryMenu";
-import Cookies from "universal-cookie";
-import ServerConnection from "../../utils/ServerConnection";
-import {AxiosResponse} from "axios";
-
-async function TryLogin() {
-    if (localStorage.getItem("userLoginStatus") === "true") {
-        return;
-    }
-    const cookie = new Cookies();
-    let loginCookie = cookie.get("userLogin");
-    if (loginCookie != null) {
-        let scon = new ServerConnection();
-        await scon.sendPostRequest("loginCookie", {}, OnLoginResponse);
-    }
-}
-
-function OnLoginResponse(response: AxiosResponse) {
-    var loginStatus = "false";
-    if (response.data.toString() === "true") {
-        loginStatus = "true";
-    }
-    localStorage.setItem("userLoginStatus", loginStatus);
-}
 
 export default function HomePage() {
     //TODO: fix page opening as hostname/assets/ and showing Index of assets instead of actual page
-    TryLogin();
     return (
         <BrowserRouter>
             <SiteAppBar/>
@@ -74,15 +50,15 @@ function GetPage() {
 }
 
 function MainContent() {
-    const [width, setWidth] = React.useState(window.innerWidth);
-    const [height, setHeight] = React.useState(window.innerHeight);
+    const [width, setWidth] = useState(window.innerWidth);
+    const [height, setHeight] = useState(window.innerHeight);
 
     const updateWidthAndHeight = () => {
         setWidth(window.innerWidth);
         setHeight(window.innerHeight);
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         window.addEventListener("resize", updateWidthAndHeight);
         return () => window.removeEventListener("resize", updateWidthAndHeight);
     });

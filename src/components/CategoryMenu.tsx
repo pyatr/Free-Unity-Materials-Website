@@ -1,14 +1,13 @@
 import {Box, Button, Grid} from "@mui/material";
 import {Link} from "react-router-dom";
+import {IsMobileResolution} from "../utils/MobileUtilities";
 
 export default function CategoryMenu() {
     var landW = "14%";
     var portW = "25%";
     var landFontS = 14;
     var portFontS = 11;
-    let height = window.screen.height;
-    let width = window.screen.width;
-    const isPortrait = height > width;
+    const isPortrait = IsMobileResolution();
     var selectedWidth = isPortrait ? portW : landW;
     var fontSize = isPortrait ? portFontS : landFontS;
     var buttonStyle = {

@@ -8,34 +8,8 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Cookies from "universal-cookie";
-
-import ServerConnection from "../../utils/ServerConnection";
 import {Link} from "react-router-dom";
-import {AxiosResponse} from "axios";
-
-async function OnLoginResponse(response: AxiosResponse) {
-    try {
-        let parsed = response.data.toString();
-        let split = parsed.split(',');
-        if (split.length <= 1) {
-            console.log("Login response broken: " + parsed + "/" + split);
-            return;
-        }
-        if (split[0] !== "loginSuccess") {
-            return;
-        }
-        const cookies = new Cookies();
-        const date = Date.now();
-        const expirationDate = new Date(date + 1000 * 60 * 60 * 24);
-        cookies.set("userLogin", split[1], {expires: expirationDate});
-        localStorage.setItem("userLoginStatus", "true");
-        window.open(window.location.protocol + "//" + window.location.hostname, "_self");
-    } catch (e) {
-        console.log("Error when parsing login response: " + e);
-    }
-}
-
+import {TryLogin} from "../../utils/Login";
 
 export default function LoginPage() {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -52,14 +26,7 @@ export default function LoginPage() {
             password = pdata.toString();
         }
         if (email != null && password != null) {
-            let scon: ServerConnection;
-            scon = new ServerConnection();
-
-            const params = {
-                email: email,
-                password: password
-            };
-            await scon.sendPostRequest("login", params, OnLoginResponse);
+            await TryLogin(email, password);
         }
     };
 

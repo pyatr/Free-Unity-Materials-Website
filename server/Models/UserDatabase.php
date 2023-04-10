@@ -30,6 +30,16 @@ class UserDatabase extends Database
             ) > 0;
     }
 
+    //How to change username: UPDATE USERS SET USERNAME = 'newname' WHERE USERNAME = 'oldname';
+
+    public function getUserName(string $email): string
+    {
+        $query = "SELECT * FROM " . $this::TABLE_USERS . " WHERE " . $this::ENTRY_EMAIL . " = '$email'";
+        $req = $this->DBConn->prepare($query);
+        $req->execute();
+        return $req->fetch()["USERNAME"];
+    }
+
     public function createNewUser(
         string $newName,
         string $password,
