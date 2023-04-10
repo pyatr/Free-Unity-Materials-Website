@@ -11,44 +11,7 @@ import {
     Grid
 } from "@mui/material";
 import {ClearUserData, TryCookieLogin} from "../utils/Login";
-
-function AuthorizationLinksDisplay() {
-    return (<Grid
-        container
-        direction="column"
-        justifyContent="flex-end"
-        alignItems="left"
-        //TODO: разобраться откуда берутся -16px
-        marginTop="0px"
-        marginLeft="0px"
-        spacing={2}
-        sx={{
-            width: "20%"
-        }}>
-        <Link style={{fontSize: 18, color: "#000000"}} to="/login">Log in</Link>
-        <Link style={{fontSize: 18, color: "#000000"}} to="/register">Register</Link>
-    </Grid>);
-}
-
-function UserDisplay() {
-    const userName = sessionStorage.getItem("userName");
-
-    return (
-        <Grid
-            container
-            direction="column"
-            justifyContent="flex-end"
-            alignItems="left"
-            marginTop="0px"
-            marginLeft="0px"
-            spacing={2}
-            sx={{
-                width: "20%"
-            }}>
-            <Typography style={{fontSize: 18, color: "#000000"}}>You are logged in as {userName}</Typography>
-            <Link style={{fontSize: 18, color: "#000000"}} to="/assets" onClick={LogOut}>Log out</Link>
-        </Grid>);
-}
+import {IsMobileResolution} from "../utils/MobileUtilities";
 
 function LogOut() {
     ClearUserData();
@@ -57,6 +20,8 @@ function LogOut() {
 
 function GetAuthorizationResult() {
     const [isLoading, setLoadingStatus] = useState(true);
+    let isMobile = IsMobileResolution();
+    let fontsize = isMobile ? 12 : 18;
 
     useEffect(() => {
         TryCookieLogin().then(() => {
@@ -69,27 +34,32 @@ function GetAuthorizationResult() {
     })
 
     let isLoggedIn = (sessionStorage.getItem("userLoginStatus") === "success");
-    if (isLoading) {
-        return (
-            <Grid
-                container
-                direction="column"
-                justifyContent="flex-end"
-                alignItems="left"
-                marginTop="0px"
-                marginLeft="0px"
-                spacing={2}
-                sx={{
-                    width: "20%"
-                }}>
-                <Typography style={{fontSize: 18, color: "#000000"}}>Loading...</Typography>
-            </Grid>);
-    } else {
-        if (isLoggedIn)
-            return (<UserDisplay/>);
-        else
-            return (<AuthorizationLinksDisplay/>);
-    }
+    let fontStyle = {fontSize: fontsize, color: "#000000"};
+    return (
+        <Grid
+            container
+            direction="column"
+            justifyContent="flex-end"
+            alignItems="left"
+            marginTop="0px"
+            marginLeft="0px"
+            spacing={2}
+            sx={{
+                width: "20%"
+            }}>
+            {isLoading ?
+                <Typography style={fontStyle}>Loading...</Typography> :
+                isLoggedIn ?
+                    <Fragment>
+                        <Typography style={fontStyle}>{sessionStorage.getItem("userName")}</Typography>
+                        <Link style={fontStyle} to="/assets" onClick={LogOut}>Log out</Link>
+                    </Fragment> :
+                    <Fragment>
+                        <Link style={fontStyle} to="/login">Log in</Link>
+                        <Link style={fontStyle} to="/register">Register</Link>
+                    </Fragment>
+            }
+        </Grid>);
 }
 
 export default function SiteAppBar() {

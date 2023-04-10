@@ -34,7 +34,6 @@ function OnCookieLoginResponse(response: AxiosResponse) {
     }
 }
 
-
 function OnLoginResponse(response: AxiosResponse) {
     try {
         if (response.data.loginStatus !== "success") {
