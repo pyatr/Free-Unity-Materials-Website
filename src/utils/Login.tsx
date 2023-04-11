@@ -54,4 +54,5 @@ export function ClearUserData() {
     cookies.remove("userLogin");
     sessionStorage.removeItem("userLoginStatus");
     sessionStorage.removeItem("userName");
+    console.log("User data cleared");
 }

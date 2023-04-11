@@ -44,18 +44,21 @@ class API
                     $this->respond($response);
                     break;
                 case "loginCookie":
-                    $cookies = explode(";", $_SERVER["HTTP_COOKIE"]);
+                    $response = array("loginStatus" => "failed");
+
+                    $cookies = explode("; ", $_SERVER["HTTP_COOKIE"]);
                     $cookie = null;
                     foreach ($cookies as $kvp) {
                         $result = explode("=", $kvp);
-                        if (count($result)) {
-                            if ($result[0] === "userLogin") {
+                        if (count($result) > 1) {
+                            $cookieName = "userLogin";
+                            $stringEquality = strcmp($result[0], $cookieName);
+                            if ($stringEquality == 0) {
                                 //Decode to add special symbols back
                                 $cookie = urldecode($result[1]);
                             }
                         }
                     }
-                    $response = array("loginStatus" => "failed");
                     if ($cookie != null) {
                         $dehashed = openssl_decrypt(
                             $cookie,
