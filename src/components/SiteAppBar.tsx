@@ -27,7 +27,7 @@ function GetAuthorizationResult() {
         TryCookieLogin().then(() => {
                 const timer = setTimeout(() => {
                     setLoadingStatus(false);
-                }, 300);
+                }, 500);
                 return () => clearTimeout(timer);
             }
         );
