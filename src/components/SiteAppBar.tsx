@@ -22,7 +22,7 @@ function GetAuthorizationResult() {
     const [isLoading, setLoadingStatus] = useState(true);
     let isMobile = IsMobileResolution();
     let fontsize = isMobile ? 12 : 18;
-    let fontStyle = {fontSize: fontsize, color: "#000000"};
+    let fontStyle = {fontSize: fontsize, color: "#000000", width: "fit-content"};
 
     let isLoggedIn = (sessionStorage.getItem("userLoginStatus") === "success");
     let finishedWaiting = (sessionStorage.getItem("finishedWaiting") === "true");
