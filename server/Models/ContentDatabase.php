@@ -9,6 +9,7 @@ class ContentDatabase extends Database
     private const ENTRY_SHORTTITLE = "SHORTTITLE";
     private const ENTRY_CONTENT = "CONTENT";
     private const ENTRY_CATEGORIES = "CATEGORIES";
+    private const ENTRY_CREDATE = "CREATION_DATE";
 
     public function createPost(string $title, string $shortTitle, string $content, string $categories): array
     {
@@ -36,7 +37,7 @@ class ContentDatabase extends Database
             $response["requesterror"] = $e;
             $response["result"] = "failed";
         }
-        $response["content"] = $req->fetchAll();
+        $response["content"] = $req->fetchAll(PDO::FETCH_NAMED);
         $response["code"] = $req->errorCode();
         return $response;
     }
@@ -50,7 +51,11 @@ class ContentDatabase extends Database
     public function getPosts(int $pageSize, int $page): array
     {
         $postsOffset = $pageSize * ($page - 1);
-        $query = "SELECT * FROM " . $this::TABLE_POSTS . " ORDER BY 1 DESC LIMIT $pageSize OFFSET $postsOffset";
+        $query = "SELECT " . $this::ENTRY_NUMBER . ","
+            . $this::ENTRY_TITLE . ","
+            . $this::ENTRY_SHORTTITLE . ","
+            . $this::ENTRY_CATEGORIES . ","
+            . $this::ENTRY_CREDATE . " FROM " . $this::TABLE_POSTS . " ORDER BY 1 DESC LIMIT $pageSize OFFSET $postsOffset";
         return $this->executeRequest($query);
     }
 
