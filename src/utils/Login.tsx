@@ -8,7 +8,11 @@ export async function TryCookieLogin() {
     let loginCookie = cookie.get("userLogin");
     if (loginCookie != null) {
         let scon = new ServerConnection();
+        sessionStorage.removeItem("finishedWaiting");
         await scon.sendPostRequest("loginCookie", {}, OnCookieLoginResponse);
+    } else {
+        ClearUserData();
+        sessionStorage.setItem("finishedWaiting", "true");
     }
 }
 
@@ -32,6 +36,7 @@ function OnCookieLoginResponse(response: AxiosResponse) {
         sessionStorage.setItem("userLoginStatus", loginStatus);
         sessionStorage.setItem("userName", response.data.userName);
     }
+    sessionStorage.setItem("finishedWaiting", "true");
 }
 
 function OnLoginResponse(response: AxiosResponse) {
@@ -54,5 +59,6 @@ export function ClearUserData() {
     cookies.remove("userLogin");
     sessionStorage.removeItem("userLoginStatus");
     sessionStorage.removeItem("userName");
+    sessionStorage.removeItem("finishedWaiting");
     console.log("User data cleared");
 }

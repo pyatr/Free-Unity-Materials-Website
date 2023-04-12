@@ -22,19 +22,38 @@ function GetAuthorizationResult() {
     const [isLoading, setLoadingStatus] = useState(true);
     let isMobile = IsMobileResolution();
     let fontsize = isMobile ? 12 : 18;
+    let fontStyle = {fontSize: fontsize, color: "#000000"};
+
+    let isLoggedIn = (sessionStorage.getItem("userLoginStatus") === "success");
+    let finishedWaiting = (sessionStorage.getItem("finishedWaiting") === "true");
+
+    const loginCheckIntervalMs = 10;
+    const loginTimeMs = 8000;
 
     useEffect(() => {
         TryCookieLogin().then(() => {
-                const timer = setTimeout(() => {
+                const loginInterval = setInterval(() => {
+                    finishedWaiting = (sessionStorage.getItem("finishedWaiting") === "true");
+                    if (finishedWaiting) {
+                        setLoadingStatus(false);
+                        clearInterval(loginInterval);
+                    }
+                }, loginCheckIntervalMs);
+
+                const loginWaitTimer = setTimeout(() => {
                     setLoadingStatus(false);
-                }, 500);
-                return () => clearTimeout(timer);
+                    clearInterval(loginInterval);
+                    finishedWaiting = true;
+                }, loginTimeMs);
+
+                return () => {
+                    clearInterval(loginInterval);
+                    clearTimeout(loginWaitTimer);
+                }
             }
         );
-    })
+    });
 
-    let isLoggedIn = (sessionStorage.getItem("userLoginStatus") === "success");
-    let fontStyle = {fontSize: fontsize, color: "#000000"};
     return (
         <Grid
             container
