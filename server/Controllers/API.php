@@ -6,11 +6,13 @@ class API
 
     private Database $database;
     private UserDatabase $userDatabase;
+    private ContentDatabase $contentDatabase;
 
     function __construct()
     {
         $this->database = new Database();
         $this->userDatabase = new UserDatabase();
+        $this->contentDatabase = new ContentDatabase();
     }
 
     public function parseRequest(array $data): void
@@ -78,11 +80,44 @@ class API
                     }
                     $this->respond($response);
                     break;
+                case "createPost":
+                    $title = $this->tryGetValue($params, "title");
+                    $shortTitle = $this->tryGetValue($params, "shortTitle");
+                    $content = $this->tryGetValue($params, "content");
+                    $categories = $this->tryGetValue($params, "categories");
+                    $response = $this->contentDatabase->createPost($title, $shortTitle, $content, $categories);
+                    $this->respond($response);
+                    break;
+                case "deletePost":
+                    $number = $this->tryGetValue($params, "number");
+                    $response = $this->contentDatabase->deletePost($number);
+                    $this->respond($response);
+                    break;
+                case "updatePost":
+                    $number = $this->tryGetValue($params, "number");
+                    $title = $this->tryGetValue($params, "title");
+                    $shortTitle = $this->tryGetValue($params, "shortTitle");
+                    $content = $this->tryGetValue($params, "content");
+                    $categories = $this->tryGetValue($params, "categories");
+                    $response = $this->contentDatabase->updatePost($number, $title, $shortTitle, $content, $categories);
+                    $this->respond($response);
+                    break;
+                case "getPost":
+                    $number = $this->tryGetValue($params, "number");
+                    $response = $this->contentDatabase->getPost($number);
+                    $this->respond($response);
+                    break;
+                case "getPosts":
+                    $pageSize = $this->tryGetValue($params, "pageSize");
+                    $page = $this->tryGetValue($params, "page");
+                    $response = $this->contentDatabase->getPosts($pageSize, $page);
+                    $this->respond($response);
+                    break;
                 default:
                     break;
             }
         } else {
-            $this->respond("Invalid request: " . json_encode($data));
+            $this->respond("Invalid request: $data");
         }
     }
 
