@@ -10,7 +10,7 @@ import {
     Typography,
     Grid
 } from "@mui/material";
-import {ClearUserData, TryCookieLogin} from "../utils/Login";
+import {ClearUserData} from "../utils/Login";
 import {IsMobileResolution} from "../utils/MobileUtilities";
 
 function LogOut() {
@@ -18,41 +18,43 @@ function LogOut() {
     window.location.reload();
 }
 
-function GetAuthorizationResult() {
+function WaitForLogin(onFinishedWaiting: Function) {
+    let finishedWaiting = (sessionStorage.getItem("finishedWaiting") === "true");
+
+    if (finishedWaiting) {
+        onFinishedWaiting(false);
+        return;
+    }
+    const loginCheckIntervalMs = 10;
+    const loginTimeMs = 8000;
+
+    const loginInterval = setInterval(() => {
+        finishedWaiting = (sessionStorage.getItem("finishedWaiting") === "true");
+        if (finishedWaiting) {
+            onFinishedWaiting(false);
+            clearInterval(loginInterval);
+        }
+    }, loginCheckIntervalMs);
+
+    const loginWaitTimer = setTimeout(() => {
+        onFinishedWaiting(false);
+        clearInterval(loginInterval);
+        clearTimeout(loginWaitTimer);
+        finishedWaiting = true;
+    }, loginTimeMs);
+}
+
+function AuthorizationResult() {
     const [isLoading, setLoadingStatus] = useState(true);
     let isMobile = IsMobileResolution();
     let fontsize = isMobile ? 12 : 18;
     let fontStyle = {fontSize: fontsize, color: "#000000", width: "fit-content"};
 
     let isLoggedIn = (sessionStorage.getItem("userLoginStatus") === "success");
-    let finishedWaiting = (sessionStorage.getItem("finishedWaiting") === "true");
-
-    const loginCheckIntervalMs = 10;
-    const loginTimeMs = 8000;
 
     useEffect(() => {
-        TryCookieLogin().then(() => {
-                const loginInterval = setInterval(() => {
-                    finishedWaiting = (sessionStorage.getItem("finishedWaiting") === "true");
-                    if (finishedWaiting) {
-                        setLoadingStatus(false);
-                        clearInterval(loginInterval);
-                    }
-                }, loginCheckIntervalMs);
-
-                const loginWaitTimer = setTimeout(() => {
-                    setLoadingStatus(false);
-                    clearInterval(loginInterval);
-                    finishedWaiting = true;
-                }, loginTimeMs);
-
-                return () => {
-                    clearInterval(loginInterval);
-                    clearTimeout(loginWaitTimer);
-                }
-            }
-        );
-    });
+        WaitForLogin(setLoadingStatus);
+    }, []);
 
     return (
         <Grid
@@ -98,7 +100,7 @@ export default function SiteAppBar() {
                             height: "100%",
                             margin: "0.5%"
                         }}/>
-                    <GetAuthorizationResult/>
+                    <AuthorizationResult/>
                 </Toolbar>
             </AppBar>
         </Box>
