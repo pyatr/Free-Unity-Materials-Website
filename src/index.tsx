@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import HomePage from './pages/Home/HomePage';
+import App from './pages/Home/App';
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -9,7 +9,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
     <React.StrictMode>
-        <HomePage/>
+        <App/>
     </React.StrictMode>
 );
 

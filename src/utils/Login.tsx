@@ -60,5 +60,4 @@ export function ClearUserData() {
     sessionStorage.removeItem("userLoginStatus");
     sessionStorage.removeItem("userName");
     sessionStorage.removeItem("finishedWaiting");
-    console.log("User data cleared");
 }
