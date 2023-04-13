@@ -1,6 +1,10 @@
 <?php
 
-class ContentDatabase extends Database
+namespace Server;
+
+use PDO;
+
+class ContentModel extends BaseModel
 {
     private const TABLE_POSTS = "POSTS";
 

@@ -1,6 +1,10 @@
 <?php
 
-class UserDatabase extends Database
+namespace Server;
+
+use PDO;
+
+class UserModel extends BaseModel
 {
     private const TABLE_USERS = "USERS";
 
@@ -16,10 +20,10 @@ class UserDatabase extends Database
 
     private function getUserTableColumns(): string
     {
-        return "(`" . UserDatabase::ENTRY_USERNAME .
-            "`, `" . UserDatabase::ENTRY_PASSWORD .
-            "`, `" . UserDatabase::ENTRY_EMAIL .
-            "`, `" . UserDatabase::ENTRY_ROLE . "`)";
+        return "(`" . UserModel::ENTRY_USERNAME .
+            "`, `" . UserModel::ENTRY_PASSWORD .
+            "`, `" . UserModel::ENTRY_EMAIL .
+            "`, `" . UserModel::ENTRY_ROLE . "`)";
     }
 
     public function doesUserExist(
@@ -46,10 +50,10 @@ class UserDatabase extends Database
         string $email
     ): void {
         if (!$this->doesUserExist($email)) {
-            $hashedPassword = hash(Database::HASHING_ALGORITHM, $password);
+            $hashedPassword = hash(BaseModel::HASHING_ALGORITHM, $password);
             $this->performQuery();
             $this->DBConn->query(
-                "INSERT INTO " . UserDatabase::TABLE_USERS . " {$this::getUserTableColumns()} VALUES ('$newName', '$hashedPassword', '$email', '" . UserDatabase::ROLE_USER . "');"
+                "INSERT INTO " . UserModel::TABLE_USERS . " {$this::getUserTableColumns()} VALUES ('$newName', '$hashedPassword', '$email', '" . UserModel::ROLE_USER . "');"
             );
         }
     }

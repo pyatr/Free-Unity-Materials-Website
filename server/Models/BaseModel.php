@@ -1,6 +1,10 @@
 <?php
 
-class Database
+namespace Server;
+
+use PDO;
+
+class BaseModel
 {
     protected const HOST_NAME = "fum-db";
     protected const DATABASE_NAME = "PrimaryDatabase";
@@ -17,7 +21,7 @@ class Database
     private function connect(): void
     {
         $this->DBConn = new PDO(
-            "mysql:host=" . $this::HOST_NAME . ";dbname=" . Database::DATABASE_NAME,
+            "mysql:host=" . $this::HOST_NAME . ";dbname=" . BaseModel::DATABASE_NAME,
             "admin",
             "admin"
         );
