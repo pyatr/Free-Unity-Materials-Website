@@ -6,9 +6,12 @@ class ContentController extends BaseController
 {
     private ContentModel $contentModel;
 
+    private string $titlepicFolder;
+
     public function __construct()
     {
         $this->contentModel = new ContentModel();
+        $this->titlepicFolder = "http://" . $_SERVER["SERVER_ADDR"] . ":" . $_SERVER["SERVER_PORT"] . '/TitlePics/';
     }
 
     public function createPost($params): array
@@ -46,6 +49,13 @@ class ContentController extends BaseController
     {
         $pageSize = $this->tryGetValue($params, "pageSize");
         $page = $this->tryGetValue($params, "page");
-        return $this->contentModel->getPosts($pageSize, $page);
+        $result = $this->contentModel->getPosts($pageSize, $page);
+        $resultCount = count($result["content"]);
+        for ($i = 0; $i < $resultCount; $i++) {
+            $number = $result["content"][$i]["NUMBER"];
+            $name = $this->titlepicFolder . $number . '.png';
+            $result["content"][$i]["TITLEPIC_LINK"] = $name;
+        }
+        return $result;
     }
 }

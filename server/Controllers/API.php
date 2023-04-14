@@ -13,8 +13,13 @@ class API
         $this->contentController = new ContentController();
     }
 
-    public function parseRequest(array $data): void
+    public function parseRequest(): void
     {
+        if ($_SERVER["REQUEST_METHOD"] == "OPTIONS") {
+            return;
+        }
+        $data = (array)json_decode(file_get_contents("php://input"));
+
         $request = $data["request"];
         $params = (array)$data["params"];
         if ($request != null) {
