@@ -31,7 +31,7 @@ export default function MainContent({mainElement}: ContentProps) {
     return (
         <Fragment>
             <CategoryMenu/>
-            <Box sx={style}>
+            <Box sx={style} id="mainElementBox">
                 {mainElement}
             </Box>
         </Fragment>);
