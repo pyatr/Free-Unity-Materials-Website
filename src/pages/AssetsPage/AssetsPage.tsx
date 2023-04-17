@@ -15,11 +15,37 @@ type AssetItem = {
 
 export default function AssetsPage() {
     const [rawContent, setRawContent] = useState(null);
+    let itemDimensions = IsMobileResolution() ? [240, 384] : [160, 256];
+    const sizeRatio = 0.625;
+
     const landscapeRowColumnCount = [2, 6];
     const mobileRowColumnCount = [4, 2];
     const rcCount = IsMobileResolution() ? mobileRowColumnCount : landscapeRowColumnCount;
+
     const pageSize = rcCount[0] * rcCount[1];
     const page = 1;
+
+    let rowSpacing = 0;
+
+    let mainBox = document.getElementById("mainElementBox");
+
+    if (mainBox != null) {
+        let boxWidth = (mainBox as HTMLElement).getBoundingClientRect().width;
+        itemDimensions[0] = boxWidth / (rcCount[1] + 1);
+        itemDimensions[1] = itemDimensions[0] / sizeRatio;
+
+        rowSpacing = ((mainBox as HTMLElement).getBoundingClientRect().height - itemDimensions[1] * rcCount[0]);
+    }
+
+    const boxStyle = {
+        width: itemDimensions[0] + 'px',
+        height: itemDimensions[1] + 'px',
+        margin: "auto",
+        border: 2,
+        borderColor: 'primary.main',
+        borderRadius: 1
+    };
+
     let preparedContent: JSX.Element[] = [];
     useEffect(() => {
         const waitForContent = async () => {
@@ -27,6 +53,7 @@ export default function AssetsPage() {
                 return;
             let scon = new ServerConnection();
             let params = {
+                //Taking content for next page
                 pageSize: pageSize,
                 page: page
             };
@@ -43,39 +70,27 @@ export default function AssetsPage() {
         waitForContent();
     });
 
+    const [[width, height], setWidthHeight] = useState([window.innerWidth, window.innerHeight]);
+
+    const updateWidthAndHeight = () => {
+        setWidthHeight([window.innerWidth, window.innerHeight]);
+    };
+
+    useEffect(() => {
+        window.addEventListener("resize", updateWidthAndHeight);
+        return () => window.removeEventListener("resize", updateWidthAndHeight);
+    });
+
     if (rawContent == null) {
         return (<Typography variant="h4">Loading assets...</Typography>);
     } else {
-        let itemSpacing = 24;
-        let itemDimensions = [160, 256];
-        const mainBox = document.getElementById("mainElementBox");
-        let spaceToItemRatio = 0.150;
-        let sizeRatio = 0.625;
-        if (mainBox != null) {
-            let boxWidth = mainBox.getBoundingClientRect().width;
-            itemDimensions[0] = boxWidth / (rcCount[1]);
-            itemDimensions[1] = itemDimensions[0] / sizeRatio;
-            itemSpacing = itemDimensions[0] * spaceToItemRatio;
-            itemDimensions[0] = itemDimensions[0] - itemSpacing;
-            itemDimensions[1] = itemDimensions[1] - itemSpacing;
-        }
-        const boxStyle = {
-            width: itemDimensions[0] + 'px',
-            height: itemDimensions[1] + 'px',
-            alignSelf: "normal",
-            border: 2,
-            borderColor: 'primary.main',
-            borderRadius: 1
-        };
-
+        //Taking content that fits more than one page
         preparedContent = (rawContent as Array<AssetItem>).map((item) => {
-            return (<Grid item>
-                <Box style={boxStyle}>
-                    {<img src={item.TITLEPIC_LINK} width={boxStyle.width} height={boxStyle.width}/>}
-                </Box>
+            return (<Grid item style={boxStyle}>
+                {<img src={item.TITLEPIC_LINK} width={boxStyle.width} height={boxStyle.width}/>}
             </Grid>);
 
         });
-        return (<Grid container columns={rcCount[1]} spacing={itemSpacing + "px"}>{preparedContent}</Grid>);
+        return (<Grid container rowSpacing={rowSpacing + "px"}>{preparedContent}</Grid>);
     }
 }
