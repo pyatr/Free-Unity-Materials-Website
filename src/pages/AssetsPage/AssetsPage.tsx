@@ -1,5 +1,5 @@
-import {Box, Button, Grid, Typography} from "@mui/material";
-import React, {Fragment, ReactNode, useEffect, useState} from "react";
+import {Grid, Typography} from "@mui/material";
+import React, {useEffect, useState} from "react";
 import ServerConnection from "../../utils/ServerConnection";
 import {AxiosResponse} from "axios";
 import {IsMobileResolution} from "../../utils/MobileUtilities";
@@ -53,7 +53,6 @@ export default function AssetsPage() {
                 return;
             let scon = new ServerConnection();
             let params = {
-                //Taking content for next page
                 pageSize: pageSize,
                 page: page
             };
@@ -84,7 +83,6 @@ export default function AssetsPage() {
     if (rawContent == null) {
         return (<Typography variant="h4">Loading assets...</Typography>);
     } else {
-        //Taking content that fits more than one page
         preparedContent = (rawContent as Array<AssetItem>).map((item) => {
             return (<Grid item style={boxStyle}>
                 {<img src={item.TITLEPIC_LINK} width={boxStyle.width} height={boxStyle.width}/>}
