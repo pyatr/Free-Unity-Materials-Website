@@ -2,25 +2,27 @@ import React, {Fragment, useEffect, useState} from "react";
 import CategoryMenu from "./CategoryMenu";
 import {Box} from "@mui/material";
 import {ContentProps} from "../pages/Home/App";
+import {IsMobileResolution} from "../utils/MobileUtilities";
 
 export default function MainContent({mainElement}: ContentProps) {
-    const [width, setWidth] = useState(window.innerWidth);
-    const [height, setHeight] = useState(window.innerHeight);
+    const [[width, height], setWidthHeight] = useState([window.innerWidth, window.innerHeight]);
 
     const updateWidthAndHeight = () => {
-        setWidth(window.innerWidth);
-        setHeight(window.innerHeight);
+        setWidthHeight([window.innerWidth, window.innerHeight]);
     };
 
     useEffect(() => {
         window.addEventListener("resize", updateWidthAndHeight);
         return () => window.removeEventListener("resize", updateWidthAndHeight);
     });
+    const landHeight = "65vh";
+    const mobileHeight = "90vh";
+    let realHeight = IsMobileResolution() ? mobileHeight : landHeight;
     var style = {
         p: 2,
         //71+12+12+1.5+1.5+1+1 = 100%
         width: "71%",
-        height: '65vh',
+        height: realHeight,
         border: 2,
         borderColor: 'primary.main',
         m: '0.5%',
