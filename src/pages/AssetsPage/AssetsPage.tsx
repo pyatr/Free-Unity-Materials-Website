@@ -1,10 +1,11 @@
 import {Grid, Typography} from "@mui/material";
-import React, {useEffect, useState} from "react";
+import React, {Fragment, useEffect, useState} from "react";
 import ServerConnection from "../../utils/ServerConnection";
 import {AxiosResponse} from "axios";
 import {IsMobileResolution} from "../../utils/MobileUtilities";
+import AssetItemDisplay from "../../components/AssetItemDisplay";
 
-type AssetItem = {
+export type AssetItem = {
     NUMBER: number,
     TITLE: string,
     SHORTTITLE: string,
@@ -14,9 +15,9 @@ type AssetItem = {
 }
 
 export default function AssetsPage() {
-    const [rawContent, setRawContent] = useState(null);
+    const [rawContent, setRawContent] = useState(Array<AssetItem>);
     let itemDimensions = IsMobileResolution() ? [240, 384] : [160, 256];
-    const sizeRatio = 0.625;
+    const sizeRatio = 0.7;
 
     const landscapeRowColumnCount = [2, 6];
     const mobileRowColumnCount = [4, 2];
@@ -25,7 +26,7 @@ export default function AssetsPage() {
     const pageSize = rcCount[0] * rcCount[1];
     const page = 1;
 
-    let rowSpacing = 0;
+    let rowSpacing = 32;
 
     let mainBox = document.getElementById("mainElementBox");
 
@@ -33,8 +34,6 @@ export default function AssetsPage() {
         let boxWidth = (mainBox as HTMLElement).getBoundingClientRect().width;
         itemDimensions[0] = boxWidth / (rcCount[1] + 1);
         itemDimensions[1] = itemDimensions[0] / sizeRatio;
-
-        rowSpacing = ((mainBox as HTMLElement).getBoundingClientRect().height - itemDimensions[1] * rcCount[0]);
     }
 
     const boxStyle = {
@@ -42,14 +41,13 @@ export default function AssetsPage() {
         height: itemDimensions[1] + 'px',
         margin: "auto",
         border: 2,
-        borderColor: 'primary.main',
-        borderRadius: 1
+        borderStyle: "solid",
+        borderColor: "primary.main"
     };
 
-    let preparedContent: JSX.Element[] = [];
     useEffect(() => {
         const waitForContent = async () => {
-            if (rawContent != null)
+            if (rawContent.length > 0)
                 return;
             let scon = new ServerConnection();
             let params = {
@@ -80,15 +78,21 @@ export default function AssetsPage() {
         return () => window.removeEventListener("resize", updateWidthAndHeight);
     });
 
-    if (rawContent == null) {
+    if (rawContent.length == 0) {
         return (<Typography variant="h4">Loading assets...</Typography>);
     } else {
-        preparedContent = (rawContent as Array<AssetItem>).map((item) => {
-            return (<Grid item style={boxStyle}>
-                {<img src={item.TITLEPIC_LINK} width={boxStyle.width} height={boxStyle.width}/>}
-            </Grid>);
+        let slicedPreparedContent: JSX.Element[][] = [];
 
+        for (let i = 0; i < rcCount[0]; i++) {
+            let offset = i * rcCount[1];
+            let count = offset + rcCount[1];
+            slicedPreparedContent.push(rawContent.slice(offset, count).map((item) => (
+                <AssetItemDisplay itemData={item} itemStyle={boxStyle}/>)));
+        }
+
+        let preparedContent = slicedPreparedContent.map((line) => {
+            return (<Fragment><Grid container>{line}</Grid><br/></Fragment>);
         });
-        return (<Grid container rowSpacing={rowSpacing + "px"}>{preparedContent}</Grid>);
+        return (<Grid>{preparedContent}</Grid>);
     }
 }
