@@ -1,6 +1,6 @@
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 
-import {Grid, IconProps} from "@mui/material";
+import {Grid} from "@mui/material";
 
 import "../../assets/HomePage.css";
 import SiteAppBar from "../../components/SiteAppBar";
