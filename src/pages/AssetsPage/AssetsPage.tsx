@@ -58,6 +58,7 @@ export default function AssetsPage() {
                 (response: AxiosResponse) => {
                     //Use response.data.code for SQL request code and response.data.requesterror for error details
                     if (response.data.result === "success") {
+                        (response.data.content as AssetItem[]).forEach(assItem => assItem.TITLEPIC_LINK = "http://" + window.location.host + assItem.TITLEPIC_LINK)
                         setRawContent(response.data.content);
                     } else {
                         console.log("request failed: " + response.data.code + "\nError: " + response.data.requesterror);
@@ -81,7 +82,6 @@ export default function AssetsPage() {
     if (rawContent.length == 0) {
         return (<Typography variant="h4">Loading assets...</Typography>);
     } else {
-        rawContent.forEach(assItem => assItem.TITLEPIC_LINK = "http://" + window.location.host + assItem.TITLEPIC_LINK)
         let slicedPreparedContent: JSX.Element[][] = [];
 
         for (let i = 0; i < rcCount[0]; i++) {
