@@ -1,8 +1,9 @@
 import React, {Fragment, useEffect, useState} from "react";
 import CategoryMenu from "./CategoryMenu";
-import {Box} from "@mui/material";
+import {Box, Grid} from "@mui/material";
 import {ContentProps} from "../pages/Home/App";
 import {IsMobileResolution} from "../utils/MobileUtilities";
+import ContentPageSwitch from "./ContentPageSwitch";
 
 export default function MainContent({mainElement}: ContentProps) {
     const [[width, height], setWidthHeight] = useState([window.innerWidth, window.innerHeight]);
@@ -37,5 +38,6 @@ export default function MainContent({mainElement}: ContentProps) {
             <Box sx={style} id="mainElementBox">
                 {mainElement}
             </Box>
+            <ContentPageSwitch/>
         </Fragment>);
 }

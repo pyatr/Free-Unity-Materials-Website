@@ -4,6 +4,7 @@ import ServerConnection from "../../utils/ServerConnection";
 import {AxiosResponse} from "axios";
 import {IsMobileResolution} from "../../utils/MobileUtilities";
 import AssetItemDisplay from "../../components/AssetItemDisplay";
+import {SitePages} from "../../utils/PageData/PageData";
 
 export type AssetItem = {
     NUMBER: number,
@@ -18,13 +19,9 @@ export default function AssetsPage() {
     const [rawContent, setRawContent] = useState(Array<AssetItem>);
     let itemDimensions = IsMobileResolution() ? [240, 384] : [160, 256];
     const sizeRatio = 0.7;
+    let elementPageData = SitePages.page["AssetsPage"];
 
-    const landscapeRowColumnCount = [2, 6];
-    const mobileRowColumnCount = [4, 2];
-    const rcCount = IsMobileResolution() ? mobileRowColumnCount : landscapeRowColumnCount;
-    const maxPageSize = Math.max(landscapeRowColumnCount[0] * landscapeRowColumnCount[1], mobileRowColumnCount[0] * mobileRowColumnCount[1]);
-
-    const page = 1;
+    const rcCount = IsMobileResolution() ? elementPageData.mobileRowColumnCount : elementPageData.landscapeRowColumnCount;
 
     let mainBox = document.getElementById("mainElementBox");
 
@@ -49,8 +46,8 @@ export default function AssetsPage() {
                 return;
             let scon = new ServerConnection();
             let params = {
-                pageSize: maxPageSize,
-                page: page
+                pageSize: elementPageData.pageSize,
+                page: elementPageData.currentPage
             };
             await scon.sendPostRequest("getPosts", params,
                 (response: AxiosResponse) => {
