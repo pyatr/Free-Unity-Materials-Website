@@ -22,11 +22,9 @@ export default function AssetsPage() {
     const landscapeRowColumnCount = [2, 6];
     const mobileRowColumnCount = [4, 2];
     const rcCount = IsMobileResolution() ? mobileRowColumnCount : landscapeRowColumnCount;
+    const maxPageSize = Math.max(landscapeRowColumnCount[0] * landscapeRowColumnCount[1], mobileRowColumnCount[0] * mobileRowColumnCount[1]);
 
-    const pageSize = rcCount[0] * rcCount[1];
     const page = 1;
-
-    let rowSpacing = 32;
 
     let mainBox = document.getElementById("mainElementBox");
 
@@ -51,7 +49,7 @@ export default function AssetsPage() {
                 return;
             let scon = new ServerConnection();
             let params = {
-                pageSize: pageSize,
+                pageSize: maxPageSize,
                 page: page
             };
             await scon.sendPostRequest("getPosts", params,

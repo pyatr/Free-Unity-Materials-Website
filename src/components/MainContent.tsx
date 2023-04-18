@@ -21,8 +21,9 @@ export default function MainContent({mainElement}: ContentProps) {
     var style = {
         p: 2,
         //71+12+12+1.5+1.5+1+1 = 100%
+        minHeight: realHeight,
         width: "71%",
-        height: realHeight,
+        height: "100%",
         border: 2,
         borderColor: 'primary.main',
         m: '0.5%',
