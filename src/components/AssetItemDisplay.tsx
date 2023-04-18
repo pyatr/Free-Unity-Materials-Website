@@ -21,7 +21,6 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
     }
     const titleFontSize = fontSizeMod + "rem";
     const subtitleFontSite = (fontSizeMod * 0.7) + "rem";
-    console.log([titleFontSize, subtitleFontSite]);
     return (<Grid item style={itemStyle} sx={{boxSizing: "content-box"}}>
         {<img src={itemData.TITLEPIC_LINK} style={imageStyle}/>}
         <Grid style={gridStyle}>
