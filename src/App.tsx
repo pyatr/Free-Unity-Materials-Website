@@ -2,30 +2,28 @@ import {BrowserRouter, Routes, Route} from "react-router-dom";
 
 import {Grid} from "@mui/material";
 
-import "../../assets/HomePage.css";
-import SiteAppBar from "../../components/SiteAppBar";
-import LoginPage from "../Login/LoginPage";
-import AssetsPage from "../AssetsPage/AssetsPage";
-import ArticlesPage from "../Articles/ArticlesPage";
-import ScriptsPage from "../Scripts/ScriptsPage";
-import NonExistentPage from "../NonExistent/NonExistentPage";
-import MainContent from "../../components/MainContent";
-import {TryCookieLogin} from "../../utils/Login";
-import {ReactNode} from "react";
+import "./assets/HomePage.css";
+import SiteAppBar from "./components/SiteAppBar";
+import LoginPage from "./pages/Login/LoginPage";
+import AssetsPage from "./pages/AssetsPage/AssetsPage";
+import ArticlesPage from "./pages/Articles/ArticlesPage";
+import ScriptsPage from "./pages/Scripts/ScriptsPage";
+import NonExistentPage from "./pages/NonExistent/NonExistentPage";
+import MainContent from "./components/MainContent";
+import {TryCookieLogin} from "./utils/Login";
 
 export type ContentProps = {
-    mainElement: ReactNode
+    mainElement: string
 }
-
 
 export default function App() {
     //TODO: fix page opening as hostname/assets/ and showing Index of assets instead of actual page
     TryCookieLogin();
 
-    const assets = <AssetsPage/>;
-    const articles = <ArticlesPage/>;
-    const scripts = <ScriptsPage/>;
-    const none = <NonExistentPage/>;
+    const assets = "AssetsPage";
+    const articles = "ArticlesPage";
+    const scripts = "ScriptsPage";
+    const none = "NonExistentPage";
 
     return (
         <BrowserRouter>
