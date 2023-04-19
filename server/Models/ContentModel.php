@@ -15,6 +15,8 @@ class ContentModel extends BaseModel
     private const ENTRY_CATEGORIES = "CATEGORIES";
     private const ENTRY_CREDATE = "CREATION_DATE";
 
+    private const SHORT_DESC_LENGTH = 256;
+
     public function createPost(string $title, string $shortTitle, string $content, string $categories): array
     {
         $query = "INSERT INTO " . $this::TABLE_POSTS . " (" . $this::ENTRY_TITLE . "," . $this::ENTRY_SHORTTITLE . "," . $this::ENTRY_CONTENT . "," . $this::ENTRY_CATEGORIES . ") VALUES('$title', '$shortTitle', '$content', '$categories')";
@@ -59,8 +61,22 @@ class ContentModel extends BaseModel
             . $this::ENTRY_TITLE . ","
             . $this::ENTRY_SHORTTITLE . ","
             . $this::ENTRY_CATEGORIES . ","
-            . $this::ENTRY_CREDATE . " FROM " . $this::TABLE_POSTS . " ORDER BY 1 DESC LIMIT $pageSize OFFSET $postsOffset";
-        return $this->executeRequest($query);
+            . $this::ENTRY_CREDATE . ","
+            . $this::ENTRY_CONTENT . " FROM " . $this::TABLE_POSTS . " ORDER BY 1 DESC LIMIT $pageSize OFFSET $postsOffset";
+        $result = $this->executeRequest($query);
+        for ($i = 0; $i < count($result["content"]); $i++) {
+            $result["content"][$i]["CONTENT"] = substr($result["content"][$i]["CONTENT"], 0, $this::SHORT_DESC_LENGTH);
+        }
+        $result["postsCount"] = $this->getPostsCount();
+        return $result;
+    }
+
+    public function getPostsCount()
+    {
+        $query = "SELECT COUNT(*) FROM " . $this::TABLE_POSTS . ";";
+        $req = $this->DBConn->prepare($query);
+        $req->execute();
+        return $req->fetch(PDO::FETCH_NAMED)["COUNT(*)"];
     }
 
     public function deletePost(int $number): array
