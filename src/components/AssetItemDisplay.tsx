@@ -1,6 +1,6 @@
-import React from "react";
+import React, {Fragment} from "react";
 import {AssetItem} from "../pages/AssetsPage/AssetsPage";
-import {Grid, Typography} from "@mui/material";
+import {Box, Grid, Typography} from "@mui/material";
 //If you get react-scale-text is not a module error, create react-scale-text.d.ts in node_modules package and add "declare module 'react-scale-text';"
 //TODO: try use for scaling import {ScaleText} from "react-scale-text"
 import TextTruncate from "react-text-truncate";
@@ -11,6 +11,13 @@ export type AssetItemDisplay = {
 }
 
 export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay) {
+    if (itemData.NUMBER < 0) {
+        //Dummy item in case there are not enough items in row
+        let newWidth = (parseFloat(itemStyle.width as string) + 4) + "px";
+        let newHeight = (parseFloat(itemStyle.height as string) + 4) + "px";
+        return (<Box width={newWidth} height={newHeight} margin="auto"/>);
+    }
+
     const gridStyle = {
         padding: "4px"
     }
@@ -25,10 +32,9 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
     const subtitleFontSite = (fontSizeMod * 0.7) + "rem";
     return (<Grid item style={itemStyle} sx={{boxSizing: "content-box"}}>
         {<img src={itemData.TITLEPIC_LINK} style={imageStyle}/>}
-        <Grid style={gridStyle}>
+        <Grid style={gridStyle} fontSize={subtitleFontSite}>
             <Typography component="h6" fontSize={titleFontSize}>{itemData.SHORTTITLE}</Typography>
-            <Typography variant="subtitle1" color="#999999"
-                        fontSize={subtitleFontSite}> {itemData.CATEGORIES}</Typography>
+            <Typography variant="subtitle1" color="#999999"> {itemData.CATEGORIES}</Typography>
             <TextTruncate line={4} truncateText="..." text={itemData.CONTENT}/>
         </Grid>
     </Grid>);

@@ -1,20 +1,40 @@
-import {MouseEventHandler} from "react";
+export type PageLoadProps = {
+    pageData: PageData,
+    onPageLoaded: Function
+}
 
-class PageData {
+export class PageData {
     landscapeRowColumnCount: number[];
     mobileRowColumnCount: number[];
 
     pageSize: number;
     currentPage: number;
 
-    onClickBack: MouseEventHandler<HTMLSpanElement> | undefined;
-    onClickForward: MouseEventHandler<HTMLSpanElement> | undefined;
+    shouldUpdate: boolean = false;
 
-    constructor(lrc: number, lcc: number, mrc: number, mcc: number) {//, onClickBack: Function, onClickForward: Function
+    private postsCount: number;
+    private pagesCount: number;
+
+    constructor(lrc: number, lcc: number, mrc: number, mcc: number) {
         this.landscapeRowColumnCount = [lrc, lcc];
         this.mobileRowColumnCount = [mrc, mcc];
         this.pageSize = Math.max(this.landscapeRowColumnCount[0] * this.landscapeRowColumnCount[1], this.mobileRowColumnCount[0] * this.mobileRowColumnCount[1]);
         this.currentPage = 1;
+        this.postsCount = 0;
+        this.pagesCount = 0;
+    }
+
+    setPostsCount(newNum: number) {
+        this.postsCount = newNum;
+        this.pagesCount = Math.max(1, Math.ceil(newNum / this.pageSize));
+    }
+
+    getPostsCount() {
+        return this.postsCount;
+    }
+
+    getPagesCount() {
+        return this.pagesCount;
     }
 
     getFirstItemNumber(): number {
@@ -22,18 +42,6 @@ class PageData {
     }
 
     getLastItemNumber(): number {
-        return this.getFirstItemNumber() + this.pageSize;
-    }
-}
-
-interface Dictionary<PageData> {
-    [key: string]: PageData;
-}
-
-export module SitePages {
-    export var page: Dictionary<PageData> = {
-        AssetsPage: new PageData(2, 6, 4, 2),
-        ArticlesPage: new PageData(10, 1, 10, 1),
-        ScriptsPage: new PageData(10, 1, 10, 1)
+        return Math.min(this.getFirstItemNumber() + this.pageSize, this.getPostsCount());
     }
 }

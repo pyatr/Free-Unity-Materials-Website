@@ -11,6 +11,7 @@ import ScriptsPage from "./pages/Scripts/ScriptsPage";
 import NonExistentPage from "./pages/NonExistent/NonExistentPage";
 import MainContent from "./components/MainContent";
 import {TryCookieLogin} from "./utils/Login";
+import {useEffect, useState} from "react";
 
 export type ContentProps = {
     mainElement: string
@@ -19,6 +20,17 @@ export type ContentProps = {
 export default function App() {
     //TODO: fix page opening as hostname/assets/ and showing Index of assets instead of actual page
     TryCookieLogin();
+
+    const [[width, height], setWidthHeight] = useState([window.innerWidth, window.innerHeight]);
+
+    const updateWidthAndHeight = () => {
+        setWidthHeight([window.innerWidth, window.innerHeight]);
+    };
+
+    useEffect(() => {
+        window.addEventListener("resize", updateWidthAndHeight);
+        return () => window.removeEventListener("resize", updateWidthAndHeight);
+    });
 
     const assets = "AssetsPage";
     const articles = "ArticlesPage";
