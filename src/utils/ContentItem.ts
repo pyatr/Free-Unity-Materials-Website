@@ -4,6 +4,5 @@ export type ContentItem = {
     SHORTTITLE: string,
     CATEGORIES: string,
     CREATION_DATE: string,
-    CONTENT: string,
-    TITLEPIC_LINK: string
+    CONTENT: string
 }

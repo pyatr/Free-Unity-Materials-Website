@@ -44,7 +44,6 @@ export default function App() {
                 <Routes>
                     <Route path="login" element={<LoginPage/>}/>
                     <Route path="register" element={<LoginPage/>}/>
-                    <Route path="assets" element={<MainContent mainElement={assets}/>}/>
                     <Route path="articles" element={<MainContent mainElement={articles}/>}/>
                     <Route path="scripts" element={<MainContent mainElement={scripts}/>}/>
                     <Route path="/" element={<MainContent mainElement={assets}/>}/>

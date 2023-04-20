@@ -36,8 +36,8 @@ export default function CategoryMenu() {
         borderRadius: 1,
         width: selectedWidth
     };
-    const links = [["/assets", "Assets"], ["/articles", "Articles"], ["/scripts", "Scripts"]];
-    const buttons = links.map((link) => <Button variant="outlined" component={Link} to={link[0]}
+    const links = [["/", "Assets"], ["/articles", "Articles"], ["/scripts", "Scripts"]];
+    const buttons = links.map((link) => <Button variant="outlined" key={link[0]} component={Link} to={link[0]}
                                                 sx={buttonStyle}>{link[1]}</Button>);
     return (
         <Box sx={style}>

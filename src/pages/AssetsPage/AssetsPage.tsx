@@ -1,9 +1,10 @@
 import {Grid, Typography} from "@mui/material";
-import React, {Fragment, useEffect, useState} from "react";
+import React, {Fragment} from "react";
 import {IsMobileResolution} from "../../utils/MobileUtilities";
 import AssetItemDisplay from "../../components/AssetItemDisplay";
 import {PageData, PageLoadProps} from "../../utils/PageData/PageData";
 import {ContentItem} from "../../utils/ContentItem";
+import {ContentPreview} from "../../utils/ContentPreview";
 
 function GetItemStyle(pageData: PageData): Array<any> {
     let itemDimensions = IsMobileResolution() ? [240, 384] : [160, 256];
@@ -25,7 +26,9 @@ function GetItemStyle(pageData: PageData): Array<any> {
         margin: "auto",
         border: 2,
         borderStyle: "solid",
-        borderColor: "primary.main"
+        borderColor: "primary.main",
+        color: "black",
+        textDecoration: "none"
     }, rcCount]);
 }
 
@@ -39,7 +42,7 @@ export default function AssetsPage({pageData, rawContent}: PageLoadProps) {
         for (let i = 0; i < realRowCount; i++) {
             let offset = i * rcCount[1];
             let count = offset + rcCount[1];
-            let slice: ContentItem[] = rawContent.slice(offset, count);
+            let slice: ContentPreview[] = rawContent.slice(offset, count);
             let realLength = slice.length;
             slice.length += rcCount[1] - realLength;
             for (let j = realLength; j < slice.length; j++) {

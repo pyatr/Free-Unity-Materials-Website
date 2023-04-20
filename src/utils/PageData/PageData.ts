@@ -1,8 +1,8 @@
-import {ContentItem} from "../ContentItem";
+import {ContentPreview} from "../ContentPreview";
 
 export type PageLoadProps = {
     pageData: PageData,
-    rawContent: ContentItem[]
+    rawContent: ContentPreview[]
 }
 
 export class PageData {
@@ -17,9 +17,9 @@ export class PageData {
 
     private requestName: string;
 
-    constructor(lrc: number, lcc: number, mrc: number, mcc: number, requestName: string) {
-        this.landscapeRowColumnCount = [lrc, lcc];
-        this.mobileRowColumnCount = [mrc, mcc];
+    constructor(landscapeRowCount: number, landscapeColumnCount: number, mobileRowCount: number, mobileColumnCount: number, requestName: string) {
+        this.landscapeRowColumnCount = [landscapeRowCount, landscapeColumnCount];
+        this.mobileRowColumnCount = [mobileRowCount, mobileColumnCount];
         this.pageSize = Math.max(this.landscapeRowColumnCount[0] * this.landscapeRowColumnCount[1], this.mobileRowColumnCount[0] * this.mobileRowColumnCount[1]);
         this.currentPage = 1;
         this.postsCount = 0;

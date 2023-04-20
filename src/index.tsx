@@ -7,9 +7,6 @@ const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
 
-root.render(
-    <React.StrictMode>
-        <App/>
-    </React.StrictMode>
-);
+//NOTE: deleted <React.StrictMode> because it causes rendering twice in development mode
+root.render(<App/>);
 

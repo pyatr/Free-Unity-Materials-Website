@@ -11,6 +11,9 @@ export type PageSwitchProps = {
 
 export default function ContentPageSwitch({pageName, onClickBack, onClickForward, onClickNum}: PageSwitchProps) {
     let elementPageData = SitePages.page[pageName];
+    if (elementPageData === undefined) {
+        return (<Fragment/>);
+    }
     if (elementPageData.getPostsCount() == 0) {
         //Not initialized, display nothing
         return (<Fragment/>);
@@ -32,7 +35,7 @@ export default function ContentPageSwitch({pageName, onClickBack, onClickForward
     }
     let pagesAsText = pageNumbers.map((num) => {
         let isCurrentPage = elementPageData.currentPage == num;
-        return <Button style={isCurrentPage ? {
+        return <Button key={pageName + "Page" + num} style={isCurrentPage ? {
             fontSize: "1.5rem",
             color: "black",
             fontWeight: "bold"

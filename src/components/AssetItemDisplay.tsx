@@ -1,12 +1,13 @@
 import React from "react";
 import {Box, Grid, Typography} from "@mui/material";
 import TextTruncate from "react-text-truncate";
-import {ContentItem} from "../utils/ContentItem";
 import PixelSumm from "../utils/PixelSumm";
 import {IsMobileResolution} from "../utils/MobileUtilities";
+import {Link} from "react-router-dom";
+import {ContentPreview} from "../utils/ContentPreview";
 
 export type AssetItemDisplay = {
-    itemData: ContentItem,
+    itemData: ContentPreview,
     itemStyle: React.CSSProperties
 }
 
@@ -24,6 +25,7 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
     const imageStyle = {
         width: itemStyle.width,
         height: itemStyle.width,
+        color: "black",
         borderBottom: "inherit"
     }
     const startPictureWidth = 187;
@@ -33,7 +35,9 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
 
     const titleFontSize = fontSizeMod + "rem";
     const subtitleFontSite = (fontSizeMod * 0.7) + "rem";
-    return (<Grid item style={itemStyle} sx={{boxSizing: "content-box"}}>
+
+    let link = "/" + itemData.NUMBER;
+    return (<Grid item component={Link} to={link} style={itemStyle} sx={{boxSizing: "content-box"}}>
         {<img src={itemData.TITLEPIC_LINK} style={imageStyle}/>}
         <Grid style={gridStyle} fontSize={subtitleFontSite}>
             <Typography component="h6" fontSize={titleFontSize}>{itemData.SHORTTITLE}</Typography>
