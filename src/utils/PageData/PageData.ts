@@ -1,6 +1,8 @@
+import {ContentItem} from "../ContentItem";
+
 export type PageLoadProps = {
     pageData: PageData,
-    onPageLoaded: Function
+    rawContent: ContentItem[]
 }
 
 export class PageData {
@@ -10,18 +12,19 @@ export class PageData {
     pageSize: number;
     currentPage: number;
 
-    shouldUpdate: boolean = false;
-
     private postsCount: number;
     private pagesCount: number;
 
-    constructor(lrc: number, lcc: number, mrc: number, mcc: number) {
+    private requestName: string;
+
+    constructor(lrc: number, lcc: number, mrc: number, mcc: number, requestName: string) {
         this.landscapeRowColumnCount = [lrc, lcc];
         this.mobileRowColumnCount = [mrc, mcc];
         this.pageSize = Math.max(this.landscapeRowColumnCount[0] * this.landscapeRowColumnCount[1], this.mobileRowColumnCount[0] * this.mobileRowColumnCount[1]);
         this.currentPage = 1;
         this.postsCount = 0;
         this.pagesCount = 0;
+        this.requestName = requestName;
     }
 
     setPostsCount(newNum: number) {
@@ -31,6 +34,10 @@ export class PageData {
 
     getPostsCount() {
         return this.postsCount;
+    }
+
+    getRequestName() {
+        return this.requestName;
     }
 
     getPagesCount() {
