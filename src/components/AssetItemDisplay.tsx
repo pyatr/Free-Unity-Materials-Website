@@ -1,41 +1,45 @@
-import React, {Fragment} from "react";
-import {AssetItem} from "../pages/AssetsPage/AssetsPage";
+import React from "react";
 import {Box, Grid, Typography} from "@mui/material";
-//If you get react-scale-text is not a module error, create react-scale-text.d.ts in node_modules package and add "declare module 'react-scale-text';"
-//TODO: try use for scaling import {ScaleText} from "react-scale-text"
 import TextTruncate from "react-text-truncate";
+import {ContentItem} from "../utils/ContentItem";
+import PixelSumm from "../utils/PixelSumm";
+import {IsMobileResolution} from "../utils/MobileUtilities";
 
 export type AssetItemDisplay = {
-    itemData: AssetItem,
+    itemData: ContentItem,
     itemStyle: React.CSSProperties
 }
 
 export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay) {
     if (itemData.NUMBER < 0) {
         //Dummy item in case there are not enough items in row
-        let newWidth = (parseFloat(itemStyle.width as string) + 4) + "px";
-        let newHeight = (parseFloat(itemStyle.height as string) + 4) + "px";
+        let newWidth = PixelSumm(itemStyle.width as string, "4");
+        let newHeight = PixelSumm(itemStyle.height as string, "4");
         return (<Box width={newWidth} height={newHeight} margin="auto"/>);
     }
 
     const gridStyle = {
         padding: "4px"
     }
-    const startPictureWidth = 187;
-    let fontSizeMod = parseFloat(itemStyle.width as string) / startPictureWidth;
     const imageStyle = {
         width: itemStyle.width,
         height: itemStyle.width,
         borderBottom: "inherit"
     }
+    const startPictureWidth = 187;
+    let fontSizeMod = parseFloat(itemStyle.width as string) / startPictureWidth;
+    //Truncate doesn't work well on mobile browsers (ok in mobile mode on desktop) so we have to use different line parameter
+    const truncateLine = IsMobileResolution() ? 3 : 4;
+
     const titleFontSize = fontSizeMod + "rem";
     const subtitleFontSite = (fontSizeMod * 0.7) + "rem";
     return (<Grid item style={itemStyle} sx={{boxSizing: "content-box"}}>
         {<img src={itemData.TITLEPIC_LINK} style={imageStyle}/>}
         <Grid style={gridStyle} fontSize={subtitleFontSite}>
             <Typography component="h6" fontSize={titleFontSize}>{itemData.SHORTTITLE}</Typography>
-            <Typography variant="subtitle1" color="#999999"> {itemData.CATEGORIES}</Typography>
-            <TextTruncate line={4} truncateText="..." text={itemData.CONTENT}/>
+            <Typography variant="subtitle1" fontSize={subtitleFontSite}
+                        color="#999999"> {itemData.CATEGORIES}</Typography>
+            <TextTruncate line={truncateLine} truncateText="..." text={itemData.CONTENT}/>
         </Grid>
     </Grid>);
 }

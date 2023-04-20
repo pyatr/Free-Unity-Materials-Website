@@ -2,7 +2,6 @@ import React, {Fragment, useEffect, useState} from "react";
 import CategoryMenu from "./CategoryMenu";
 import {Box, Grid} from "@mui/material";
 import {ContentProps} from "../App";
-import {IsMobileResolution} from "../utils/MobileUtilities";
 import ContentPageSwitch from "./ContentPageSwitch";
 import AssetsPage from "../pages/AssetsPage/AssetsPage";
 import ScriptsPage from "../pages/Scripts/ScriptsPage";
@@ -10,22 +9,20 @@ import ArticlesPage from "../pages/Articles/ArticlesPage";
 import NonExistentPage from "../pages/NonExistent/NonExistentPage";
 import {SitePages} from "../utils/PageData/SitePages";
 import {PageData} from "../utils/PageData/PageData";
+import ServerConnection from "../utils/ServerConnection";
+import {AxiosResponse} from "axios";
+import {ContentItem} from "../utils/ContentItem";
 
 function GetMainStyles() {
-    const landHeight = "65vh";
-    const mobileHeight = "90vh";
-    let realHeight = IsMobileResolution() ? mobileHeight : landHeight;
     return ([{
         width: "71%",
         justifyContent: "center",
         margin: '0.5%',
-        paddingTop: "16px",
         gap: "32px",
         paddingBottom: "96px",
     }, {
         p: 2,
         //71+12+12+1.5+1.5+1+1 = 100%
-        minHeight: realHeight,
         width: "100%",
         border: 2,
         borderColor: 'primary.main',
@@ -38,18 +35,15 @@ function GetMainStyles() {
 export default function MainContent({mainElement}: ContentProps) {
     const [gridStyle, boxStyle] = GetMainStyles();
 
-    const [pageFinishedLoading, setPageLoaded] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [rawContent, setRawContent] = useState(Array<ContentItem>);
 
     const elementPageData: PageData = SitePages.page[mainElement];
 
-    const pageLoaded = () => {
-        setPageLoaded(true);
-    };
-
     const setPageNum = (newNum: number) => {
-        SitePages.page[mainElement].shouldUpdate = true;
-        setCurrentPage(newNum);
+        if (elementPageData.currentPage != newNum) {
+            setCurrentPage(newNum);
+        }
     }
 
     const clickBack = () => {
@@ -60,14 +54,43 @@ export default function MainContent({mainElement}: ContentProps) {
         setPageNum(Math.min(elementPageData.getPagesCount(), elementPageData.currentPage + 1));
     }
 
+    let shouldUpdate = elementPageData.currentPage != currentPage;
     elementPageData.currentPage = currentPage;
 
-    const elements = new Map();
-    elements.set("AssetsPage", <AssetsPage pageData={elementPageData} onPageLoaded={pageLoaded}/>);
-    elements.set("ArticlesPage", <ArticlesPage pageData={elementPageData} onPageLoaded={pageLoaded}/>);
-    elements.set("ScriptsPage", <ScriptsPage pageData={elementPageData} onPageLoaded={pageLoaded}/>);
-    elements.set("NonExistentPage", <NonExistentPage pageData={elementPageData} onPageLoaded={pageLoaded}/>);
+    useEffect(() => {
+        const waitForContent = async () => {
+            //Do not reload content if its loaded and if page was not told to update
+            if (rawContent.length > 0 && !shouldUpdate) {
+                return;
+            }
+            let scon = new ServerConnection();
+            let params = {
+                pageSize: elementPageData.pageSize,
+                page: elementPageData.currentPage
+            };
+            await scon.sendPostRequest(elementPageData.getRequestName(), params,
+                (response: AxiosResponse) => {
+                    //Use response.data.code for SQL request code and response.data.requesterror for error details
+                    if (response.data.result === "success") {
+                        (response.data.content as ContentItem[]).forEach(assItem => assItem.TITLEPIC_LINK = "http://" + window.location.host + assItem.TITLEPIC_LINK);
+                        elementPageData.setPostsCount(response.data.postsCount);
+                        window.scrollTo(0, 0);
+                        setRawContent(response.data.content);
+                    } else {
+                        console.log("request failed: " + response.data.code + "\nError: " + response.data.requesterror);
+                    }
+                });
+        }
+        waitForContent();
+    });
 
+    const elements = new Map();
+    elements.set("AssetsPage", <AssetsPage pageData={elementPageData} rawContent={rawContent}/>);
+    elements.set("ArticlesPage", <ArticlesPage/>);
+    elements.set("ScriptsPage", <ScriptsPage/>);
+    elements.set("NonExistentPage", <NonExistentPage/>);
+
+    let pageFinishedLoading = rawContent.length > 0;
     return (
         <Fragment>
             <CategoryMenu/>
