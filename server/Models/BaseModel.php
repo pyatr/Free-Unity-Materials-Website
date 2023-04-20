@@ -6,10 +6,10 @@ use PDO;
 
 class BaseModel
 {
-    protected const HOST_NAME = "fum-db";
-    protected const DATABASE_NAME = "PrimaryDatabase";
+    protected const HOST_NAME = 'fum-db';
+    protected const DATABASE_NAME = 'PrimaryDatabase';
 
-    protected const HASHING_ALGORITHM = "md5";
+    protected const HASHING_ALGORITHM = 'md5';
 
     protected PDO $DBConn;
 
@@ -21,9 +21,9 @@ class BaseModel
     private function connect(): void
     {
         $this->DBConn = new PDO(
-            "mysql:host=" . $this::HOST_NAME . ";dbname=" . BaseModel::DATABASE_NAME,
-            "admin",
-            "admin"
+            'mysql:host=' . $this::HOST_NAME . ';dbname=' . BaseModel::DATABASE_NAME,
+            'admin',
+            'admin'
         );
     }
 

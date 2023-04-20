@@ -6,24 +6,24 @@ use PDO;
 
 class UserModel extends BaseModel
 {
-    private const TABLE_USERS = "USERS";
+    private const TABLE_USERS = 'USERS';
 
-    private const ROLE_EDITOR = "EDITOR";
-    private const ROLE_ADMIN = "ADMIN";
-    private const ROLE_USER = "USER";
+    private const ROLE_EDITOR = 'EDITOR';
+    private const ROLE_ADMIN = 'ADMIN';
+    private const ROLE_USER = 'USER';
 
-    private const ENTRY_USERNAME = "USERNAME";
-    private const ENTRY_PASSWORD = "PASSWORD";
-    private const ENTRY_EMAIL = "EMAIL";
-    private const ENTRY_ROLE = "ROLE";
+    private const ENTRY_USERNAME = 'USERNAME';
+    private const ENTRY_PASSWORD = 'PASSWORD';
+    private const ENTRY_EMAIL = 'EMAIL';
+    private const ENTRY_ROLE = 'ROLE';
 
 
     private function getUserTableColumns(): string
     {
-        return "(`" . UserModel::ENTRY_USERNAME .
-            "`, `" . UserModel::ENTRY_PASSWORD .
-            "`, `" . UserModel::ENTRY_EMAIL .
-            "`, `" . UserModel::ENTRY_ROLE . "`)";
+        return '(`' . UserModel::ENTRY_USERNAME .
+            '`, `' . UserModel::ENTRY_PASSWORD .
+            '`, `' . UserModel::ENTRY_EMAIL .
+            '`, `' . UserModel::ENTRY_ROLE . '`)';
     }
 
     public function doesUserExist(
@@ -41,7 +41,7 @@ class UserModel extends BaseModel
         $query = "SELECT * FROM " . $this::TABLE_USERS . " WHERE " . $this::ENTRY_EMAIL . " = '$email'";
         $req = $this->DBConn->prepare($query);
         $req->execute();
-        return $req->fetch()["USERNAME"];
+        return $req->fetch()['USERNAME'];
     }
 
     public function createNewUser(
