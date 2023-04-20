@@ -11,50 +11,50 @@ class ContentController extends BaseController
     public function __construct()
     {
         $this->contentModel = new ContentModel();
-        $this->titlepicFolder = ":" . $_SERVER["SERVER_PORT"] . '/TitlePics/';
+        $this->titlepicFolder = ':' . $_SERVER['SERVER_PORT'] . '/TitlePics/';
     }
 
-    public function createPost($params): array
+    public function createContent($params): array
     {
-        $title = $this->tryGetValue($params, "title");
-        $shortTitle = $this->tryGetValue($params, "shortTitle");
-        $content = $this->tryGetValue($params, "content");
-        $categories = $this->tryGetValue($params, "categories");
-        return $this->contentModel->createPost($title, $shortTitle, $content, $categories);
+        $title = $this->tryGetValue($params, 'title');
+        $shortTitle = $this->tryGetValue($params, 'shortTitle');
+        $content = $this->tryGetValue($params, 'content');
+        $categories = $this->tryGetValue($params, 'categories');
+        return $this->contentModel->createContent($title, $shortTitle, $content, $categories);
     }
 
-    public function deletePost($params): array
+    public function deleteContent($params): array
     {
-        $number = $this->tryGetValue($params, "number");
-        return $this->contentModel->deletePost($number);
+        $contentNumber = $this->tryGetValue($params, 'number');
+        return $this->contentModel->deleteContent($contentNumber);
     }
 
-    public function updatePost($params): array
+    public function updateContent($params): array
     {
-        $number = $this->tryGetValue($params, "number");
-        $title = $this->tryGetValue($params, "title");
-        $shortTitle = $this->tryGetValue($params, "shortTitle");
-        $content = $this->tryGetValue($params, "content");
-        $categories = $this->tryGetValue($params, "categories");
-        return $this->contentModel->updatePost($number, $title, $shortTitle, $content, $categories);
+        $contentNumber = $this->tryGetValue($params, 'number');
+        $title = $this->tryGetValue($params, 'title');
+        $shortTitle = $this->tryGetValue($params, 'shortTitle');
+        $content = $this->tryGetValue($params, 'content');
+        $categories = $this->tryGetValue($params, 'categories');
+        return $this->contentModel->updateContent($contentNumber, $title, $shortTitle, $content, $categories);
     }
 
-    public function getPost($params): array
+    public function getContent($params): array
     {
-        $number = $this->tryGetValue($params, "number");
-        return $this->contentModel->getPost($number);
+        $contentNumber = $this->tryGetValue($params, 'number');
+        return $this->contentModel->getContent($contentNumber);
     }
 
-    public function getPosts($params): array
+    public function getContentPreviews($params): array
     {
-        $pageSize = $this->tryGetValue($params, "pageSize");
-        $page = $this->tryGetValue($params, "page");
-        $result = $this->contentModel->getPosts($pageSize, $page);
-        $resultCount = count($result["content"]);
+        $pageSize = $this->tryGetValue($params, 'pageSize');
+        $page = $this->tryGetValue($params, 'page');
+        $result = $this->contentModel->getContentPreviews($pageSize, $page);
+        $resultCount = count($result['content']);
         for ($i = 0; $i < $resultCount; $i++) {
-            $number = $result["content"][$i]["NUMBER"];
-            $name = $this->titlepicFolder . $number . '.png';
-            $result["content"][$i]["TITLEPIC_LINK"] = $name;
+            $contentNumber = $result['content'][$i]['NUMBER'];
+            $name = $this->titlepicFolder . $contentNumber . '.png';
+            $result['content'][$i]['TITLEPIC_LINK'] = $name;
         }
         return $result;
     }
