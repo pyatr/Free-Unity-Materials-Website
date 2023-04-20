@@ -23,13 +23,13 @@ class ContentModel extends BaseModel
         return $this->executeRequest($query);
     }
 
-    public function updateContent(int $number, string $title, string $shortTitle, string $content, string $categories): array
+    public function updateContent(int $contentNumber, string $title, string $shortTitle, string $content, string $categories): array
     {
         $query = "UPDATE " . $this::TABLE_POSTS . " SET "
             . $this::ENTRY_TITLE . "='$title',"
             . $this::ENTRY_SHORTTITLE . "='$shortTitle',"
             . $this::ENTRY_CONTENT . "='$content',"
-            . $this::ENTRY_CATEGORIES . "='$categories' WHERE " . $this::ENTRY_NUMBER . " = '$number'";
+            . $this::ENTRY_CATEGORIES . "='$categories' WHERE " . $this::ENTRY_NUMBER . " = '$contentNumber'";
         return $this->executeRequest($query);
     }
 
@@ -48,9 +48,9 @@ class ContentModel extends BaseModel
         return $response;
     }
 
-    public function getContent(int $number): array
+    public function getContent(int $contentNumber): array
     {
-        $query = 'SELECT * FROM ' . $this::TABLE_POSTS . ' WHERE NUMBER = ' . "$number";
+        $query = 'SELECT * FROM ' . $this::TABLE_POSTS . ' WHERE NUMBER = ' . "$contentNumber";
         return $this->executeRequest($query);
     }
 
@@ -77,9 +77,9 @@ class ContentModel extends BaseModel
         return $req->fetch(PDO::FETCH_NAMED)['COUNT(*)'];
     }
 
-    public function deleteContent(int $number): array
+    public function deleteContent(int $contentNumber): array
     {
-        $query = "DELETE FROM " . $this::TABLE_POSTS . " WHERE " . $this::ENTRY_NUMBER . " = '$number'";
+        $query = "DELETE FROM " . $this::TABLE_POSTS . " WHERE " . $this::ENTRY_NUMBER . " = '$contentNumber'";
         return $this->executeRequest($query);
     }
 }
