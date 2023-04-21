@@ -1,10 +1,9 @@
 import React from "react";
 import {Box, Grid, Typography} from "@mui/material";
-import TextTruncate from "react-text-truncate";
 import PixelSumm from "../utils/PixelSumm";
-import {IsMobileResolution} from "../utils/MobileUtilities";
 import {Link} from "react-router-dom";
 import {ContentPreview} from "../utils/ContentPreview";
+import {StripHTMLFromString} from "../utils/StripHTMLFromString";
 
 export type AssetItemDisplay = {
     itemData: ContentPreview,
@@ -30,8 +29,6 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
     }
     const startPictureWidth = 187;
     let fontSizeMod = parseFloat(itemStyle.width as string) / startPictureWidth;
-    //Truncate doesn't work well on mobile browsers (ok in mobile mode on desktop) so we have to use different line parameter
-    const truncateLine = IsMobileResolution() ? 3 : 4;
 
     const titleFontSize = fontSizeMod + "rem";
     const subtitleFontSite = (fontSizeMod * 0.7) + "rem";
@@ -43,7 +40,14 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
             <Typography component="h6" fontSize={titleFontSize}>{itemData.SHORTTITLE}</Typography>
             <Typography variant="subtitle1" fontSize={subtitleFontSite}
                         color="#999999"> {itemData.CATEGORIES}</Typography>
-            <TextTruncate line={truncateLine} truncateText="..." text={itemData.CONTENT}/>
+            <Typography sx={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                wordWrap: "anywhere",
+                WebkitLineClamp: "5",
+                WebkitBoxOrient: "vertical",
+                display: "-webkit-box"
+            }}> {StripHTMLFromString(itemData.CONTENT)}</Typography>
         </Grid>
     </Grid>);
 }
