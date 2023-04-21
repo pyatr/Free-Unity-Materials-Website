@@ -17,13 +17,13 @@ class UserController extends BaseController
         $this->userModel = new UserModel();
     }
 
-    public function Login($params): array
+    public function tryLogin($params): array
     {
         $response = array('loginStatus' => 'failed');
         $email = $this->tryGetValue($params, 'email');
         $password = $this->tryGetValue($params, 'password');
         if ($email != null && $password != null) {
-            $loginStatus = $this->tryLogin($email, $password);
+            $loginStatus = $this->doesUserExist($email, $password);
             if ($loginStatus) {
                 //Should hash with User IP
                 $hashedData = openssl_encrypt(
@@ -67,16 +67,22 @@ class UserController extends BaseController
             $decoded = json_decode($dehashed);
             $email = $decoded[0];
             $password = $decoded[1];
-            $loginStatus = $this->tryLogin($email, $password);
+            $loginStatus = $this->doesUserExist($email, $password);
             if ($loginStatus) {
                 $response['loginStatus'] = 'success';
                 $response['userName'] = $this->userModel->getUserName($email);
+                $response['userRole'] = $this->userModel->getUserRole($email);
             }
         }
         return $response;
     }
 
-    private function tryLogin(string $email, string $password): bool
+    private function getUserRole(string $email): string
+    {
+        return $this->userModel->getUserRole($email);
+    }
+
+    private function doesUserExist(string $email, string $password): bool
     {
         return $this->userModel->elementWithParametersExists(
             'USERS',

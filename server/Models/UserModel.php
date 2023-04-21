@@ -26,29 +26,33 @@ class UserModel extends BaseModel
             '`, `' . UserModel::ENTRY_ROLE . '`)';
     }
 
-    public function doesUserExist(
-        string $key
-    ): bool {
-        return $this->DBConn->query(
-                "SELECT COUNT(1) FROM " . $this::TABLE_USERS . " WHERE unique_key = $key"
-            ) > 0;
+    public function doesUserExist(string $key): bool
+    {
+        return $this->DBConn->query("SELECT COUNT(1) FROM " . $this::TABLE_USERS . " WHERE unique_key = $key") > 0;
     }
 
     //How to change username: UPDATE USERS SET USERNAME = 'newname' WHERE USERNAME = 'oldname';
 
-    public function getUserName(string $email): string
+    public function getUserParam(string $email, string $param): string
     {
         $query = "SELECT * FROM " . $this::TABLE_USERS . " WHERE " . $this::ENTRY_EMAIL . " = '$email'";
         $req = $this->DBConn->prepare($query);
         $req->execute();
-        return $req->fetch()['USERNAME'];
+        return $req->fetch()[$param];
     }
 
-    public function createNewUser(
-        string $newName,
-        string $password,
-        string $email
-    ): void {
+    public function getUserName(string $email): string
+    {
+        return $this->getUserParam($email, 'USERNAME');
+    }
+
+    public function getUserRole(string $email): string
+    {
+        return $this->getUserParam($email, 'STATUS');
+    }
+
+    public function createNewUser(string $newName, string $password, string $email): void
+    {
         if (!$this->doesUserExist($email)) {
             $hashedPassword = hash(BaseModel::HASHING_ALGORITHM, $password);
             $this->performQuery();

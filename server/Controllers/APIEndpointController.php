@@ -25,7 +25,7 @@ class APIEndpointController
         if ($request != null) {
             switch ($request) {
                 case 'login':
-                    $this->respond($this->userController->Login($params));
+                    $this->respond($this->userController->tryLogin($params));
                     break;
                 case 'loginCookie':
                     $this->respond($this->userController->tryLoginWithCookie());
