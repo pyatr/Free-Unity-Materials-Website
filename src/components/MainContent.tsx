@@ -14,6 +14,7 @@ import {AxiosResponse} from "axios";
 import {Route, Routes} from "react-router-dom";
 import ItemPage from "../pages/Item/ItemPage";
 import {ContentPreview} from "../utils/ContentPreview";
+import {GetSubURL} from "../utils/GetSubURL";
 
 function GetMainStyles() {
     return ([{
@@ -97,9 +98,8 @@ export default function MainContent({mainElement}: ContentProps) {
     }
 
     let pageFinishedLoading = rawContent.length > 0;
-    let urlParts = window.location.pathname.split('/');
 
-    const lastPart = Number(urlParts[urlParts.length - 1]);
+    const lastPart = Number(GetSubURL());
     let itemNum = -1;
     if (!isNaN(lastPart)) {
         itemNum = lastPart;

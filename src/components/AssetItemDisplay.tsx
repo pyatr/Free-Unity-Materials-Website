@@ -44,9 +44,10 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 wordWrap: "anywhere",
-                WebkitLineClamp: "5",
+                WebkitLineClamp: "4",
                 WebkitBoxOrient: "vertical",
-                display: "-webkit-box"
+                display: "-webkit-box",
+                fontSize: subtitleFontSite
             }}> {StripHTMLFromString(itemData.CONTENT)}</Typography>
         </Grid>
     </Grid>);

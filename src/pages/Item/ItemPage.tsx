@@ -3,6 +3,7 @@ import {Grid, Typography} from "@mui/material";
 import ServerConnection from "../../utils/ServerConnection";
 import {AxiosResponse} from "axios";
 import {ContentItem} from "../../utils/ContentItem";
+import parse from 'html-react-parser';
 
 export type ItemNumber = {
     itemNumber: number
@@ -40,14 +41,14 @@ export default function ItemPage({itemNumber}: ItemNumber) {
     const gridStyle = {
         display: "grid"
     }
-
     if (rawItemContent.length > 0) {
         window.scrollTo(0, 0);
+        let content = parse(rawItemContent[0].CONTENT.replace('\n', '<br/>'));
         return (
             <Grid style={gridStyle}>
-                <Typography variant="h5" >{rawItemContent[0].TITLE}</Typography>
-                <Typography variant="h6" color="grey">{rawItemContent[0].CATEGORIES}</Typography>
-                <Typography variant="h5">{rawItemContent[0].CONTENT}</Typography>
+                <Typography variant="h4">{rawItemContent[0].TITLE}</Typography>
+                <Typography variant="subtitle2" color="grey">{rawItemContent[0].CATEGORIES}</Typography>
+                <Typography sx={{wordBreak: "break-word"}} variant="body1">{content}</Typography>
             </Grid>);
     } else {
         return (<Fragment/>);
