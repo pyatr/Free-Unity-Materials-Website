@@ -21,7 +21,6 @@ export default function CategoryMenu() {
         marginBottom: "8px",
         fontSize: fontSize,
         border: 2,
-        borderColor: "white",
         fontWeight: "bold",
         display: 'block',
         padding: "6px"
