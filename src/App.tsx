@@ -1,7 +1,5 @@
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 
-import {Grid} from "@mui/material";
-
 import "./assets/HomePage.css";
 import SiteAppBar from "./components/SiteAppBar";
 import LoginPage from "./pages/Login/LoginPage";
@@ -40,16 +38,14 @@ export default function App() {
     return (
         <BrowserRouter>
             <SiteAppBar/>
-            <Grid container margin="1%">
-                <Routes>
-                    <Route path="login" element={<LoginPage/>}/>
-                    <Route path="register" element={<LoginPage/>}/>
-                    <Route path="articles" element={<MainContent mainElement={articles}/>}/>
-                    <Route path="scripts" element={<MainContent mainElement={scripts}/>}/>
-                    <Route path="/" element={<MainContent mainElement={assets}/>}/>
-                    <Route path="*" element={<MainContent mainElement={none}/>}/>
-                </Routes>
-            </Grid>
+            <Routes>
+                <Route path="login" element={<LoginPage/>}/>
+                <Route path="register" element={<LoginPage/>}/>
+                <Route path="articles" element={<MainContent mainElement={articles}/>}/>
+                <Route path="scripts" element={<MainContent mainElement={scripts}/>}/>
+                <Route path="/" element={<MainContent mainElement={assets}/>}/>
+                <Route path="*" element={<MainContent mainElement={none}/>}/>
+            </Routes>
         </BrowserRouter>
     );
 }

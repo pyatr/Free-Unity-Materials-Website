@@ -1,6 +1,6 @@
 import React, {Fragment, useEffect, useState} from "react";
 import CategoryMenu from "./CategoryMenu";
-import {Box, Grid} from "@mui/material";
+import {Box, Button, Grid} from "@mui/material";
 import {ContentProps} from "../App";
 import ContentPageSwitch from "./ContentPageSwitch";
 import AssetsPage from "../pages/AssetsPage/AssetsPage";
@@ -15,27 +15,33 @@ import {Route, Routes} from "react-router-dom";
 import ItemPage from "../pages/Item/ItemPage";
 import {ContentPreview} from "../utils/ContentPreview";
 import {GetSubURL} from "../utils/GetSubURL";
+import {IsMobileResolution} from "../utils/MobileUtilities";
+import {CanUserEditContent} from "../utils/Login";
 
 function GetMainStyles() {
+    //71+12+12+1.5+1.5+1+1 = 100%
+    //grid style
     return ([{
-        width: "71%",
-        justifyContent: "center",
-        margin: '0.5%',
+        width: "70%",
         gap: "32px",
         paddingBottom: "96px",
+        display: "grid"
     }, {
-        p: 2,
-        //71+12+12+1.5+1.5+1+1 = 100%
+        //content box style
         width: "100%",
         border: 2,
         borderColor: 'primary.main',
         borderRadius: 1,
-        justifySelf: "stretch",
-        alignSelf: "stretch",
+        padding: "16px"
     }]);
 }
 
 export default function MainContent({mainElement}: ContentProps) {
+    const landW = "15%";
+    const portW = "30%";
+    const isPortrait = IsMobileResolution();
+    const selectedWidth = isPortrait ? portW : landW;
+
     const [gridStyle, boxStyle] = GetMainStyles();
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -104,11 +110,19 @@ export default function MainContent({mainElement}: ContentProps) {
     if (!isNaN(lastPart)) {
         itemNum = lastPart;
     }
-
     return (
-        <Fragment>
-            <CategoryMenu/>
-            <Grid container sx={gridStyle}>
+        <Grid display="flex" padding="8px" gap="8px" paddingTop="16px">
+            <Grid display="grid" width={selectedWidth} height="fit-content" gap="8px">
+                <CategoryMenu/>
+                {CanUserEditContent() ? <Button sx={{
+                    border: "2px",
+                    borderStyle: "solid",
+                    borderColor: "primary.main",
+                    borderRadius: 1,
+                    fontWeight: "700"
+                }}>Add new item</Button> : <Fragment/>}
+            </Grid>
+            <Grid sx={gridStyle}>
                 <Box sx={boxStyle} id="mainElementBox">
                     {<Routes>
                         <Route path="/" element={elements.get(mainElement)}/>
@@ -120,5 +134,7 @@ export default function MainContent({mainElement}: ContentProps) {
                                        onClickNum={setPageNum}/> :
                     <Fragment/>}
             </Grid>
-        </Fragment>);
+            {/*Right page content placeholder*/}
+            {isPortrait ? <Fragment/> : <Box width={selectedWidth}/>}
+        </Grid>);
 }

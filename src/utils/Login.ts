@@ -1,7 +1,6 @@
 import Cookies from "universal-cookie";
 import ServerConnection from "./ServerConnection";
 import {AxiosResponse} from "axios/index";
-import React from "react";
 
 export async function TryCookieLogin() {
     const cookie = new Cookies();
@@ -35,6 +34,7 @@ function OnCookieLoginResponse(response: AxiosResponse) {
     } else {
         sessionStorage.setItem("userLoginStatus", loginStatus);
         sessionStorage.setItem("userName", response.data.userName);
+        sessionStorage.setItem("userRole", response.data.userRole);
     }
     sessionStorage.setItem("finishedWaiting", "true");
 }
@@ -54,10 +54,19 @@ function OnLoginResponse(response: AxiosResponse) {
     }
 }
 
+export function CanUserEditContent(): boolean {
+    const editorRoles = Array("ADMIN", "EDITOR");
+    let userRole = sessionStorage.getItem("userRole");
+    if (userRole == null)
+        return false;
+    return editorRoles.includes(userRole);
+}
+
 export function ClearUserData() {
     const cookies = new Cookies();
     cookies.remove("userLogin");
     sessionStorage.removeItem("userLoginStatus");
     sessionStorage.removeItem("userName");
+    sessionStorage.removeItem("userRole");
     sessionStorage.removeItem("finishedWaiting");
 }

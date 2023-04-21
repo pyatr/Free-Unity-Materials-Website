@@ -1,19 +1,15 @@
-import {Fragment, useEffect, useState} from "react";
-import {Grid, Typography} from "@mui/material";
+import React, {Fragment, useEffect, useState} from "react";
+import {Box, Grid, Typography} from "@mui/material";
 import ServerConnection from "../../utils/ServerConnection";
 import {AxiosResponse} from "axios";
 import {ContentItem} from "../../utils/ContentItem";
 import parse from 'html-react-parser';
 
-export type ItemNumber = {
+export type ItemPage = {
     itemNumber: number
 }
 
-export type ItemPage = {
-    rawContent: ContentItem
-}
-
-export default function ItemPage({itemNumber}: ItemNumber) {
+export default function ItemPage({itemNumber}: ItemPage) {
     const [rawItemContent, setRawItemContent] = useState(Array<ContentItem>);
 
     useEffect(() => {
@@ -39,13 +35,18 @@ export default function ItemPage({itemNumber}: ItemNumber) {
     });
 
     const gridStyle = {
-        display: "grid"
+        display: "grid",
+        gap: "8px"
     }
     if (rawItemContent.length > 0) {
         window.scrollTo(0, 0);
         let content = parse(rawItemContent[0].CONTENT);
         return (
             <Grid style={gridStyle}>
+                <Box style={{width: "204px", height: "204px", border: "2px solid", borderColor: "black"}}>
+                    {<img width="200px" height="200px"
+                          src={"http://" + window.location.host + ":8000/TitlePics/" + itemNumber + ".png"}/>}
+                </Box>
                 <Typography variant="h4">{rawItemContent[0].TITLE}</Typography>
                 <Typography variant="subtitle2" color="grey">{rawItemContent[0].CATEGORIES}</Typography>
                 <Typography sx={{width: "100%", height: "100%", wordBreak: "break-word", display: "grid"}}
