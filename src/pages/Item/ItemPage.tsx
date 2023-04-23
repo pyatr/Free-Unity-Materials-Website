@@ -4,9 +4,23 @@ import ServerConnection from "../../utils/ServerConnection";
 import {AxiosResponse} from "axios";
 import {ContentItem} from "../../utils/ContentItem";
 import parse from 'html-react-parser';
+import "../../assets/HomePage.css";
 
 export type ItemPage = {
     itemNumber: number
+}
+
+const itemBorderStyle = {
+    width: "203px",
+    height: "203px",
+    border: "2px solid black"
+}
+
+const itemContentDisplay = {
+    width: '100%',
+    height: '100%',
+    wordBreak: 'break-word',
+    display: 'grid'
 }
 
 export default function ItemPage({itemNumber}: ItemPage) {
@@ -42,15 +56,14 @@ export default function ItemPage({itemNumber}: ItemPage) {
         window.scrollTo(0, 0);
         let content = parse(rawItemContent[0].CONTENT);
         return (
-            <Grid style={gridStyle}>
-                <Box style={{width: "204px", height: "204px", border: "2px solid", borderColor: "black"}}>
+            <Grid sx={itemContentDisplay}>
+                <Box style={itemBorderStyle}>
                     {<img width="200px" height="200px"
                           src={"http://" + window.location.host + ":8000/TitlePics/" + itemNumber + ".png"}/>}
                 </Box>
                 <Typography variant="h4">{rawItemContent[0].TITLE}</Typography>
                 <Typography variant="subtitle2" color="grey">{rawItemContent[0].CATEGORIES}</Typography>
-                <Typography sx={{width: "100%", height: "100%", wordBreak: "break-word", display: "grid"}}
-                            variant="body1">{content}</Typography>
+                <Typography sx={itemContentDisplay} variant="body1">{content}</Typography>
             </Grid>);
     } else {
         return (<Fragment/>);

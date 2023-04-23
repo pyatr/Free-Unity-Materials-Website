@@ -11,29 +11,36 @@ import {SitePages} from "../utils/PageData/SitePages";
 import {PageData} from "../utils/PageData/PageData";
 import ServerConnection from "../utils/ServerConnection";
 import {AxiosResponse} from "axios";
-import {Route, Routes} from "react-router-dom";
+import {Link, Route, Routes} from "react-router-dom";
 import ItemPage from "../pages/Item/ItemPage";
 import {ContentPreview} from "../utils/ContentPreview";
 import {GetSubURL} from "../utils/GetSubURL";
 import {IsMobileResolution} from "../utils/MobileUtilities";
 import {CanUserEditContent} from "../utils/Login";
+import ItemEditPage from "../pages/Item/ItemEditPage";
+import "../assets/HomePage.css";
 
-function GetMainStyles() {
-    //71+12+12+1.5+1.5+1+1 = 100%
-    //grid style
-    return ([{
-        width: "70%",
-        gap: "32px",
-        paddingBottom: "96px",
-        display: "grid"
-    }, {
-        //content box style
-        width: "100%",
-        border: 2,
-        borderColor: 'primary.main',
-        borderRadius: 1,
-        padding: "16px"
-    }]);
+const mainContentGrid = {
+    width: '70%',
+    gap: '32px',
+    paddingBottom: '96px',
+    display: 'grid'
+}
+
+const mainContentBox = {
+    width: '100%',
+    border: '2px solid',
+    //Works in border property in ItemPage but not here. Why?
+    borderColor: 'primary.main',
+    borderRadius: '4px',
+    padding: '16px'
+}
+
+const sideButtonStyle = {
+    border: '2px solid',
+    borderColor: 'primary.main',
+    borderRadius: '4px',
+    fontWeight: '700'
 }
 
 export default function MainContent({mainElement}: ContentProps) {
@@ -41,8 +48,6 @@ export default function MainContent({mainElement}: ContentProps) {
     const portW = "30%";
     const isPortrait = IsMobileResolution();
     const selectedWidth = isPortrait ? portW : landW;
-
-    const [gridStyle, boxStyle] = GetMainStyles();
 
     const [currentPage, setCurrentPage] = useState(1);
     const [rawContent, setRawContent] = useState(Array<ContentPreview>);
@@ -114,20 +119,16 @@ export default function MainContent({mainElement}: ContentProps) {
         <Grid display="flex" padding="8px" gap="8px" paddingTop="16px">
             <Grid display="grid" width={selectedWidth} height="fit-content" gap="8px">
                 <CategoryMenu/>
-                {CanUserEditContent() ? <Button sx={{
-                    border: "2px",
-                    borderStyle: "solid",
-                    borderColor: "primary.main",
-                    borderRadius: 1,
-                    fontWeight: "700"
-                }}>Add new item</Button> : <Fragment/>}
+                {CanUserEditContent() ?
+                    <Button sx={sideButtonStyle} component={Link} to={"/create"}>Add new item</Button> : <Fragment/>}
             </Grid>
-            <Grid sx={gridStyle}>
-                <Box sx={boxStyle} id="mainElementBox">
-                    {<Routes>
+            <Grid sx={mainContentGrid}>
+                <Box sx={mainContentBox} id="mainElementBox">
+                    <Routes>
                         <Route path="/" element={elements.get(mainElement)}/>
                         <Route path={"/" + itemNum} element={<ItemPage itemNumber={itemNum}/>}/>
-                    </Routes>}
+                        <Route path={"/create"} element={<ItemEditPage itemContent={null}/>}/>
+                    </Routes>
                 </Box>
                 {pageFinishedLoading ?
                     <ContentPageSwitch pageName={mainElement} onClickBack={clickBack} onClickForward={clickForward}

@@ -18,19 +18,17 @@ export default function CategoryMenu() {
     const buttonStyle = {
         ':hover': hoverButtonStyle,
         fontSize: fontSize,
-        fontWeight: "bold",
+        fontWeight: 'bold',
         display: 'block',
-        border: "2px",
-        borderStyle: "solid",
+        border: '2px solid',
         borderRadius: 1
     };
     const selectedButtonStyle = {
         ':hover': hoverButtonStyle,
         fontSize: fontSize,
-        fontWeight: "bold",
+        fontWeight: 'bold',
         display: 'block',
-        border: "2px",
-        borderStyle: "solid",
+        border: '2px solid',
         borderRadius: 1
     };
     //Border around buttons
@@ -38,12 +36,11 @@ export default function CategoryMenu() {
         height: 'fit-content',
         alignSelf: 'normal',
         color: 'primary.main',
-        border: "2px",
-        borderStyle: "solid",
+        border: '2px solid',
         borderRadius: 1,
-        gap: "8px",
-        padding: "8px",
-        width: "auto"
+        gap: '8px',
+        padding: '8px',
+        width: 'auto'
     };
     const links = [["/", "Assets"], ["/articles", "Articles"], ["/scripts", "Scripts"]];
     const currentURL = "/" + GetSubURL();

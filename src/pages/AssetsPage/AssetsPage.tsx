@@ -46,9 +46,14 @@ export default function AssetsPage({pageData, rawContent}: PageLoadProps) {
             let realLength = slice.length;
             slice.length += rcCount[1] - realLength;
             for (let j = realLength; j < slice.length; j++) {
-                slice[j] = structuredClone(slice[0]);
                 //Create dummy elements for dynamic grid in case there are not enough items in row
-                slice[j].NUMBER = -1;
+                slice[j] = {
+                    NUMBER: -1,
+                    SHORTTITLE: "",
+                    CATEGORIES: "",
+                    CONTENT: "",
+                    TITLEPIC_LINK: ""
+                }
             }
             slicedPreparedContent.push(slice.map((item) => (
                 <AssetItemDisplay itemData={item} itemStyle={boxStyle}/>)));

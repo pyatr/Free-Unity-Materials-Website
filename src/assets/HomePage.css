@@ -15,6 +15,7 @@ body {
     sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow: scroll;
 }
 
 img {
@@ -26,4 +27,32 @@ code {
     display: block;
     white-space: pre-wrap;
 }
+
 /*Alternative to code styling - pre{white-space: break-spaces;}*/
+
+mainContentGrid {
+    width: 70%;
+    gap: 32px;
+    padding-bottom: 96px;
+    display: grid;
+}
+
+mainContentBox {
+    width: 100%;
+    border: 2px solid #1976d2;
+    border-radius: 4px;
+    padding: 16px;
+}
+
+itemContentImageContainer {
+    width: 203px;
+    height: 203px;
+    border: 2px solid black;
+}
+
+itemContentDisplay {
+    width: 100%;
+    height: 100%;
+    word-break: break-word;
+    display: grid;
+}

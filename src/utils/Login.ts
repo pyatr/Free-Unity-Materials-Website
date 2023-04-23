@@ -1,6 +1,7 @@
 import Cookies from "universal-cookie";
 import ServerConnection from "./ServerConnection";
 import {AxiosResponse} from "axios/index";
+import {GoToHomePage} from "./GoToHomePage";
 
 export async function TryCookieLogin() {
     const cookie = new Cookies();
@@ -48,7 +49,7 @@ function OnLoginResponse(response: AxiosResponse) {
         const date = Date.now();
         const expirationDate = new Date(date + 1000 * 60 * 60 * 24);
         cookies.set("userLogin", response.data.loginCookie, {expires: expirationDate});
-        window.open(window.location.protocol + "//" + window.location.hostname, "_self");
+        GoToHomePage();
     } catch (e) {
         console.log("Error when parsing login response: " + e);
     }
