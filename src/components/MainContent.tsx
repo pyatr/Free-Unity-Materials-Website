@@ -43,6 +43,8 @@ const sideButtonStyle = {
     fontWeight: '700'
 }
 
+export {sideButtonStyle}
+
 export default function MainContent({mainElement}: ContentProps) {
     const landW = "15%";
     const portW = "30%";
@@ -84,7 +86,7 @@ export default function MainContent({mainElement}: ContentProps) {
                 pageSize: elementPageData.pageSize,
                 page: elementPageData.currentPage
             };
-            await scon.sendPostRequest(elementPageData.getRequestName(), params,
+            await scon.SendPostRequest(elementPageData.getRequestName(), params,
                 (response: AxiosResponse) => {
                     //Use response.data.code for SQL request code and response.data.requesterror for error details
                     if (response.data.result === "success") {

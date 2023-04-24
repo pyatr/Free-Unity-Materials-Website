@@ -11,9 +11,9 @@ export type ItemPage = {
 }
 
 const itemBorderStyle = {
-    width: "203px",
-    height: "203px",
-    border: "2px solid black"
+    width: '203px',
+    height: '203px',
+    border: '2px solid black'
 }
 
 const itemContentDisplay = {
@@ -22,6 +22,8 @@ const itemContentDisplay = {
     wordBreak: 'break-word',
     display: 'grid'
 }
+
+export {itemBorderStyle}
 
 export default function ItemPage({itemNumber}: ItemPage) {
     const [rawItemContent, setRawItemContent] = useState(Array<ContentItem>);
@@ -35,7 +37,7 @@ export default function ItemPage({itemNumber}: ItemPage) {
             let params = {
                 number: itemNumber
             };
-            await scon.sendPostRequest("getContent", params,
+            await scon.SendPostRequest("getContent", params,
                 (response: AxiosResponse) => {
                     //Use response.data.code for SQL request code and response.data.requesterror for error details
                     if (response.data.result === "success") {
@@ -48,10 +50,6 @@ export default function ItemPage({itemNumber}: ItemPage) {
         waitForItemContent();
     });
 
-    const gridStyle = {
-        display: "grid",
-        gap: "8px"
-    }
     if (rawItemContent.length > 0) {
         window.scrollTo(0, 0);
         let content = parse(rawItemContent[0].CONTENT);
