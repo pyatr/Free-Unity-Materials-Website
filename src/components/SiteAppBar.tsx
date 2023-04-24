@@ -10,13 +10,8 @@ import {
     Typography,
     Grid
 } from "@mui/material";
-import {ClearUserData} from "../utils/Login";
 import {IsMobileResolution} from "../utils/MobileUtilities";
-
-function LogOut() {
-    ClearUserData();
-    window.location.reload();
-}
+import {LogOut} from "../utils/Login";
 
 function WaitForLogin(onFinishedWaiting: Function) {
     let finishedWaiting = (sessionStorage.getItem("finishedWaiting") === "true");

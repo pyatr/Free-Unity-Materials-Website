@@ -55,6 +55,11 @@ function OnLoginResponse(response: AxiosResponse) {
     }
 }
 
+export function LogOut() {
+    ClearUserData();
+    GoToHomePage();
+}
+
 export function CanUserEditContent(): boolean {
     const editorRoles = Array("ADMIN", "EDITOR");
     let userRole = sessionStorage.getItem("userRole");
