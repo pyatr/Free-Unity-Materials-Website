@@ -9,7 +9,7 @@ export default class ServerConnection {
         this.serverConnection = "http://" + window.location.host + ":" + this.serverPort;
     }
 
-    public async sendPostRequest(requestName: string, requestParams: {}, onRequestResponse: Function) {
+    public async SendPostRequest(requestName: string, requestParams: {}, onRequestResponse: Function) {
         axios.post(this.serverConnection, {
             request: requestName,
             params: requestParams

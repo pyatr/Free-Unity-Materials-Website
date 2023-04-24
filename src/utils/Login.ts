@@ -9,7 +9,7 @@ export async function TryCookieLogin() {
     if (loginCookie != null) {
         let scon = new ServerConnection();
         sessionStorage.removeItem("finishedWaiting");
-        await scon.sendPostRequest("loginCookie", {}, OnCookieLoginResponse);
+        await scon.SendPostRequest("loginCookie", {}, OnCookieLoginResponse);
     } else {
         ClearUserData();
         sessionStorage.setItem("finishedWaiting", "true");
@@ -24,7 +24,7 @@ export async function TryLogin(email: string, password: string) {
         email: email,
         password: password
     };
-    await scon.sendPostRequest("login", params, OnLoginResponse);
+    await scon.SendPostRequest("login", params, OnLoginResponse);
 }
 
 function OnCookieLoginResponse(response: AxiosResponse) {
