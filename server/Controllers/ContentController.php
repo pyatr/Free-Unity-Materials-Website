@@ -20,7 +20,18 @@ class ContentController extends BaseController
         $shortTitle = $this->tryGetValue($params, 'shortTitle');
         $content = $this->tryGetValue($params, 'content');
         $categories = $this->tryGetValue($params, 'categories');
-        return $this->contentModel->createContent($title, $shortTitle, $content, $categories);
+        $response = $this->contentModel->createContent($title, $shortTitle, $content, $categories);
+        //Enable image saving (and probably more): /var/www/html/server# chmod -R 777 TitlePics
+        $lastID = $this->contentModel->getLastPostID();
+        if ($response['result'] == 'success') {
+            $preview = $this->tryGetValue($params, 'preview');
+            $saveLocation = "/var/www/html/server/TitlePics/$lastID.png";
+            //echo $saveLocation . $preview;
+            $savedImage = file_get_contents($preview);
+            file_put_contents($saveLocation, $savedImage);
+        }
+        $response['content']['itemID'] = $lastID;
+        return $response;
     }
 
     public function deleteContent($params): array

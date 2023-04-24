@@ -23,6 +23,12 @@ class ContentModel extends BaseModel
         return $this->executeRequest($query);
     }
 
+    public function getLastPostID(): string
+    {
+        $query = "SELECT LAST_INSERT_ID();";
+        return $this->executeRequest($query)['content'][0]['LAST_INSERT_ID()'];
+    }
+
     public function updateContent(int $contentNumber, string $title, string $shortTitle, string $content, string $categories): array
     {
         $query = "UPDATE " . $this::TABLE_POSTS . " SET "
