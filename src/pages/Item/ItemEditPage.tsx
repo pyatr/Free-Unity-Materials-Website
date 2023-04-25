@@ -1,24 +1,24 @@
 import React, {Fragment, useEffect, useState} from "react";
 import {Button, Grid, Typography} from "@mui/material";
 import TextField from "@mui/material/TextField";
+import {ErrorRounded} from "@mui/icons-material";
 
+import {ContentItem, GetDummyContent} from "../../utils/Types/ContentItem";
+import {ContentItemContainer} from "../../utils/Types/ContentItemContainer";
+import {ItemPage} from "../../utils/Types/ItemPage";
+
+import {GetItem} from "../../utils/GetItem";
 import ServerConnection from "../../utils/ServerConnection";
-import {ContentItem} from "../../utils/ContentItem";
 import {GoToHomePage} from "../../utils/GoToHomePage";
+import FileToBase64 from "../../utils/FileToBase64";
 
 import ItemEditCategorySelection, {SetCategorySelection} from "./ItemEditCategorySelection";
 import ItemStateInteractionButtons from "./ItemStateInteractionButtons";
 import ItemEditPreviewSelection from "./ItemEditPreviewSelection";
+
 import {AxiosResponse} from "axios/index";
-import FileToBase64 from "../../utils/FileToBase64";
-import {ErrorRounded} from "@mui/icons-material";
 import AssetsPage from "../AssetsPage/AssetsPage";
 import ArticlesPage from "../Articles/ArticlesPage";
-
-export type ContentItemContainer = {
-    itemContent: ContentItem,
-    contentCategory: string
-}
 
 const itemContentDisplay = {
     width: '100%',
@@ -43,7 +43,25 @@ async function SendItemChangeRequest(itemContent: ContentItem, previewImage: str
     }
 }
 
-export default function ItemEditPage({itemContent, contentCategory}: ContentItemContainer) {
+export default function ItemEditPage({itemNumber, itemCategory}: ItemPage) {
+    const [itemContent, setItemContent] = useState(GetDummyContent());
+
+    useEffect(() => {
+        if (itemContent.NUMBER == -1 && itemNumber != -1) {
+            GetItem(itemNumber).then((conItem: ContentItem) => {
+                setItemContent(conItem);
+            });
+        }
+    });
+
+    if (itemContent.NUMBER != -1 || itemNumber == -1) {
+        return (<LoadedItemEditPage itemContent={itemContent} contentCategory={itemCategory}/>);
+    } else {
+        return (<Fragment/>);
+    }
+}
+
+function LoadedItemEditPage({itemContent, contentCategory}: ContentItemContainer) {
     //Displaying category selection menu
     const [categorySelectionDisplayed, setCategorySelectionDisplay] = useState(false);
     //Content preview image as link to blob

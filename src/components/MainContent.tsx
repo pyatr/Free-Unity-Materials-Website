@@ -13,13 +13,13 @@ import ServerConnection from "../utils/ServerConnection";
 import {AxiosResponse} from "axios";
 import {Link, Route, Routes} from "react-router-dom";
 import ItemPage from "../pages/Item/ItemPage";
-import {ContentPreview} from "../utils/ContentPreview";
+import {ContentPreview} from "../utils/Types/ContentPreview";
 import {GetSubURL} from "../utils/GetSubURL";
 import {IsMobileResolution} from "../utils/MobileUtilities";
 import {CanUserEditContent} from "../utils/Login";
 import ItemEditPage from "../pages/Item/ItemEditPage";
 import "../assets/HomePage.css";
-import {GetDummyContent} from "../utils/ContentItem";
+import {GetDummyContent} from "../utils/Types/ContentItem";
 
 const mainContentGrid = {
     width: '70%',
@@ -119,11 +119,13 @@ export default function MainContent({mainElement}: ContentProps) {
         itemNum = lastPart;
     }
     const cachedLastUrl = subUrl.length > 0 ? "/" + subUrl : "";
+    const permittedCreationLinks = ["", "/articles", "/scripts"];
+    const canShowCreateButton = permittedCreationLinks.includes(cachedLastUrl);
     return (
         <Grid display="flex" padding="8px" gap="8px" paddingTop="16px">
             <Grid display="grid" width={selectedWidth} height="fit-content" gap="8px">
                 <CategoryMenu/>
-                {CanUserEditContent() ?
+                {CanUserEditContent() && canShowCreateButton ?
                     <Button sx={sideButtonStyle} component={Link} to={cachedLastUrl + "/create"}>Add new item</Button> :
                     <Fragment/>}
             </Grid>
@@ -131,13 +133,14 @@ export default function MainContent({mainElement}: ContentProps) {
                 <Box sx={mainContentBox} id="mainElementBox">
                     <Routes>
                         <Route path="/" element={elements.get(mainElement)}/>
-                        <Route path={"/" + itemNum} element={<ItemPage itemNumber={itemNum}/>}/>
-                        <Route path={"/create"} element={<ItemEditPage contentCategory={"AssetsPage"}
-                                                                       itemContent={GetDummyContent()}/>}/>
-                        <Route path={"/articles/create"} element={<ItemEditPage contentCategory={"ArticlesPage"}
-                                                                                itemContent={GetDummyContent()}/>}/>
-                        <Route path={"/scripts/create"} element={<ItemEditPage contentCategory={"ScriptsPage"}
-                                                                       itemContent={GetDummyContent()}/>}/>
+                        <Route path={"/" + itemNum}
+                               element={<ItemPage itemCategory={"AssetsPage"} itemNumber={itemNum}/>}/>
+                        <Route path={"/create"}
+                               element={<ItemEditPage itemCategory={"AssetsPage"} itemNumber={-1}/>}/>
+                        <Route path={"/articles/create"}
+                               element={<ItemEditPage itemCategory={"ArticlesPage"} itemNumber={-1}/>}/>
+                        <Route path={"/scripts/create"}
+                               element={<ItemEditPage itemCategory={"ScriptsPage"} itemNumber={-1}/>}/>
                     </Routes>
                 </Box>
                 {pageFinishedLoading ?

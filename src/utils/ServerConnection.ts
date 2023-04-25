@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, {AxiosResponse} from 'axios';
 
 export default class ServerConnection {
     private readonly serverConnection: string;
@@ -20,5 +20,13 @@ export default class ServerConnection {
             .catch(function (error) {
                 console.log(error);
             });
+    }
+
+    public async SendPostRequestPromise(requestName: string, requestParams: {}): Promise<AxiosResponse> {
+        const response = await axios.post(this.serverConnection, {
+            request: requestName,
+            params: requestParams
+        });
+        return response;
     }
 }
