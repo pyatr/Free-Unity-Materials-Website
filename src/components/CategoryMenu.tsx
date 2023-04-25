@@ -11,8 +11,7 @@ export default function CategoryMenu() {
     const hoverButtonStyle = {
         border: "2px",
         borderStyle: "solid",
-        borderRadius: 1,
-        bgColor: 'default'
+        borderRadius: 1
     }
     //Add color: "white" to make highlight for selected category button, not used right now
     const buttonStyle = {
@@ -21,6 +20,7 @@ export default function CategoryMenu() {
         fontWeight: 'bold',
         display: 'block',
         border: '2px solid',
+        borderColor: 'white',
         borderRadius: 1
     };
     const selectedButtonStyle = {
@@ -29,6 +29,7 @@ export default function CategoryMenu() {
         fontWeight: 'bold',
         display: 'block',
         border: '2px solid',
+        borderColor: 'primary.main',
         borderRadius: 1
     };
     //Border around buttons

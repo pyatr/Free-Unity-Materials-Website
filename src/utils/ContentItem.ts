@@ -6,3 +6,14 @@ export type ContentItem = {
     CREATION_DATE: string,
     CONTENT: string
 }
+
+export function GetDummyContent(): ContentItem {
+    return {
+        NUMBER: -1,
+        TITLE: "",
+        SHORTTITLE: "",
+        CATEGORIES: "",
+        CREATION_DATE: "",
+        CONTENT: ""
+    }
+}

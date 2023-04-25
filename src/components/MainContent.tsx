@@ -19,6 +19,7 @@ import {IsMobileResolution} from "../utils/MobileUtilities";
 import {CanUserEditContent} from "../utils/Login";
 import ItemEditPage from "../pages/Item/ItemEditPage";
 import "../assets/HomePage.css";
+import {GetDummyContent} from "../utils/ContentItem";
 
 const mainContentGrid = {
     width: '70%',
@@ -111,25 +112,32 @@ export default function MainContent({mainElement}: ContentProps) {
     }
 
     let pageFinishedLoading = rawContent.length > 0;
-
-    const lastPart = Number(GetSubURL());
+    const subUrl = GetSubURL();
+    const lastPart = Number(subUrl);
     let itemNum = -1;
     if (!isNaN(lastPart)) {
         itemNum = lastPart;
     }
+    const cachedLastUrl = subUrl.length > 0 ? "/" + subUrl : "";
     return (
         <Grid display="flex" padding="8px" gap="8px" paddingTop="16px">
             <Grid display="grid" width={selectedWidth} height="fit-content" gap="8px">
                 <CategoryMenu/>
                 {CanUserEditContent() ?
-                    <Button sx={sideButtonStyle} component={Link} to={"/create"}>Add new item</Button> : <Fragment/>}
+                    <Button sx={sideButtonStyle} component={Link} to={cachedLastUrl + "/create"}>Add new item</Button> :
+                    <Fragment/>}
             </Grid>
             <Grid sx={mainContentGrid}>
                 <Box sx={mainContentBox} id="mainElementBox">
                     <Routes>
                         <Route path="/" element={elements.get(mainElement)}/>
                         <Route path={"/" + itemNum} element={<ItemPage itemNumber={itemNum}/>}/>
-                        <Route path={"/create"} element={<ItemEditPage itemContent={null}/>}/>
+                        <Route path={"/create"} element={<ItemEditPage contentCategory={"AssetsPage"}
+                                                                       itemContent={GetDummyContent()}/>}/>
+                        <Route path={"/articles/create"} element={<ItemEditPage contentCategory={"ArticlesPage"}
+                                                                                itemContent={GetDummyContent()}/>}/>
+                        <Route path={"/scripts/create"} element={<ItemEditPage contentCategory={"ScriptsPage"}
+                                                                       itemContent={GetDummyContent()}/>}/>
                     </Routes>
                 </Box>
                 {pageFinishedLoading ?

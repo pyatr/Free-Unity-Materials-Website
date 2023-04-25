@@ -10,9 +10,14 @@ import ItemEditCategorySelection, {SetCategorySelection} from "./ItemEditCategor
 import ItemStateInteractionButtons from "./ItemStateInteractionButtons";
 import ItemEditPreviewSelection from "./ItemEditPreviewSelection";
 import {AxiosResponse} from "axios/index";
+import FileToBase64 from "../../utils/FileToBase64";
+import {ErrorRounded} from "@mui/icons-material";
+import AssetsPage from "../AssetsPage/AssetsPage";
+import ArticlesPage from "../Articles/ArticlesPage";
 
 export type ContentItemContainer = {
-    itemContent: ContentItem | null
+    itemContent: ContentItem,
+    contentCategory: string
 }
 
 const itemContentDisplay = {
@@ -32,33 +37,52 @@ async function SendItemChangeRequest(itemContent: ContentItem, previewImage: str
         preview: previewImage
     };
 
-    let scon = new ServerConnection();
-    await scon.SendPostRequest(requestName, params, callback);
+    if (previewImage != "") {
+        let scon = new ServerConnection();
+        await scon.SendPostRequest(requestName, params, callback);
+    }
 }
 
-export default function ItemEditPage({itemContent: currentItem}: ContentItemContainer) {
-    if (currentItem == null) {
-        currentItem = {
-            NUMBER: -1,
-            TITLE: "No title",
-            SHORTTITLE: "No short title",
-            CATEGORIES: "",
-            CREATION_DATE: "generated",
-            CONTENT: ""
-        };
-    }
-
+export default function ItemEditPage({itemContent, contentCategory}: ContentItemContainer) {
+    //Displaying category selection menu
     const [categorySelectionDisplayed, setCategorySelectionDisplay] = useState(false);
-    const [file, setFile] = useState("");
-    const [currentItemCategories, changeCategorySet] = useState(currentItem.CATEGORIES);
+    //Content preview image as link to blob
+    //Get image "http://" + window.location.host + ":8000/TitlePics/" + itemContent.NUMBER + ".png"
+    const [previewImage, setPreviewImage] = useState("");
+    //Preview image converted to Base64 string
+    const [previewAsBase64, setPreview] = useState("");
+    //Error notification message
+    const [errorNotification, setErrorNotification] = useState("");
+
+    const [currentItemState, setItemState] = useState<ContentItem>(
+        {
+            NUMBER: itemContent.NUMBER,
+            TITLE: itemContent.TITLE,
+            SHORTTITLE: itemContent.SHORTTITLE,
+            CATEGORIES: itemContent.CATEGORIES,
+            CREATION_DATE: itemContent.CREATION_DATE,
+            CONTENT: itemContent.CONTENT
+        }
+    );
+
+    const pageCategoryNames = new Map();
+
+    pageCategoryNames.set("AssetsPage", "Assets");
+    pageCategoryNames.set("ArticlesPage", "Articles");
+    pageCategoryNames.set("ScriptsPage", "Scripts");
+    console.log(pageCategoryNames);
+    console.log(contentCategory);
+    const pageTitle = currentItemState.NUMBER == -1 ? pageCategoryNames.get(contentCategory) + ": Create new item" : "Edit " + itemContent.TITLE;
 
     const titleLimit = 128;
     const shortTitleLimit = 20;
 
-    const currentCategories = currentItemCategories.split(", ");
-
     function loadImage(e: any) {
-        setFile(URL.createObjectURL(e.target.files[0]));
+        let file = e.target.files[0];
+        FileToBase64(file, (result: string) => {
+            setPreview(result);
+        });
+        setPreviewImage(URL.createObjectURL(file));
     }
 
     const switchCatSelection = () => {
@@ -66,32 +90,61 @@ export default function ItemEditPage({itemContent: currentItem}: ContentItemCont
     }
 
     const setTitle = (event: any) => {
-        if (currentItem != null)
-            currentItem.TITLE = event.target.value;
+        setItemState({
+            NUMBER: currentItemState.NUMBER,
+            TITLE: event.target.value,
+            SHORTTITLE: currentItemState.SHORTTITLE,
+            CATEGORIES: currentItemState.CATEGORIES,
+            CREATION_DATE: currentItemState.CREATION_DATE,
+            CONTENT: currentItemState.CONTENT
+        });
     }
 
     const setShortTitle = (event: any) => {
-        if (currentItem != null)
-            currentItem.SHORTTITLE = event.target.value;
+        setItemState({
+            NUMBER: currentItemState.NUMBER,
+            TITLE: currentItemState.TITLE,
+            SHORTTITLE: event.target.value,
+            CATEGORIES: currentItemState.CATEGORIES,
+            CREATION_DATE: currentItemState.CREATION_DATE,
+            CONTENT: currentItemState.CONTENT
+        });
     }
 
     const setContent = (event: any) => {
-        if (currentItem != null)
-            currentItem.CONTENT = event.target.value;
+        setItemState({
+            NUMBER: currentItemState.NUMBER,
+            TITLE: currentItemState.TITLE,
+            SHORTTITLE: currentItemState.SHORTTITLE,
+            CATEGORIES: currentItemState.CATEGORIES,
+            CREATION_DATE: currentItemState.CREATION_DATE,
+            CONTENT: event.target.value
+        });
     }
 
     const submitContent = async () => {
-        if (currentItem == null)
+        let error: string = "";
+        if (currentItemState.TITLE == "") {
+            error += "Title is not defined\n";
+        }
+        if (currentItemState.SHORTTITLE == "") {
+            error += "Short title is not defined\n";
+        }
+        if (currentItemState.CONTENT == "") {
+            error += "No content\n";
+        }
+        if (error != "") {
+            setErrorNotification(error);
             return;
-        await SendItemChangeRequest(currentItem, file, currentItem.NUMBER == -1 ? "createContent" : "updateContent", (response: AxiosResponse) => {
+        }
+
+        await SendItemChangeRequest(currentItemState, previewAsBase64, currentItemState.NUMBER == -1 ? "createContent" : "updateContent", (response: AxiosResponse) => {
             window.open("http://" + window.location.host + "/" + response.data.content.itemID, "_self");
         });
     }
 
     const submitDeletion = async () => {
-        if (currentItem == null)
-            return;
-        await SendItemChangeRequest(currentItem, file, "deleteContent", () => {
+        await SendItemChangeRequest(currentItemState, previewImage, "deleteContent", () => {
         });
     }
 
@@ -100,25 +153,54 @@ export default function ItemEditPage({itemContent: currentItem}: ContentItemCont
     }
 
     const setCategorySelection = (cat: string) => {
-        let newCategorySelection = SetCategorySelection(cat, currentItemCategories);
-        if (currentItem != null)
-            currentItem.CATEGORIES = newCategorySelection;
-        changeCategorySet(newCategorySelection);
+        let newCategorySelection = SetCategorySelection(cat, currentItemState.CATEGORIES);
+        setItemState({
+            NUMBER: currentItemState.NUMBER,
+            TITLE: currentItemState.TITLE,
+            SHORTTITLE: currentItemState.SHORTTITLE,
+            CATEGORIES: newCategorySelection,
+            CREATION_DATE: currentItemState.CREATION_DATE,
+            CONTENT: currentItemState.CONTENT
+        });
     }
 
     return (
         <Grid style={{display: "grid", gap: "32px"}}>
             {/*Content grid*/}
             <Grid style={{display: "grid", gap: "16px"}}>
-                <ItemEditPreviewSelection previewImage={file} loadImageFunction={loadImage}/>
+                <Typography variant="h6">{pageTitle}</Typography>
+                {errorNotification != "" ?
+                    <Grid style={{
+                        display: "flex",
+                        gap: "16px",
+                        color: "red",
+                        border: "2px",
+                        borderStyle: "solid",
+                        borderRadius: "4px",
+                        padding: "16px",
+                        width: "100%",
+                        alignItems: "center",
+                        justifyContent: "space-between"
+                    }}>
+                        <Grid style={{display: "flex", gap: "16px"}}>
+                            <ErrorRounded style={{height: "inherit"}}/>
+                            <Typography textAlign="center">
+                                <pre style={{textAlign: "left"}}>{errorNotification}</pre>
+                            </Typography>
+                        </Grid>
+                        <Button onClick={() => setErrorNotification("")} style={{color: "red"}}>Dismiss</Button>
+                    </Grid> :
+                    <Fragment/>
+                }
+                <ItemEditPreviewSelection previewImage={previewImage} loadImageFunction={loadImage}/>
                 <TextField onChange={setTitle}
                            label={"Title (" + titleLimit + " characters)"}
                            inputProps={{maxLength: titleLimit}}
-                           defaultValue={currentItem.TITLE}/>
+                           defaultValue={currentItemState.TITLE}/>
                 <TextField onChange={setShortTitle}
                            label={"Preview title (" + shortTitleLimit + " characters)"}
                            inputProps={{maxLength: shortTitleLimit}}
-                           defaultValue={currentItem.SHORTTITLE}/>
+                           defaultValue={currentItemState.SHORTTITLE}/>
                 <Grid
                     style={{
                         display: "flex",
@@ -128,9 +210,9 @@ export default function ItemEditPage({itemContent: currentItem}: ContentItemCont
                         height: "24px",
                         maxHeight: "24px"
                     }}>
-                    {currentItemCategories === "" ?
+                    {currentItemState.CATEGORIES === "" ?
                         <Typography variant="subtitle2" fontStyle="italic">Choose categories</Typography> :
-                        <Typography variant="subtitle2">{currentItemCategories}</Typography>}
+                        <Typography variant="subtitle2">{currentItemState.CATEGORIES}</Typography>}
                     <Button
                         style={{
                             color: categorySelectionDisplayed ? "white" : "black",
@@ -145,7 +227,7 @@ export default function ItemEditPage({itemContent: currentItem}: ContentItemCont
                         }}
                         onClick={switchCatSelection}>+</Button>
                     {categorySelectionDisplayed ?
-                        <ItemEditCategorySelection currentCategories={currentCategories}
+                        <ItemEditCategorySelection currentCategories={currentItemState.CATEGORIES.split(", ")}
                                                    onCategorySelected={setCategorySelection}/> :
                         <Fragment/>}
                 </Grid>
@@ -153,11 +235,11 @@ export default function ItemEditPage({itemContent: currentItem}: ContentItemCont
                            label="Content"
                            multiline={true}
                            sx={itemContentDisplay}
-                           defaultValue={currentItem.CONTENT}/>
+                           defaultValue={currentItemState.CONTENT}/>
             </Grid>
             {/*Bottom buttons grid*/}
             <ItemStateInteractionButtons onSave={submitContent} onCancel={cancel} onDelete={submitDeletion}
-                                         enableDelete={currentItem.NUMBER != -1}/>
+                                         enableDelete={currentItemState.NUMBER != -1}/>
         </Grid>
     );
 }
