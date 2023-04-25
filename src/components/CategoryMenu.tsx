@@ -44,8 +44,16 @@ export default function CategoryMenu() {
         width: 'auto'
     };
     const links = [["/", "Assets"], ["/articles", "Articles"], ["/scripts", "Scripts"]];
-    const currentURL = "/" + GetSubURL();
+    const path: string = window.location.pathname;
+    let usedPath: string = path;
+    usedPath = '/' + path.split("/")[1];
+    //TODO: rework this
+    if (path === '/create') {
+        usedPath = '/';
+    }
     const buttons = links.map((link) => <Button variant="outlined" key={link[0]} component={Link} to={link[0]}
-                                                sx={currentURL == link[0] ? selectedButtonStyle : buttonStyle}>{link[1]}</Button>);
+                                                sx={(link[0].length > 1 ?
+                                                    usedPath.startsWith(link[0]) : usedPath === link[0]) ?
+                                                    selectedButtonStyle : buttonStyle}>{link[1]}</Button>);
     return (<Grid sx={boxStyle} display="grid">{buttons}</Grid>);
 }
