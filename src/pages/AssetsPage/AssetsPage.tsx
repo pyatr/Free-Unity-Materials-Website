@@ -3,8 +3,8 @@ import React, {Fragment} from "react";
 import {IsMobileResolution} from "../../utils/MobileUtilities";
 import AssetItemDisplay from "../../components/AssetItemDisplay";
 import {PageData, PageLoadProps} from "../../utils/PageData/PageData";
-import {ContentItem} from "../../utils/ContentItem";
-import {ContentPreview} from "../../utils/ContentPreview";
+import {ContentItem} from "../../utils/Types/ContentItem";
+import {ContentPreview} from "../../utils/Types/ContentPreview";
 
 function GetItemStyle(pageData: PageData): Array<any> {
     let itemDimensions = IsMobileResolution() ? [240, 384] : [160, 256];

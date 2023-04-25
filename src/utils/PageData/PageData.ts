@@ -1,4 +1,4 @@
-import {ContentPreview} from "../ContentPreview";
+import {ContentPreview} from "../Types/ContentPreview";
 
 export type PageLoadProps = {
     pageData: PageData,

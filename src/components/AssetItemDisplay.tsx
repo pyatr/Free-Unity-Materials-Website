@@ -1,7 +1,7 @@
 import React, {Fragment, useState} from "react";
 import {Box, Grid, Typography} from "@mui/material";
 import PixelSumm from "../utils/PixelSumm";
-import {ContentPreview} from "../utils/ContentPreview";
+import {ContentPreview} from "../utils/Types/ContentPreview";
 import {StripHTMLFromString} from "../utils/StripHTMLFromString";
 import {CanUserEditContent} from "../utils/Login";
 import {Cancel, CheckCircle, Delete} from "@mui/icons-material";
@@ -31,6 +31,7 @@ const adminButtonsStyle = {
     border: '2px',
     borderStyle: 'solid',
     color: 'white',
+    background: 'black',
     width: '40px',
     height: '40px',
     cursor: 'pointer',
