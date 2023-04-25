@@ -70,7 +70,7 @@ export default function ItemEditPage({itemContent, contentCategory}: ContentItem
     pageCategoryNames.set("AssetsPage", "Assets");
     pageCategoryNames.set("ArticlesPage", "Articles");
     pageCategoryNames.set("ScriptsPage", "Scripts");
-    
+
     const pageTitle = currentItemState.NUMBER == -1 ? pageCategoryNames.get(contentCategory) + ": Create new item" : "Edit " + itemContent.TITLE;
 
     const titleLimit = 128;

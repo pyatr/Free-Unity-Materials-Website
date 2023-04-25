@@ -28,7 +28,8 @@ function GetItemStyle(pageData: PageData): Array<any> {
         borderStyle: "solid",
         borderColor: "primary.main",
         color: "black",
-        textDecoration: "none"
+        textDecoration: "none",
+        boxSizing: "content-box"
     }, rcCount]);
 }
 
