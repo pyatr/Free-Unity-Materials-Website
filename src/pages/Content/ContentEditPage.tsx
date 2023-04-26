@@ -7,16 +7,17 @@ import {ContentUnit, GetDummyContent} from "../../utils/Types/Content/ContentUni
 import {ContentUnitContainer} from "../../utils/Types/Content/ContentUnitContainer";
 import {ContentUnitRequestData} from "../../utils/Types/Content/ContentUnitRequestData";
 
-import {GetContent} from "../../utils/GetContent";
+import {GetContent} from "../../utils/ContentLoading/GetContent";
 import ServerConnection from "../../utils/ServerConnection";
 import {GoToHomePage} from "../../utils/GoToHomePage";
 import FileToBase64 from "../../utils/FileToBase64";
 
 import ContentEditCategorySelection, {SetCategorySelection} from "./ContentEditCategorySelection";
 import ContentStateInteractionButtons from "./ContentStateInteractionButtons";
-import ContentEditPreviewSelection from "./ContentEditPreviewSelection";
+import ContentEditLoadImages from "./ContentEditLoadImages";
 
 import {AxiosResponse} from "axios/index";
+import ErrorNotification from "../../components/ErrorNotification";
 
 const itemContentDisplay = {
     width: '100%',
@@ -25,19 +26,19 @@ const itemContentDisplay = {
     display: 'grid'
 }
 
-async function SendContentChangeRequest(itemContent: ContentUnit, previewImage: string, requestName: string, callback: Function) {
+async function SendContentChangeRequest(itemContent: ContentUnit, imageGallery: string[], requestName: string, callback: Function) {
     const params = {
         title: itemContent.title,
         content: itemContent.content,
         categories: itemContent.categories,
         number: itemContent.number,
-        preview: previewImage
+        preview: imageGallery
     };
 
-    if (previewImage != "") {
-        let serverConnection = new ServerConnection();
-        await serverConnection.SendPostRequest(requestName, params, callback);
-    }
+    let serverConnection = new ServerConnection();
+    await serverConnection.SendPostRequestPromise(requestName, params).then(() => {
+        callback();
+    });
 }
 
 export default function ContentEditPage({contentNumber, contentCategory}: ContentUnitRequestData) {
@@ -62,9 +63,9 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
     //Displaying category selection menu
     const [categorySelectionDisplayed, setCategorySelectionDisplay] = useState(false);
     //Content preview image as link to blob
-    const [previewImage, setPreviewImage] = useState("");
+    const [galleryImages, setGalleryImages] = useState(Array<string>);
     //Preview image converted to Base64 string
-    const [previewAsBase64, setPreview] = useState("");
+    const [galleryImagesBase64, setGalleryImagesBase64] = useState(Array<string>);
     //Error notification message
     const [errorNotification, setErrorNotification] = useState("");
 
@@ -83,11 +84,18 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
     const titleLimit = 128;
 
     function loadImage(e: any) {
-        let file = e.target.files[0];
-        FileToBase64(file, (result: string) => {
-            setPreview(result);
-        });
-        setPreviewImage(URL.createObjectURL(file));
+        let files: FileList = e.target.files as FileList;
+        let filesBase64: string[] = [];
+        let blobs: string[] = [];
+        //FileList has no foreach
+        for (let i = 0; i < files.length; i++) {
+            FileToBase64(files[i], (result: string) => {
+                filesBase64.push(result);
+            });
+            blobs.push(URL.createObjectURL(files[i]));
+        }
+        setGalleryImagesBase64(filesBase64);
+        setGalleryImages(blobs);
     }
 
     const switchCatSelection = () => {
@@ -127,13 +135,13 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             return;
         }
 
-        await SendContentChangeRequest(currentItemState, previewAsBase64, currentItemState.number == -1 ? "createContent" : "updateContent", (response: AxiosResponse) => {
+        await SendContentChangeRequest(currentItemState, [], currentItemState.number == -1 ? "createContent" : "updateContent", (response: AxiosResponse) => {
             window.open("http://" + window.location.host + "/" + response.data.content.itemID, "_self");
         });
     }
 
     const submitDeletion = async () => {
-        await SendContentChangeRequest(currentItemState, previewImage, "deleteContent", () => {
+        await SendContentChangeRequest(currentItemState, [], "deleteContent", () => {
         });
     }
 
@@ -157,59 +165,36 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             {/*Content grid*/}
             <Grid style={{display: "grid", gap: "16px"}}>
                 <Typography variant="h6">{pageTitle}</Typography>
-                {errorNotification != "" ?
-                    <Grid style={{
-                        display: "flex",
-                        gap: "16px",
-                        color: "red",
-                        border: "2px",
-                        borderStyle: "solid",
-                        borderRadius: "4px",
-                        padding: "16px",
-                        width: "100%",
-                        alignItems: "center",
-                        justifyContent: "space-between"
-                    }}>
-                        <Grid style={{display: "flex", gap: "16px"}}>
-                            <ErrorRounded style={{height: "inherit"}}/>
-                            <Typography textAlign="center">
-                                <pre style={{textAlign: "left"}}>{errorNotification}</pre>
-                            </Typography>
-                        </Grid>
-                        <Button onClick={() => setErrorNotification("")} style={{color: "red"}}>Dismiss</Button>
-                    </Grid> :
-                    <Fragment/>
-                }
-                <ContentEditPreviewSelection previewImage={previewImage} loadImageFunction={loadImage}/>
+                <ErrorNotification message={errorNotification} onDismiss={() => {
+                    setErrorNotification("")
+                }}/>
+                <ContentEditLoadImages loadImageFunction={loadImage}/>
                 <TextField onChange={setTitle}
                            label={"Title (" + titleLimit + " characters)"}
                            inputProps={{maxLength: titleLimit}}
                            defaultValue={currentItemState.title}/>
-                <Grid
-                    style={{
-                        display: "flex",
-                        alignItems: "flex-end",
-                        gap: "8px",
-                        width: "fit-content",
-                        height: "24px",
-                        maxHeight: "24px"
-                    }}>
+                <Grid style={{
+                    display: "flex",
+                    alignItems: "flex-end",
+                    gap: "8px",
+                    width: "fit-content",
+                    height: "24px",
+                    maxHeight: "24px"
+                }}>
                     {currentItemState.categories === "" ?
                         <Typography variant="subtitle2" fontStyle="italic">Choose categories</Typography> :
                         <Typography variant="subtitle2">{currentItemState.categories}</Typography>}
-                    <Button
-                        style={{
-                            color: categorySelectionDisplayed ? "white" : "black",
-                            background: categorySelectionDisplayed ? "black" : "white",
-                            border: "1px solid",
-                            borderRadius: "50px",
-                            borderColor: "black",
-                            minWidth: "24px",
-                            minHeight: "24px",
-                            height: "24px",
-                            width: "24px"
-                        }}
-                        onClick={switchCatSelection}>+</Button>
+                    <Button style={{
+                        color: categorySelectionDisplayed ? "white" : "black",
+                        background: categorySelectionDisplayed ? "black" : "white",
+                        border: "1px solid",
+                        borderRadius: "50px",
+                        borderColor: "black",
+                        minWidth: "24px",
+                        minHeight: "24px",
+                        height: "24px",
+                        width: "24px"
+                    }} onClick={switchCatSelection}>+</Button>
                     {categorySelectionDisplayed ?
                         <ContentEditCategorySelection currentCategories={currentItemState.categories.split(", ")}
                                                       onCategorySelected={setCategorySelection}/> :

@@ -1,18 +1,13 @@
 import {Box, Grid, Typography} from "@mui/material";
 import React, {ChangeEventHandler, Fragment} from "react";
-import {itemBorderStyle} from "./ContentPage";
 
 export type ItemPreviewSelection = {
-    previewImage: string,
     loadImageFunction: ChangeEventHandler
 }
 
-export default function ContentEditPreviewSelection({previewImage, loadImageFunction}: ItemPreviewSelection) {
+export default function ContentEditLoadImages({loadImageFunction}: ItemPreviewSelection) {
     return (
         <Fragment>
-            <Box style={itemBorderStyle}>
-                {<img width="200px" height="200px" src={previewImage}/>}
-            </Box>
             <Grid
                 style={{
                     display: "flex",
@@ -22,8 +17,8 @@ export default function ContentEditPreviewSelection({previewImage, loadImageFunc
                     height: "24px",
                     maxHeight: "24px"
                 }}>
-                <Typography variant="subtitle2">Set preview image</Typography>
-                {<input onChange={loadImageFunction} type="file"/>}
+                <Typography variant="subtitle2">Add images to gallery</Typography>
+                {<input onChange={loadImageFunction} multiple={true} type="file"/>}
             </Grid>
         </Fragment>);
 }

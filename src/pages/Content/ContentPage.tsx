@@ -7,7 +7,7 @@ import "../../assets/HomePage.css";
 import {ContentUnit, GetDummyContent} from "../../utils/Types/Content/ContentUnit";
 import {ContentUnitContainer} from "../../utils/Types/Content/ContentUnitContainer";
 import {ContentUnitRequestData} from "../../utils/Types/Content/ContentUnitRequestData";
-import {GetContent} from "../../utils/GetContent";
+import {GetContent} from "../../utils/ContentLoading/GetContent";
 import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
 
 const itemBorderStyle = {
