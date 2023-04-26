@@ -8,7 +8,7 @@ import ArticlesPage from "./pages/Articles/ArticlesPage";
 import ScriptsPage from "./pages/Scripts/ScriptsPage";
 import NonExistentPage from "./pages/NonExistent/NonExistentPage";
 import MainContent from "./components/MainContent";
-import {TryCookieLogin} from "./utils/Login";
+import {IsLoggedIn, TryCookieLogin} from "./utils/Login";
 import {useEffect, useState} from "react";
 
 export type ContentProps = {
@@ -16,10 +16,14 @@ export type ContentProps = {
 }
 
 export default function App() {
-    //TODO: fix page opening as hostname/assets/ and showing Index of assets instead of actual page
-    TryCookieLogin();
-
     const [[width, height], setWidthHeight] = useState([window.innerWidth, window.innerHeight]);
+    const [isLoggedIn, setLoggedInStatus] = useState(false);
+
+    TryCookieLogin().then(() => {
+        if (IsLoggedIn() != isLoggedIn) {
+            setLoggedInStatus(IsLoggedIn());
+        }
+    });
 
     const updateWidthAndHeight = () => {
         setWidthHeight([window.innerWidth, window.innerHeight]);
