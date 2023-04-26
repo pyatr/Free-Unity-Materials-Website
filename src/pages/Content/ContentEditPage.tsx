@@ -3,22 +3,20 @@ import {Button, Grid, Typography} from "@mui/material";
 import TextField from "@mui/material/TextField";
 import {ErrorRounded} from "@mui/icons-material";
 
-import {ContentItem, GetDummyContent} from "../../utils/Types/ContentItem";
-import {ContentItemContainer} from "../../utils/Types/ContentItemContainer";
-import {ItemPage} from "../../utils/Types/ItemPage";
+import {ContentUnit, GetDummyContent} from "../../utils/Types/Content/ContentUnit";
+import {ContentUnitContainer} from "../../utils/Types/Content/ContentUnitContainer";
+import {ContentUnitRequestData} from "../../utils/Types/Content/ContentUnitRequestData";
 
-import {GetItem} from "../../utils/GetItem";
+import {GetContent} from "../../utils/GetContent";
 import ServerConnection from "../../utils/ServerConnection";
 import {GoToHomePage} from "../../utils/GoToHomePage";
 import FileToBase64 from "../../utils/FileToBase64";
 
-import ItemEditCategorySelection, {SetCategorySelection} from "./ItemEditCategorySelection";
-import ItemStateInteractionButtons from "./ItemStateInteractionButtons";
-import ItemEditPreviewSelection from "./ItemEditPreviewSelection";
+import ContentEditCategorySelection, {SetCategorySelection} from "./ContentEditCategorySelection";
+import ContentStateInteractionButtons from "./ContentStateInteractionButtons";
+import ContentEditPreviewSelection from "./ContentEditPreviewSelection";
 
 import {AxiosResponse} from "axios/index";
-import AssetsPage from "../AssetsPage/AssetsPage";
-import ArticlesPage from "../Articles/ArticlesPage";
 
 const itemContentDisplay = {
     width: '100%',
@@ -27,72 +25,62 @@ const itemContentDisplay = {
     display: 'grid'
 }
 
-async function SendItemChangeRequest(itemContent: ContentItem, previewImage: string, requestName: string, callback: Function) {
+async function SendContentChangeRequest(itemContent: ContentUnit, previewImage: string, requestName: string, callback: Function) {
     const params = {
-        title: itemContent.TITLE,
-        shortTitle: itemContent.SHORTTITLE,
-        content: itemContent.CONTENT,
-        categories: itemContent.CATEGORIES,
-        number: itemContent.NUMBER,
+        title: itemContent.title,
+        content: itemContent.content,
+        categories: itemContent.categories,
+        number: itemContent.number,
         preview: previewImage
     };
 
     if (previewImage != "") {
-        let scon = new ServerConnection();
-        await scon.SendPostRequest(requestName, params, callback);
+        let serverConnection = new ServerConnection();
+        await serverConnection.SendPostRequest(requestName, params, callback);
     }
 }
 
-export default function ItemEditPage({itemNumber, itemCategory}: ItemPage) {
+export default function ContentEditPage({contentNumber, contentCategory}: ContentUnitRequestData) {
     const [itemContent, setItemContent] = useState(GetDummyContent());
 
     useEffect(() => {
-        if (itemContent.NUMBER == -1 && itemNumber != -1) {
-            GetItem(itemNumber).then((conItem: ContentItem) => {
+        if (itemContent.number == -1 && contentNumber != -1) {
+            GetContent(contentNumber, contentCategory).then((conItem: ContentUnit) => {
                 setItemContent(conItem);
             });
         }
     });
 
-    if (itemContent.NUMBER != -1 || itemNumber == -1) {
-        return (<LoadedItemEditPage itemContent={itemContent} contentCategory={itemCategory}/>);
+    if (itemContent.number != -1 || contentNumber == -1) {
+        return (<LoadedContentEditPage itemContent={itemContent} contentCategory={contentCategory}/>);
     } else {
         return (<Fragment/>);
     }
 }
 
-function LoadedItemEditPage({itemContent, contentCategory}: ContentItemContainer) {
+function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContainer) {
     //Displaying category selection menu
     const [categorySelectionDisplayed, setCategorySelectionDisplay] = useState(false);
     //Content preview image as link to blob
-    //Get image "http://" + window.location.host + ":8000/TitlePics/" + itemContent.NUMBER + ".png"
     const [previewImage, setPreviewImage] = useState("");
     //Preview image converted to Base64 string
     const [previewAsBase64, setPreview] = useState("");
     //Error notification message
     const [errorNotification, setErrorNotification] = useState("");
 
-    const [currentItemState, setItemState] = useState<ContentItem>(
+    const [currentItemState, setItemState] = useState<ContentUnit>(
         {
-            NUMBER: itemContent.NUMBER,
-            TITLE: itemContent.TITLE,
-            SHORTTITLE: itemContent.SHORTTITLE,
-            CATEGORIES: itemContent.CATEGORIES,
-            CREATION_DATE: itemContent.CREATION_DATE,
-            CONTENT: itemContent.CONTENT
+            number: itemContent.number,
+            title: itemContent.title,
+            categories: itemContent.categories,
+            creationDate: itemContent.creationDate,
+            content: itemContent.content
         }
     );
 
-    const pageCategoryNames = new Map();
-
-    pageCategoryNames.set("AssetsPage", "Assets");
-    pageCategoryNames.set("ArticlesPage", "Articles");
-    pageCategoryNames.set("ScriptsPage", "Scripts");
-
-    const pageTitle = currentItemState.NUMBER == -1 ? pageCategoryNames.get(contentCategory) + ": Create new item" : "Edit " + itemContent.TITLE;
+    const pageTitle = currentItemState.number == -1 ? "Create new " + contentCategory : "Edit " + itemContent.title;
 
     const titleLimit = 128;
-    const shortTitleLimit = 20;
 
     function loadImage(e: any) {
         let file = e.target.files[0];
@@ -108,46 +96,30 @@ function LoadedItemEditPage({itemContent, contentCategory}: ContentItemContainer
 
     const setTitle = (event: any) => {
         setItemState({
-            NUMBER: currentItemState.NUMBER,
-            TITLE: event.target.value,
-            SHORTTITLE: currentItemState.SHORTTITLE,
-            CATEGORIES: currentItemState.CATEGORIES,
-            CREATION_DATE: currentItemState.CREATION_DATE,
-            CONTENT: currentItemState.CONTENT
-        });
-    }
-
-    const setShortTitle = (event: any) => {
-        setItemState({
-            NUMBER: currentItemState.NUMBER,
-            TITLE: currentItemState.TITLE,
-            SHORTTITLE: event.target.value,
-            CATEGORIES: currentItemState.CATEGORIES,
-            CREATION_DATE: currentItemState.CREATION_DATE,
-            CONTENT: currentItemState.CONTENT
+            number: currentItemState.number,
+            title: event.target.value,
+            categories: currentItemState.categories,
+            creationDate: currentItemState.creationDate,
+            content: currentItemState.content
         });
     }
 
     const setContent = (event: any) => {
         setItemState({
-            NUMBER: currentItemState.NUMBER,
-            TITLE: currentItemState.TITLE,
-            SHORTTITLE: currentItemState.SHORTTITLE,
-            CATEGORIES: currentItemState.CATEGORIES,
-            CREATION_DATE: currentItemState.CREATION_DATE,
-            CONTENT: event.target.value
+            number: currentItemState.number,
+            title: currentItemState.title,
+            categories: currentItemState.categories,
+            creationDate: currentItemState.creationDate,
+            content: event.target.value
         });
     }
 
     const submitContent = async () => {
         let error: string = "";
-        if (currentItemState.TITLE == "") {
+        if (currentItemState.title == "") {
             error += "Title is not defined\n";
         }
-        if (currentItemState.SHORTTITLE == "") {
-            error += "Short title is not defined\n";
-        }
-        if (currentItemState.CONTENT == "") {
+        if (currentItemState.content == "") {
             error += "No content\n";
         }
         if (error != "") {
@@ -155,13 +127,13 @@ function LoadedItemEditPage({itemContent, contentCategory}: ContentItemContainer
             return;
         }
 
-        await SendItemChangeRequest(currentItemState, previewAsBase64, currentItemState.NUMBER == -1 ? "createContent" : "updateContent", (response: AxiosResponse) => {
+        await SendContentChangeRequest(currentItemState, previewAsBase64, currentItemState.number == -1 ? "createContent" : "updateContent", (response: AxiosResponse) => {
             window.open("http://" + window.location.host + "/" + response.data.content.itemID, "_self");
         });
     }
 
     const submitDeletion = async () => {
-        await SendItemChangeRequest(currentItemState, previewImage, "deleteContent", () => {
+        await SendContentChangeRequest(currentItemState, previewImage, "deleteContent", () => {
         });
     }
 
@@ -170,14 +142,13 @@ function LoadedItemEditPage({itemContent, contentCategory}: ContentItemContainer
     }
 
     const setCategorySelection = (cat: string) => {
-        let newCategorySelection = SetCategorySelection(cat, currentItemState.CATEGORIES);
+        let newCategorySelection = SetCategorySelection(cat, currentItemState.categories);
         setItemState({
-            NUMBER: currentItemState.NUMBER,
-            TITLE: currentItemState.TITLE,
-            SHORTTITLE: currentItemState.SHORTTITLE,
-            CATEGORIES: newCategorySelection,
-            CREATION_DATE: currentItemState.CREATION_DATE,
-            CONTENT: currentItemState.CONTENT
+            number: currentItemState.number,
+            title: currentItemState.title,
+            categories: newCategorySelection,
+            creationDate: currentItemState.creationDate,
+            content: currentItemState.content
         });
     }
 
@@ -209,15 +180,11 @@ function LoadedItemEditPage({itemContent, contentCategory}: ContentItemContainer
                     </Grid> :
                     <Fragment/>
                 }
-                <ItemEditPreviewSelection previewImage={previewImage} loadImageFunction={loadImage}/>
+                <ContentEditPreviewSelection previewImage={previewImage} loadImageFunction={loadImage}/>
                 <TextField onChange={setTitle}
                            label={"Title (" + titleLimit + " characters)"}
                            inputProps={{maxLength: titleLimit}}
-                           defaultValue={currentItemState.TITLE}/>
-                <TextField onChange={setShortTitle}
-                           label={"Preview title (" + shortTitleLimit + " characters)"}
-                           inputProps={{maxLength: shortTitleLimit}}
-                           defaultValue={currentItemState.SHORTTITLE}/>
+                           defaultValue={currentItemState.title}/>
                 <Grid
                     style={{
                         display: "flex",
@@ -227,9 +194,9 @@ function LoadedItemEditPage({itemContent, contentCategory}: ContentItemContainer
                         height: "24px",
                         maxHeight: "24px"
                     }}>
-                    {currentItemState.CATEGORIES === "" ?
+                    {currentItemState.categories === "" ?
                         <Typography variant="subtitle2" fontStyle="italic">Choose categories</Typography> :
-                        <Typography variant="subtitle2">{currentItemState.CATEGORIES}</Typography>}
+                        <Typography variant="subtitle2">{currentItemState.categories}</Typography>}
                     <Button
                         style={{
                             color: categorySelectionDisplayed ? "white" : "black",
@@ -244,19 +211,19 @@ function LoadedItemEditPage({itemContent, contentCategory}: ContentItemContainer
                         }}
                         onClick={switchCatSelection}>+</Button>
                     {categorySelectionDisplayed ?
-                        <ItemEditCategorySelection currentCategories={currentItemState.CATEGORIES.split(", ")}
-                                                   onCategorySelected={setCategorySelection}/> :
+                        <ContentEditCategorySelection currentCategories={currentItemState.categories.split(", ")}
+                                                      onCategorySelected={setCategorySelection}/> :
                         <Fragment/>}
                 </Grid>
                 <TextField onChange={setContent}
                            label="Content"
                            multiline={true}
                            sx={itemContentDisplay}
-                           defaultValue={currentItemState.CONTENT}/>
+                           defaultValue={currentItemState.content}/>
             </Grid>
             {/*Bottom buttons grid*/}
-            <ItemStateInteractionButtons onSave={submitContent} onCancel={cancel} onDelete={submitDeletion}
-                                         enableDelete={currentItemState.NUMBER != -1}/>
+            <ContentStateInteractionButtons onSave={submitContent} onCancel={cancel} onDelete={submitDeletion}
+                                            enableDelete={currentItemState.number != -1}/>
         </Grid>
     );
 }

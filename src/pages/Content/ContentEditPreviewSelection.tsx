@@ -1,13 +1,13 @@
 import {Box, Grid, Typography} from "@mui/material";
 import React, {ChangeEventHandler, Fragment} from "react";
-import {itemBorderStyle} from "./ItemPage";
+import {itemBorderStyle} from "./ContentPage";
 
 export type ItemPreviewSelection = {
     previewImage: string,
     loadImageFunction: ChangeEventHandler
 }
 
-export default function ItemEditPreviewSelection({previewImage, loadImageFunction}: ItemPreviewSelection) {
+export default function ContentEditPreviewSelection({previewImage, loadImageFunction}: ItemPreviewSelection) {
     return (
         <Fragment>
             <Box style={itemBorderStyle}>

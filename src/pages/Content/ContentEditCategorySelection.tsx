@@ -24,7 +24,7 @@ type CategorySelectionProps = {
 
 const availableCategories = Array("Scripts", "Graphics", "Models", "UI", "Shaders", "Text");
 
-export default function ItemEditCategorySelection({currentCategories, onCategorySelected}: CategorySelectionProps) {
+export default function ContentEditCategorySelection({currentCategories, onCategorySelected}: CategorySelectionProps) {
     const selectedButtonStyle = {color: "white", background: "black"};
     const nonSelectedButtonStyle = {color: "black", background: "white"};
 
@@ -34,20 +34,20 @@ export default function ItemEditCategorySelection({currentCategories, onCategory
     return (<Grid sx={categoryGridStyle}>{catButtons}</Grid>);
 }
 
-export function SetCategorySelection(cat: string, categorySelection: string) {
+export function SetCategorySelection(newCategory: string, categorySelection: string) {
     if (categorySelection === "") {
-        return cat;
+        return newCategory;
     }
     let categoryArray: string[] = categorySelection.split(", ");
-    let indexOfCat = categoryArray.indexOf(cat);
+    let indexOfNewCategory = categoryArray.indexOf(newCategory);
     let newCategorySelection = "";
-    if (indexOfCat != -1) {
+    if (indexOfNewCategory != -1) {
         //If given existing category, remove
-        categoryArray.splice(indexOfCat, 1);
+        categoryArray.splice(indexOfNewCategory, 1);
         newCategorySelection = StringArrayToString(categoryArray);
     } else {
         //If category is not in list, include
-        newCategorySelection = categorySelection + ", " + cat;
+        newCategorySelection = categorySelection + ", " + newCategory;
     }
     return newCategorySelection;
 }

@@ -9,7 +9,7 @@ export type ItemInteractionProps = {
     enableDelete: boolean
 }
 
-export default function ItemStateInteractionButtons({onSave, onCancel, onDelete, enableDelete}: ItemInteractionProps) {
+export default function ContentStateInteractionButtons({onSave, onCancel, onDelete, enableDelete}: ItemInteractionProps) {
     return (
         <Grid style={{display: "flex", gap: "16px", width: "100%", justifyContent: "space-between"}}>
             {/*Left grid*/}
