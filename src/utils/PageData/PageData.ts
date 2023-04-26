@@ -1,8 +1,8 @@
-import {ContentPreview} from "../Types/ContentPreview";
+import {ContentUnitPreview} from "../Types/Content/ContentUnitPreview";
 
 export type PageLoadProps = {
     pageData: PageData,
-    rawContent: ContentPreview[]
+    rawContent: ContentUnitPreview[]
 }
 
 export class PageData {
@@ -15,16 +15,16 @@ export class PageData {
     private postsCount: number;
     private pagesCount: number;
 
-    private requestName: string;
+    private categoryName: string;
 
-    constructor(landscapeRowCount: number, landscapeColumnCount: number, mobileRowCount: number, mobileColumnCount: number, requestName: string) {
+    constructor(landscapeRowCount: number, landscapeColumnCount: number, mobileRowCount: number, mobileColumnCount: number, categoryName: string) {
         this.landscapeRowColumnCount = [landscapeRowCount, landscapeColumnCount];
         this.mobileRowColumnCount = [mobileRowCount, mobileColumnCount];
         this.pageSize = Math.max(this.landscapeRowColumnCount[0] * this.landscapeRowColumnCount[1], this.mobileRowColumnCount[0] * this.mobileRowColumnCount[1]);
         this.currentPage = 1;
         this.postsCount = 0;
         this.pagesCount = 0;
-        this.requestName = requestName;
+        this.categoryName = categoryName;
     }
 
     setPostsCount(newNum: number) {
@@ -36,8 +36,8 @@ export class PageData {
         return this.postsCount;
     }
 
-    getRequestName() {
-        return this.requestName;
+    getCategoryName() {
+        return this.categoryName;
     }
 
     getPagesCount() {
