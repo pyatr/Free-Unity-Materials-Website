@@ -1,9 +1,12 @@
 import {Button, Grid, Typography} from "@mui/material";
 import {ErrorRounded} from "@mui/icons-material";
-import React from "react";
+import React, {Fragment} from "react";
 import {ErrorNotificationProps} from "../utils/Types/ErrorNotificationProps";
 
 export default function ErrorNotification({message, onDismiss}: ErrorNotificationProps) {
+    if (message == "") {
+        return (<Fragment/>);
+    }
     return (
         <Grid style={{
             display: "flex",
