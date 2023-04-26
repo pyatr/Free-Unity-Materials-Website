@@ -1,7 +1,7 @@
 import React, {Fragment, useState} from "react";
 import {Box, Grid, Typography} from "@mui/material";
-import PixelSumm from "../utils/PixelSumm";
-import {ContentPreview} from "../utils/Types/ContentPreview";
+import PixelSummForCSS from "../utils/PixelSummForCSS";
+import {ContentUnitPreview} from "../utils/Types/Content/ContentUnitPreview";
 import {StripHTMLFromString} from "../utils/StripHTMLFromString";
 import {CanUserEditContent} from "../utils/Login";
 import {Cancel, CheckCircle, Delete} from "@mui/icons-material";
@@ -9,7 +9,7 @@ import {Create} from "@mui/icons-material";
 import {Link} from "react-router-dom";
 
 export type AssetItemDisplay = {
-    itemData: ContentPreview,
+    itemData: ContentUnitPreview,
     itemStyle: React.CSSProperties
 }
 
@@ -61,8 +61,8 @@ function MessageBoxYesNo({message, onConfirm, onCancel, parentWidth, parentHeigh
     return (<Box padding='8px'
                  position='absolute'
                  zIndex='11'
-                 width={PixelSumm(parentWidth, "-16px")}
-                 height={PixelSumm(parentHeight, "-16px")}>
+                 width={PixelSummForCSS(parentWidth, "-16px")}
+                 height={PixelSummForCSS(parentHeight, "-16px")}>
         <Box style={{border: '2px', borderStyle: 'solid', background: 'white'}}>
             <Grid style={{display: 'grid', padding: '16px', gap: '32px'}}>
                 <Typography variant="h5">{message}</Typography>
@@ -79,13 +79,15 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
     const [showingAdminButtons, setAdminButtonStatus] = useState(false);
     const [deleteWindowOpen, setDeleteWindowStatus] = useState(false);
 
-    if (itemData.NUMBER < 0) {
+    if (itemData.number < 0) {
         //Dummy item in case there are not enough items in row
-        let newWidth = PixelSumm(itemStyle.width as string, "4");
-        let newHeight = PixelSumm(itemStyle.height as string, "4");
+        let newWidth = PixelSummForCSS(itemStyle.width as string, "4");
+        let newHeight = PixelSummForCSS(itemStyle.height as string, "4");
         return (<Box width={newWidth} height={newHeight} margin="auto"/>);
     }
     const canEdit: boolean = CanUserEditContent();
+    const shortTitleLimit = 20;
+    const shortTitle = itemData.title.length > shortTitleLimit ? itemData.title.substring(0, shortTitleLimit) + "..." : itemData.title;
 
     const showAdminButtons = () => {
         setAdminButtonStatus(canEdit);
@@ -124,7 +126,7 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
     const titleFontSize = fontSizeMod + "rem";
     const subtitleFontSite = (fontSizeMod * 0.7) + "rem";
 
-    let link = "/" + itemData.NUMBER;
+    let link = "/" + itemData.number;
     return (
         <Grid item style={itemStyle} onMouseEnter={showAdminButtons}
               onMouseLeave={hideAdminButtons}>
@@ -138,18 +140,18 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
                     <Fragment/>}
                 {deleteWindowOpen ?
                     <MessageBoxYesNo
-                        message={"Delete " + itemData.SHORTTITLE + "?"}
+                        message={"Delete " + itemData.title + "?"}
                         onConfirm={confirmDelete}
                         onCancel={cancelDelete}
                         parentWidth={imageStyle.width as string}
                         parentHeight={imageStyle.width as string}/> :
                     <Fragment/>}
-                {<img src={itemData.TITLEPIC_LINK} style={imageStyle}/>}
+                {<img src={itemData.titlepicLink} style={imageStyle}/>}
             </Box>
             <Grid style={gridStyle} fontSize={subtitleFontSite}>
-                <Typography component="h6" fontSize={titleFontSize}>{itemData.SHORTTITLE}</Typography>
+                <Typography component="h6" fontSize={titleFontSize}>{shortTitle}</Typography>
                 <Typography variant="subtitle1" fontSize={subtitleFontSite}
-                            color="#999999"> {itemData.CATEGORIES}</Typography>
+                            color="#999999"> {itemData.categories}</Typography>
                 <Typography sx={{
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -158,7 +160,7 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
                     WebkitBoxOrient: "vertical",
                     display: "-webkit-box",
                     fontSize: subtitleFontSite
-                }}> {StripHTMLFromString(itemData.CONTENT)}</Typography>
+                }}> {StripHTMLFromString(itemData.content)}</Typography>
             </Grid>
         </Grid>
     )

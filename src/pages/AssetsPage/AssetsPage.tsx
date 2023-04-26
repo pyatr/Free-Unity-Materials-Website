@@ -3,8 +3,8 @@ import React, {Fragment} from "react";
 import {IsMobileResolution} from "../../utils/MobileUtilities";
 import AssetItemDisplay from "../../components/AssetItemDisplay";
 import {PageData, PageLoadProps} from "../../utils/PageData/PageData";
-import {ContentItem} from "../../utils/Types/ContentItem";
-import {ContentPreview} from "../../utils/Types/ContentPreview";
+import {ContentUnit} from "../../utils/Types/Content/ContentUnit";
+import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
 
 function GetItemStyle(pageData: PageData): Array<any> {
     let itemDimensions = IsMobileResolution() ? [240, 384] : [160, 256];
@@ -43,17 +43,17 @@ export default function AssetsPage({pageData, rawContent}: PageLoadProps) {
         for (let i = 0; i < realRowCount; i++) {
             let offset = i * rcCount[1];
             let count = offset + rcCount[1];
-            let slice: ContentPreview[] = rawContent.slice(offset, count);
+            let slice: ContentUnitPreview[] = rawContent.slice(offset, count);
             let realLength = slice.length;
             slice.length += rcCount[1] - realLength;
             for (let j = realLength; j < slice.length; j++) {
                 //Create dummy elements for dynamic grid in case there are not enough items in row
                 slice[j] = {
-                    NUMBER: -1,
-                    SHORTTITLE: "",
-                    CATEGORIES: "",
-                    CONTENT: "",
-                    TITLEPIC_LINK: ""
+                    number: -1,
+                    title: "",
+                    categories: "",
+                    content: "",
+                    titlepicLink: ""
                 }
             }
             slicedPreparedContent.push(slice.map((item) => (
