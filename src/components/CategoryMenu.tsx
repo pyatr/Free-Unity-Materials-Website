@@ -1,7 +1,6 @@
 import {Button, Grid} from "@mui/material";
 import {Link} from "react-router-dom";
 import {IsMobileResolution} from "../utils/MobileUtilities";
-import {GetSubURL} from "../utils/GetSubURL";
 
 export default function CategoryMenu() {
     const landFontS = 14;
@@ -48,7 +47,7 @@ export default function CategoryMenu() {
     let usedPath: string = path;
     usedPath = '/' + path.split("/")[1];
     //TODO: rework this
-    if (path === '/create') {
+    if (path === '/create' || !isNaN(parseInt(path.split("/")[1]))) {
         usedPath = '/';
     }
     const buttons = links.map((link) => <Button variant="outlined" key={link[0]} component={Link} to={link[0]}
