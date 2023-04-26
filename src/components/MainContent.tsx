@@ -1,25 +1,28 @@
 import React, {Fragment, useEffect, useState} from "react";
-import CategoryMenu from "./CategoryMenu";
 import {Box, Button, Grid} from "@mui/material";
 import {ContentProps} from "../App";
+import {AxiosResponse} from "axios";
+import {Link, Route, Routes} from "react-router-dom";
+
+import CategoryMenu from "./CategoryMenu";
 import ContentPageSwitch from "./ContentPageSwitch";
+
 import AssetsPage from "../pages/AssetsPage/AssetsPage";
 import ScriptsPage from "../pages/Scripts/ScriptsPage";
 import ArticlesPage from "../pages/Articles/ArticlesPage";
 import NonExistentPage from "../pages/NonExistent/NonExistentPage";
+import ContentPage from "../pages/Content/ContentPage";
+import ContentEditPage from "../pages/Content/ContentEditPage";
+
 import {SitePages} from "../utils/PageData/SitePages";
 import {PageData} from "../utils/PageData/PageData";
+import {ContentUnitPreview} from "../utils/Types/Content/ContentUnitPreview";
 import ServerConnection from "../utils/ServerConnection";
-import {AxiosResponse} from "axios";
-import {Link, Route, Routes} from "react-router-dom";
-import ItemPage from "../pages/Item/ItemPage";
-import {ContentPreview} from "../utils/Types/ContentPreview";
-import {GetSubURL} from "../utils/GetSubURL";
 import {IsMobileResolution} from "../utils/MobileUtilities";
-import {CanUserEditContent} from "../utils/Login";
-import ItemEditPage from "../pages/Item/ItemEditPage";
-import "../assets/HomePage.css";
-import {GetDummyContent} from "../utils/Types/ContentItem";
+import {GetLastURLPart} from "../utils/GetLastURLPart";
+
+import CreateContentButton from "./Buttons/CreateContentButton";
+import GetPreviews from "../utils/ContentLoading/GetPreviews";
 
 const mainContentGrid = {
     width: '70%',
@@ -53,7 +56,7 @@ export default function MainContent({mainElement}: ContentProps) {
     const selectedWidth = isPortrait ? portW : landW;
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [rawContent, setRawContent] = useState(Array<ContentPreview>);
+    const [previewContent, setPreviewContent] = useState(Array<ContentUnitPreview>);
 
     const elementPageData: PageData = SitePages.page[mainElement];
 
@@ -77,70 +80,63 @@ export default function MainContent({mainElement}: ContentProps) {
         elementPageData.currentPage = currentPage;
     }
     useEffect(() => {
-        const waitForContent = async () => {
-            //Do not reload content if its loaded and if page was not told to update
-            if ((rawContent.length > 0 && !shouldUpdate) || elementPageData === undefined) {
-                return;
-            }
-            let scon = new ServerConnection();
-            let params = {
-                pageSize: elementPageData.pageSize,
-                page: elementPageData.currentPage
-            };
-            await scon.SendPostRequest(elementPageData.getRequestName(), params,
-                (response: AxiosResponse) => {
-                    //Use response.data.code for SQL request code and response.data.requesterror for error details
-                    if (response.data.result === "success") {
-                        (response.data.content as ContentPreview[]).forEach(assItem => assItem.TITLEPIC_LINK = "http://" + window.location.host + assItem.TITLEPIC_LINK);
-                        elementPageData.setPostsCount(response.data.contentCount);
-                        window.scrollTo(0, 0);
-                        setRawContent(response.data.content);
-                    } else {
-                        console.log("request " + elementPageData.getRequestName() + " failed: " + response.data.code + "\nError: " + response.data.requesterror);
-                    }
-                });
+        if ((previewContent.length == 0 || shouldUpdate) && elementPageData !== undefined) {
+            GetPreviews(elementPageData).then((rawPreviews) => {
+                const preparedPreviews: ContentUnitPreview[] = [];
+                rawPreviews.content.forEach((contentUnit: any) =>
+                    preparedPreviews.push({
+                            number: contentUnit.NUMBER,
+                            title: contentUnit.TITLE,
+                            categories: contentUnit.CATEGORIES,
+                            content: contentUnit.CONTENT,
+                            titlepicLink: "http://" + window.location.host + contentUnit.titlepicLink
+                        }
+                    )
+                );
+                elementPageData.setPostsCount(rawPreviews.contentCount);
+                window.scrollTo(0, 0);
+                setPreviewContent(preparedPreviews);
+            });
         }
-        waitForContent();
     });
 
     const elements = new Map();
     if (elementPageData != undefined) {
-        elements.set("AssetsPage", <AssetsPage pageData={elementPageData} rawContent={rawContent}/>);
+        elements.set("AssetsPage", <AssetsPage pageData={elementPageData} rawContent={previewContent}/>);
         elements.set("ArticlesPage", <ArticlesPage/>);
         elements.set("ScriptsPage", <ScriptsPage/>);
         elements.set("NonExistentPage", <NonExistentPage/>);
     }
 
-    let pageFinishedLoading = rawContent.length > 0;
-    const subUrl = GetSubURL();
-    const lastPart = Number(subUrl);
+    let pageFinishedLoading = previewContent.length > 0;
+    const lastUrlPart = GetLastURLPart();
+    const lastPart = Number(lastUrlPart);
     let itemNum = -1;
     if (!isNaN(lastPart)) {
         itemNum = lastPart;
     }
-    const cachedLastUrl = subUrl.length > 0 ? "/" + subUrl : "";
-    const permittedCreationLinks = ["", "/articles", "/scripts"];
-    const canShowCreateButton = permittedCreationLinks.includes(cachedLastUrl);
     return (
         <Grid display="flex" padding="8px" gap="8px" paddingTop="16px">
             <Grid display="grid" width={selectedWidth} height="fit-content" gap="8px">
                 <CategoryMenu/>
-                {CanUserEditContent() && canShowCreateButton ?
-                    <Button sx={sideButtonStyle} component={Link} to={cachedLastUrl + "/create"}>Add new item</Button> :
-                    <Fragment/>}
+                <CreateContentButton/>
             </Grid>
             <Grid sx={mainContentGrid}>
                 <Box sx={mainContentBox} id="mainElementBox">
                     <Routes>
                         <Route path="/" element={elements.get(mainElement)}/>
                         <Route path={"/" + itemNum}
-                               element={<ItemPage itemCategory={"AssetsPage"} itemNumber={itemNum}/>}/>
+                               element={<ContentPage contentCategory={"asset"} contentNumber={itemNum}/>}/>
+                        <Route path={"/articles/" + itemNum}
+                               element={<ContentPage contentCategory={"article"} contentNumber={itemNum}/>}/>
+                        <Route path={"/scripts/" + itemNum}
+                               element={<ContentPage contentCategory={"script"} contentNumber={itemNum}/>}/>
                         <Route path={"/create"}
-                               element={<ItemEditPage itemCategory={"AssetsPage"} itemNumber={-1}/>}/>
+                               element={<ContentEditPage contentCategory={"asset"} contentNumber={-1}/>}/>
                         <Route path={"/articles/create"}
-                               element={<ItemEditPage itemCategory={"ArticlesPage"} itemNumber={-1}/>}/>
+                               element={<ContentEditPage contentCategory={"article"} contentNumber={-1}/>}/>
                         <Route path={"/scripts/create"}
-                               element={<ItemEditPage itemCategory={"ScriptsPage"} itemNumber={-1}/>}/>
+                               element={<ContentEditPage contentCategory={"script"} contentNumber={-1}/>}/>
                     </Routes>
                 </Box>
                 {pageFinishedLoading ?
