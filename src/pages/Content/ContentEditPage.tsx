@@ -10,7 +10,7 @@ import {ContentUnitRequestData} from "../../utils/Types/Content/ContentUnitReque
 import {GetContent} from "../../utils/ContentLoading/GetContent";
 import ServerConnection from "../../utils/ServerConnection";
 import {GoToHomePage} from "../../utils/GoToHomePage";
-import FileToBase64 from "../../utils/FileToBase64";
+import FileToBase64 from "../../utils/Files/FileToBase64";
 
 import ContentEditCategorySelection, {SetCategorySelection} from "./ContentEditCategorySelection";
 import ContentStateInteractionButtons from "./ContentStateInteractionButtons";
@@ -18,6 +18,7 @@ import ContentEditLoadImages from "./ContentEditLoadImages";
 
 import {AxiosResponse} from "axios/index";
 import ErrorNotification from "../../components/ErrorNotification";
+import ImageGallery from "../../components/ImageGallery";
 
 const itemContentDisplay = {
     width: '100%',
@@ -82,9 +83,16 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
     const pageTitle = currentItemState.number == -1 ? "Create new " + contentCategory : "Edit " + itemContent.title;
 
     const titleLimit = 128;
+    const maxFileSize = 20;
 
     function loadImage(e: any) {
         let files: FileList = e.target.files as FileList;
+        e.target.value = null;
+        if (files.length > maxFileSize) {
+            setErrorNotification("Too many images! Max: " + maxFileSize);
+            return;
+        }
+
         let filesBase64: string[] = [];
         let blobs: string[] = [];
         //FileList has no foreach
@@ -94,8 +102,8 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             });
             blobs.push(URL.createObjectURL(files[i]));
         }
-        setGalleryImagesBase64(filesBase64);
-        setGalleryImages(blobs);
+        setGalleryImagesBase64(galleryImagesBase64.concat(filesBase64));
+        setGalleryImages(galleryImages.concat(blobs));
     }
 
     const switchCatSelection = () => {
@@ -168,6 +176,7 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
                 <ErrorNotification message={errorNotification} onDismiss={() => {
                     setErrorNotification("")
                 }}/>
+                <ImageGallery imageLinks={galleryImages}/>
                 <ContentEditLoadImages loadImageFunction={loadImage}/>
                 <TextField onChange={setTitle}
                            label={"Title (" + titleLimit + " characters)"}
