@@ -3,7 +3,8 @@
 spl_autoload_register(function ($className) {
     $directories = [
         'Controllers',
-        'Models'
+        'Models',
+        'Utilities'
     ];
     $projectDir = __DIR__ . '\\';
     $prefix = 'Server\\';

@@ -30,7 +30,10 @@ class ContentController extends BaseController
         $lastID = $this->contentModel->getLastPostID();
         $folder = $this->foldersForCategories[$category];
         if ($response['result'] == 'success') {
-            $galleryDirectory = "$this->serverRoot/Images/$folder/$lastID/Gallery";
+            $assetImageDirectory = "$this->serverRoot/Images/$folder/$lastID";
+            $galleryDirectory = "$assetImageDirectory/Gallery";
+
+            mkdir($assetImageDirectory);
             mkdir($galleryDirectory);
             $gallery = $this->tryGetValue($params, 'gallery');
             foreach ($gallery as $image) {
@@ -47,7 +50,12 @@ class ContentController extends BaseController
         $category = $this->tryGetValue($params, 'category');
         $tableName = $this->tablesForCategories[$category];
         $contentNumber = $this->tryGetValue($params, 'number');
-        return $this->contentModel->deleteContent($tableName, $contentNumber);
+        $folder = $this->foldersForCategories[$category];
+        $result = $this->contentModel->deleteContent($tableName, $contentNumber);
+        if (file_exists("$this->serverRoot/Images/$folder/$contentNumber")) {
+            FileManager::DeleteFolder("$this->serverRoot/Images/$folder/$contentNumber");
+        }
+        return $result;
     }
 
     public function updateContent($params): array
@@ -83,8 +91,11 @@ class ContentController extends BaseController
         for ($i = 0; $i < $resultCount; $i++) {
             $contentNumber = $result['content'][$i]['NUMBER'];
             $directory = "/Images/$folder/$contentNumber/Gallery";
-            $previewName = scandir("$this->serverRoot/$directory/")[2];
-            $result['content'][$i]['titlepicLink'] = ":$_SERVER[SERVER_PORT]/$directory/$previewName";
+            $filesInDirectory = scandir("$this->serverRoot/$directory/");
+            if (count($filesInDirectory) > 2) {
+                $previewName = $filesInDirectory[2];
+                $result['content'][$i]['titlepicLink'] = ":$_SERVER[SERVER_PORT]/$directory/$previewName";
+            }
         }
         return $result;
     }
