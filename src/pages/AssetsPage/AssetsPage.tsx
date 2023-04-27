@@ -2,21 +2,20 @@ import {Grid, Typography} from "@mui/material";
 import React, {Fragment} from "react";
 import {IsMobileResolution} from "../../utils/MobileUtilities";
 import AssetItemDisplay from "../../components/AssetItemDisplay";
-import {PageData, PageLoadProps} from "../../utils/PageData/PageData";
-import {ContentUnit} from "../../utils/Types/Content/ContentUnit";
 import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
+import {PageLoadProps, PageParameters} from "../../utils/PageParameters/PageParameters";
 
-function GetItemStyle(pageData: PageData): Array<any> {
+function GetItemStyle(pageParameters: PageParameters): Array<any> {
     let itemDimensions = IsMobileResolution() ? [240, 384] : [160, 256];
     const sizeRatio = 0.575;
 
-    const rcCount = IsMobileResolution() ? pageData.mobileRowColumnCount : pageData.landscapeRowColumnCount;
+    const rowColumnCount = IsMobileResolution() ? pageParameters.mobileRowColumnCount : pageParameters.landscapeRowColumnCount;
 
     let mainBox = document.getElementById("mainElementBox");
 
     if (mainBox != null) {
         let boxWidth = (mainBox as HTMLElement).getBoundingClientRect().width;
-        itemDimensions[0] = boxWidth / (rcCount[1] + 1);
+        itemDimensions[0] = boxWidth / (rowColumnCount[1] + 1);
         itemDimensions[1] = itemDimensions[0] / sizeRatio;
     }
 
@@ -30,7 +29,7 @@ function GetItemStyle(pageData: PageData): Array<any> {
         color: "black",
         textDecoration: "none",
         boxSizing: "content-box"
-    }, rcCount]);
+    }, rowColumnCount]);
 }
 
 export default function AssetsPage({pageData, rawContent}: PageLoadProps) {

@@ -14,15 +14,14 @@ import NonExistentPage from "../pages/NonExistent/NonExistentPage";
 import ContentPage from "../pages/Content/ContentPage";
 import ContentEditPage from "../pages/Content/ContentEditPage";
 
-import {SitePages} from "../utils/PageData/SitePages";
-import {PageData} from "../utils/PageData/PageData";
 import {ContentUnitPreview} from "../utils/Types/Content/ContentUnitPreview";
-import ServerConnection from "../utils/ServerConnection";
 import {IsMobileResolution} from "../utils/MobileUtilities";
 import {GetLastURLPart} from "../utils/GetLastURLPart";
 
 import CreateContentButton from "./Buttons/CreateContentButton";
 import GetPreviews from "../utils/ContentLoading/GetPreviews";
+import {SitePagesParameters} from "../utils/PageParameters/SitePagesParameters";
+import {PageParameters} from "../utils/PageParameters/PageParameters";
 
 const mainContentGrid = {
     width: '70%',
@@ -58,7 +57,7 @@ export default function MainContent({mainElement}: ContentProps) {
     const [currentPage, setCurrentPage] = useState(1);
     const [previewContent, setPreviewContent] = useState(Array<ContentUnitPreview>);
 
-    const elementPageData: PageData = SitePages.page[mainElement];
+    const elementPageData: PageParameters = SitePagesParameters.page[mainElement];
 
     const setPageNum = (newNum: number) => {
         if (elementPageData.currentPage != newNum) {

@@ -1,11 +1,11 @@
 import {ContentUnitPreview} from "../Types/Content/ContentUnitPreview";
 
 export type PageLoadProps = {
-    pageData: PageData,
+    pageData: PageParameters,
     rawContent: ContentUnitPreview[]
 }
 
-export class PageData {
+export class PageParameters {
     landscapeRowColumnCount: number[];
     mobileRowColumnCount: number[];
 

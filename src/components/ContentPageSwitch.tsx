@@ -1,6 +1,6 @@
 import {Box, Button, Grid, Typography} from "@mui/material";
 import React, {Fragment} from "react";
-import {SitePages} from "../utils/PageData/SitePages";
+import {SitePagesParameters} from "../utils/PageParameters/SitePagesParameters";
 
 export type PageSwitchProps = {
     pageName: string,
@@ -10,7 +10,7 @@ export type PageSwitchProps = {
 }
 
 export default function ContentPageSwitch({pageName, onClickBack, onClickForward, onClickNum}: PageSwitchProps) {
-    let elementPageData = SitePages.page[pageName];
+    let elementPageData = SitePagesParameters.page[pageName];
     if (elementPageData === undefined) {
         return (<Fragment/>);
     }
