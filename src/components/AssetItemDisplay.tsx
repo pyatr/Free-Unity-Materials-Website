@@ -7,6 +7,7 @@ import {CanUserEditContent} from "../utils/Login";
 import {Cancel, CheckCircle, Delete} from "@mui/icons-material";
 import {Create} from "@mui/icons-material";
 import {Link} from "react-router-dom";
+import MessageBoxYesNo from "./MessageBoxes/MessageBoxYesNo";
 
 export type AssetItemDisplay = {
     itemData: ContentUnitPreview,
@@ -38,41 +39,10 @@ const adminButtonsStyle = {
     zIndex: 10
 }
 
-const messageBoxButtonsStyle = {
-    width: '40px',
-    height: '40px'
-}
-
 const gridStyle = {
     padding: '4px',
     color: 'black',
     textDecoration: 'none'
-}
-
-type MessageBoxProps = {
-    message: string,
-    onConfirm: Function,
-    onCancel: Function,
-    parentWidth: string,
-    parentHeight: string
-}
-
-function MessageBoxYesNo({message, onConfirm, onCancel, parentWidth, parentHeight}: MessageBoxProps) {
-    return (<Box padding='8px'
-                 position='absolute'
-                 zIndex='11'
-                 width={PixelSummForCSS(parentWidth, "-16px")}
-                 height={PixelSummForCSS(parentHeight, "-16px")}>
-        <Box style={{border: '2px', borderStyle: 'solid', background: 'white'}}>
-            <Grid style={{display: 'grid', padding: '16px', gap: '32px'}}>
-                <Typography variant="h5">{message}</Typography>
-                <Grid style={{display: 'flex', justifyContent: 'space-evenly'}}>
-                    <CheckCircle style={messageBoxButtonsStyle} onClick={() => onConfirm()}/>
-                    <Cancel style={messageBoxButtonsStyle} onClick={() => onCancel()}/>
-                </Grid>
-            </Grid>
-        </Box>
-    </Box>);
 }
 
 export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay) {
