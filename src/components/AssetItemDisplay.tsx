@@ -98,7 +98,7 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
 
     let link = "/" + itemData.number;
     return (
-        <Grid item style={itemStyle} onMouseEnter={showAdminButtons}
+        <Grid style={itemStyle} onMouseEnter={showAdminButtons}
               onMouseLeave={hideAdminButtons}>
             <Box component={Link} to={link} sx={textBoxLink}/>
             <Box width="inherit">
