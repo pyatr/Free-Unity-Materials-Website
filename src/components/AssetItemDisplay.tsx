@@ -4,10 +4,11 @@ import PixelSummForCSS from "../utils/PixelSummForCSS";
 import {ContentUnitPreview} from "../utils/Types/Content/ContentUnitPreview";
 import {StripHTMLFromString} from "../utils/StripHTMLFromString";
 import {CanUserEditContent} from "../utils/Login";
-import {Cancel, CheckCircle, Delete} from "@mui/icons-material";
+import {Delete} from "@mui/icons-material";
 import {Create} from "@mui/icons-material";
 import {Link} from "react-router-dom";
 import MessageBoxYesNo from "./MessageBoxes/MessageBoxYesNo";
+import DeleteContent from "../utils/ContentInteraction/DeleteContent";
 
 export type AssetItemDisplay = {
     itemData: ContentUnitPreview,
@@ -69,16 +70,14 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
         setAdminButtonStatus(false);
     }
 
-    const openEditPage = () => {
-
-    }
-
     const askToDelete = () => {
         setDeleteWindowStatus(true);
     }
 
     const confirmDelete = () => {
-        setDeleteWindowStatus(false);
+        DeleteContent(itemData.number, "asset").then(() => {
+            window.location.reload();
+        });
     }
 
     const cancelDelete = () => {
@@ -106,7 +105,7 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
             <Box width="inherit">
                 {showingAdminButtons ?
                     <Grid sx={adminButtonsGrid}>
-                        <Create sx={adminButtonsStyle} onClick={openEditPage}/>
+                        <Create sx={adminButtonsStyle} component={Link} to={"/edit/" + itemData.number}/>
                         <Delete sx={adminButtonsStyle} onClick={askToDelete}/>
                     </Grid> :
                     <Fragment/>}
