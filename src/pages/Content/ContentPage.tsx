@@ -4,11 +4,10 @@ import parse from 'html-react-parser';
 
 import "../../assets/HomePage.css";
 
-import {ContentUnit, GetDummyContent} from "../../utils/Types/Content/ContentUnit";
+import {GetDummyContent} from "../../utils/Types/Content/ContentUnit";
 import {ContentUnitContainer} from "../../utils/Types/Content/ContentUnitContainer";
 import {ContentUnitRequestData} from "../../utils/Types/Content/ContentUnitRequestData";
-import {GetContent} from "../../utils/ContentLoading/GetContent";
-import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
+import {GetContent} from "../../utils/ContentInteraction/GetContent";
 
 const itemBorderStyle = {
     width: '203px',

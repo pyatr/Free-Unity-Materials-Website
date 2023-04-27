@@ -19,9 +19,9 @@ import {IsMobileResolution} from "../utils/MobileUtilities";
 import {GetLastURLPart} from "../utils/GetLastURLPart";
 
 import CreateContentButton from "./Buttons/CreateContentButton";
-import GetPreviews from "../utils/ContentLoading/GetPreviews";
 import {SitePagesParameters} from "../utils/PageParameters/SitePagesParameters";
 import {PageParameters} from "../utils/PageParameters/PageParameters";
+import GetPreviews from "../utils/ContentInteraction/GetPreviews";
 
 const mainContentGrid = {
     width: '70%',
