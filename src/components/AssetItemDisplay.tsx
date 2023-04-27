@@ -30,6 +30,31 @@ const textBoxLink = {
     position: 'absolute'
 }
 
+const editBoxStyle = {
+    border: '2px',
+    borderStyle: 'solid',
+    width: '40px',
+    height: '40px',
+    color: 'white',
+    background: 'black'
+}
+
+const editButtonStyle = {
+    color: 'white',
+    width: '36px',
+    height: '36px',
+    pointerEvents: 'none',
+}
+
+const editDummyBoxStyle = {
+    width: '36px',
+    height: '36px',
+    cursor: 'pointer',
+    pointerEvents: 'all',
+    display: 'inline-block',
+    zIndex: 10
+}
+
 const adminButtonsStyle = {
     border: '2px',
     borderStyle: 'solid',
@@ -105,7 +130,11 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
             <Box width="inherit">
                 {showingAdminButtons ?
                     <Grid sx={adminButtonsGrid}>
-                        <Create sx={adminButtonsStyle} component={Link} to={"/edit/" + itemData.number}/>
+                        {/*Create icon is transparent when Link is applied, using invisible box instead*/}
+                        <Box sx={editBoxStyle}>
+                            <Create sx={editButtonStyle}/>
+                            <Box sx={editDummyBoxStyle} component={Link} to={"/edit/" + itemData.number}/>
+                        </Box>
                         <Delete sx={adminButtonsStyle} onClick={askToDelete}/>
                     </Grid> :
                     <Fragment/>}

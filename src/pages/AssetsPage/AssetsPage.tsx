@@ -17,7 +17,7 @@ function GetItemStyle(pageParameters: PageParameters): React.CSSProperties {
         itemDimensions[0] = boxWidth / (rowColumnCount[1] + 1);
         itemDimensions[1] = itemDimensions[0] / sizeRatio;
     }
-    const width = 90 / rowColumnCount[1];
+
     return ({
         width: itemDimensions[0] + "px",
         height: itemDimensions[1] + "px",

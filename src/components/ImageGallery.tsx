@@ -1,6 +1,5 @@
 import React, {Fragment} from "react";
 import {Box, Grid} from "@mui/material";
-import {GetImageFromURL} from "../utils/Files/GetImageFromURL";
 
 export type ImageLinks = {
     imageLinks: string[]

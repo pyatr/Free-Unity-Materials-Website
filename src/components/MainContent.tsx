@@ -1,8 +1,7 @@
 import React, {Fragment, useEffect, useState} from "react";
-import {Box, Button, Grid} from "@mui/material";
+import {Box, Grid} from "@mui/material";
 import {ContentProps} from "../App";
-import {AxiosResponse} from "axios";
-import {Link, Route, Routes} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 
 import CategoryMenu from "./CategoryMenu";
 import ContentPageSwitch from "./ContentPageSwitch";
@@ -130,6 +129,11 @@ export default function MainContent({mainElement}: ContentProps) {
                                element={<ContentPage contentCategory={"article"} contentNumber={itemNum}/>}/>
                         <Route path={"/scripts/" + itemNum}
                                element={<ContentPage contentCategory={"script"} contentNumber={itemNum}/>}/>
+
+                        <Route path={"/edit/" + itemNum}
+                               element={<ContentEditPage contentNumber={itemNum}
+                                                         contentCategory={"asset"}/>}/>
+
                         <Route path={"/create"}
                                element={<ContentEditPage contentCategory={"asset"} contentNumber={-1}/>}/>
                         <Route path={"/articles/create"}

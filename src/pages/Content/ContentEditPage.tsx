@@ -1,13 +1,13 @@
 import React, {Fragment, useEffect, useState} from "react";
 import {Button, Grid, Typography} from "@mui/material";
 import TextField from "@mui/material/TextField";
-import {ErrorRounded} from "@mui/icons-material";
+import {AddCircle, AddCircleOutline, ErrorRounded} from "@mui/icons-material";
 
 import {ContentUnit, GetDummyContent} from "../../utils/Types/Content/ContentUnit";
 import {ContentUnitContainer} from "../../utils/Types/Content/ContentUnitContainer";
 import {ContentUnitRequestData} from "../../utils/Types/Content/ContentUnitRequestData";
 
-import {GetContent} from "../../utils/ContentLoading/GetContent";
+
 import ServerConnection from "../../utils/ServerConnection";
 import {GoToHomePage} from "../../utils/GoToHomePage";
 import FileToBase64 from "../../utils/Files/FileToBase64";
@@ -19,6 +19,8 @@ import ContentEditLoadImages from "./ContentEditLoadImages";
 import {AxiosResponse} from "axios/index";
 import ErrorNotification from "../../components/ErrorNotification";
 import ImageGallery from "../../components/ImageGallery";
+import {GetContent} from "../../utils/ContentInteraction/GetContent";
+import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
 
 const itemContentDisplay = {
     width: '100%',
@@ -27,32 +29,31 @@ const itemContentDisplay = {
     display: 'grid'
 }
 
-async function SendContentChangeRequest(itemContent: ContentUnit, imageGallery: string[], requestName: string, callback: Function) {
-    const params = {
-        title: itemContent.title,
-        content: itemContent.content,
-        categories: itemContent.categories,
-        number: itemContent.number,
-        preview: imageGallery
-    };
-
-    let serverConnection = new ServerConnection();
-    await serverConnection.SendPostRequestPromise(requestName, params).then(() => {
-        callback();
-    });
+const categoryButtonStyle = {
+    cursor: 'pointer',
+    minWidth: "24px",
+    minHeight: "24px",
+    height: "24px",
+    width: "24px"
 }
 
 export default function ContentEditPage({contentNumber, contentCategory}: ContentUnitRequestData) {
     const [itemContent, setItemContent] = useState(GetDummyContent());
-
     useEffect(() => {
+        //Request content if it's not loaded and given contentNumber is a real post number
         if (itemContent.number == -1 && contentNumber != -1) {
-            GetContent(contentNumber, contentCategory).then((conItem: ContentUnit) => {
-                setItemContent(conItem);
+            GetContent(contentNumber, contentCategory).then((conItem) => {
+                setItemContent({
+                    number: conItem.NUMBER,
+                    title: conItem.TITLE,
+                    categories: conItem.CATEGORIES,
+                    creationDate: conItem.CREATION_DATE,
+                    content: conItem.CONTENT
+                });
             });
         }
     });
-
+    //Go to editing if loaded real page or if received a non-existing contentNumber
     if (itemContent.number != -1 || contentNumber == -1) {
         return (<LoadedContentEditPage itemContent={itemContent} contentCategory={contentCategory}/>);
     } else {
@@ -70,22 +71,14 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
     //Error notification message
     const [errorNotification, setErrorNotification] = useState("");
 
-    const [currentItemState, setItemState] = useState<ContentUnit>(
-        {
-            number: itemContent.number,
-            title: itemContent.title,
-            categories: itemContent.categories,
-            creationDate: itemContent.creationDate,
-            content: itemContent.content
-        }
-    );
+    const [currentItemState, setItemState] = useState<ContentUnit>(itemContent);
 
     const pageTitle = currentItemState.number == -1 ? "Create new " + contentCategory : "Edit " + itemContent.title;
 
     const titleLimit = 128;
     const maxFileSize = 20;
 
-    function loadImage(e: any) {
+    const loadImage = async (e: any) => {
         let files: FileList = e.target.files as FileList;
         e.target.value = null;
         if (files.length > maxFileSize) {
@@ -93,19 +86,16 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             return;
         }
 
-        let filesBase64: string[] = [];
         let blobs: string[] = [];
         //FileList has no foreach
         for (let i = 0; i < files.length; i++) {
             FileToBase64(files[i], (result: string) => {
-                filesBase64.push(result);
+                setGalleryImagesBase64(galleryImagesBase64.concat(result));
             });
             blobs.push(URL.createObjectURL(files[i]));
         }
-        setGalleryImagesBase64(galleryImagesBase64.concat(filesBase64));
         setGalleryImages(galleryImages.concat(blobs));
     }
-
     const switchCatSelection = () => {
         setCategorySelectionDisplay(!categorySelectionDisplayed);
     }
@@ -143,13 +133,26 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             return;
         }
 
-        await SendContentChangeRequest(currentItemState, [], currentItemState.number == -1 ? "createContent" : "updateContent", (response: AxiosResponse) => {
-            window.open("http://" + window.location.host + "/" + response.data.content.itemID, "_self");
+        const params = {
+            title: currentItemState.title,
+            content: currentItemState.content,
+            categories: currentItemState.categories,
+            number: currentItemState.number,
+            category: contentCategory,
+            gallery: galleryImagesBase64
+        };
+
+        let serverConnection = new ServerConnection();
+        await serverConnection.SendPostRequestPromise(currentItemState.number == -1 ? "createContent" : "updateContent", params).then((response: AxiosResponse) => {
+            //TODO: open for all categories
+            const itemNumber = itemContent.number == -1 ? response.data.content.itemID : itemContent.number;
+            window.open("http://" + window.location.host + "/" + itemNumber, "_self");
         });
     }
 
     const submitDeletion = async () => {
-        await SendContentChangeRequest(currentItemState, [], "deleteContent", () => {
+        DeleteContent(itemContent.number, contentCategory).then(() => {
+            GoToHomePage();
         });
     }
 
@@ -193,21 +196,13 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
                     {currentItemState.categories === "" ?
                         <Typography variant="subtitle2" fontStyle="italic">Choose categories</Typography> :
                         <Typography variant="subtitle2">{currentItemState.categories}</Typography>}
-                    <Button style={{
-                        color: categorySelectionDisplayed ? "white" : "black",
-                        background: categorySelectionDisplayed ? "black" : "white",
-                        border: "1px solid",
-                        borderRadius: "50px",
-                        borderColor: "black",
-                        minWidth: "24px",
-                        minHeight: "24px",
-                        height: "24px",
-                        width: "24px"
-                    }} onClick={switchCatSelection}>+</Button>
                     {categorySelectionDisplayed ?
-                        <ContentEditCategorySelection currentCategories={currentItemState.categories.split(", ")}
-                                                      onCategorySelected={setCategorySelection}/> :
-                        <Fragment/>}
+                        <Fragment>
+                            <AddCircle style={categoryButtonStyle} onClick={switchCatSelection}/>
+                            <ContentEditCategorySelection currentCategories={currentItemState.categories.split(", ")}
+                                                          onCategorySelected={setCategorySelection}/>
+                        </Fragment> :
+                        <AddCircleOutline style={categoryButtonStyle} onClick={switchCatSelection}/>}
                 </Grid>
                 <TextField onChange={setContent}
                            label="Content"
