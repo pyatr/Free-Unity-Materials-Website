@@ -19,7 +19,8 @@ const adminButtonsGrid = {
     display: 'flex',
     width: 'inherit',
     justifyContent: 'space-between',
-    position: 'absolute'
+    position: 'absolute',
+    pointerEvents: "none"
 }
 
 const textBoxLink = {
@@ -36,6 +37,7 @@ const adminButtonsStyle = {
     width: '40px',
     height: '40px',
     cursor: 'pointer',
+    pointerEvents: 'all',
     zIndex: 10
 }
 
