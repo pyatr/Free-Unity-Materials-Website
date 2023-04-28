@@ -65,6 +65,8 @@ export default function ContentEditPage({contentNumber, contentCategory}: Conten
     }
 }
 
+const forbiddenSymbols = ["'"];
+
 function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContainer) {
     //Displaying category selection menu
     const [categorySelectionDisplayed, setCategorySelectionDisplay] = useState(false);
@@ -153,6 +155,13 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
         if (currentItemState.gallery.length == 0) {
             error += "Need at least one image in gallery\n";
         }
+        forbiddenSymbols.forEach((symbol: string) => {
+            let count;
+            let index;
+            for (count = -1, index = -2; index != -1; count++, index = currentItemState.content.indexOf(symbol, index + 1)) ;
+            error += "Forbidden symbol [" + symbol + "] found " + count + " times\n";
+        });
+
         if (error != "") {
             setErrorNotification(error);
             return;
