@@ -102,8 +102,11 @@ class ContentController extends BaseController
             $galleryDirectory = "Images/$folder/$contentNumber/Gallery";
             $imagesInGallery = scandir("$this->serverRoot/$galleryDirectory/");
             $imagesCount = count($imagesInGallery) - 2;
-            for ($i = 0; $i < $imagesCount; $i++) {
-                $response['content'][0]['GALLERY'][$i] = "$galleryDirectory/" . $imagesInGallery[$i + 2];
+            if ($imagesCount > 0) {
+                sort($imagesInGallery, SORT_NUMERIC);
+                for ($i = 0; $i < $imagesCount; $i++) {
+                    $response['content'][0]['GALLERY'][$i] = "$galleryDirectory/" . $imagesInGallery[$i + 2];
+                }
             }
         }
         return $response;
