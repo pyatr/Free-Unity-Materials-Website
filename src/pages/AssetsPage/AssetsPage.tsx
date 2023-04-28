@@ -37,8 +37,10 @@ export default function AssetsPage({pageData, rawContent}: PageLoadProps) {
         const gridStyle = {
             display: "flex",
             flexWrap: "wrap",
-            justifyContent: "space-around",
-            rowGap: "32px"
+            justifyContent: "space-between",
+            rowGap: "32px",
+            paddingLeft: "32px",
+            paddingRight: "32px"
         }
 
         let preparedContent = rawContent.map((previewData) => {

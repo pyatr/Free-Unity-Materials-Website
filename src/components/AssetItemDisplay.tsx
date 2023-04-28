@@ -87,8 +87,6 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
         return (<Box width={newWidth} height={newHeight} margin="auto"/>);
     }
     const canEdit: boolean = CanUserEditContent();
-    const shortTitleLimit = 20;
-    const shortTitle = itemData.title.length > shortTitleLimit ? itemData.title.substring(0, shortTitleLimit) + "..." : itemData.title;
 
     const showAdminButtons = () => {
         setAdminButtonStatus(canEdit);
@@ -115,8 +113,10 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
     const imageStyle = {
         width: itemStyle.width,
         height: itemStyle.width,
+        display: "grid",
         color: "black",
-        borderBottom: "inherit"
+        borderBottom: "inherit",
+        background: 'black'
     }
 
     const startPictureWidth = 187;
@@ -130,7 +130,7 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
         <Grid style={itemStyle} onMouseEnter={showAdminButtons}
               onMouseLeave={hideAdminButtons}>
             <Box component={Link} to={link} sx={textBoxLink}/>
-            <Box width="inherit">
+            <Box style={imageStyle}>
                 {showingAdminButtons ?
                     <Grid sx={adminButtonsGrid}>
                         {/*Create icon is transparent when Link is applied, using invisible box instead*/}
@@ -149,10 +149,11 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
                         parentWidth={imageStyle.width as string}
                         parentHeight={imageStyle.width as string}/> :
                     <Fragment/>}
-                {<img src={itemData.titlepicLink} style={imageStyle}/>}
+                {<img src={itemData.titlepicLink}/>}
             </Box>
             <Grid style={gridStyle} fontSize={subtitleFontSite}>
-                <Typography component="h6" fontSize={titleFontSize}>{shortTitle}</Typography>
+                <Typography component="h6" sx={{textOverflow: "ellipsis", overflow: "hidden"}}
+                            fontSize={titleFontSize}>{itemData.title}</Typography>
                 <Typography variant="subtitle1" fontSize={subtitleFontSite}
                             color="#999999"> {itemData.categories}</Typography>
                 <Typography sx={{

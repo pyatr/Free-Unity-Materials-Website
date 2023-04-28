@@ -17,7 +17,7 @@ export default function MessageBoxYesNo({message, onConfirm, onCancel, parentWid
                  height={PixelSummForCSS(parentHeight, "-16px")}>
         <Box style={{border: '2px', borderStyle: 'solid', background: 'white'}}>
             <Grid style={{display: 'grid', padding: '16px', gap: '32px'}}>
-                <Typography variant="h5">{message}</Typography>
+                <Typography variant="h5" sx={{textOverflow: "ellipsis", overflow: "hidden"}}>{message}</Typography>
                 <Grid style={{display: 'flex', justifyContent: 'space-evenly'}}>
                     <CheckCircle style={messageBoxButtonsStyle} onClick={() => onConfirm()}/>
                     <Cancel style={messageBoxButtonsStyle} onClick={() => onCancel()}/>

@@ -87,7 +87,7 @@ export default function MainContent({mainElement}: ContentProps) {
                             title: contentUnit.TITLE,
                             categories: contentUnit.CATEGORIES,
                             content: contentUnit.CONTENT,
-                            titlepicLink: "http://" + window.location.host + contentUnit.titlepicLink
+                            titlepicLink: "http://" + window.location.host + ":8000/" + contentUnit.titlepicLink
                         }
                     )
                 );

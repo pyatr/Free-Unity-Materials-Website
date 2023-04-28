@@ -14,7 +14,9 @@ const imageGalleryGridStyle = {
 
 const imageGalleryBoxStyle = {
     border: "2px solid",
-    borderColor: "black"
+    borderColor: "black",
+    marginTop: "16px",
+    marginBottom: "16px"
 }
 
 const imageBoxStyle = {
@@ -31,6 +33,11 @@ const imageBoxStyle = {
 }
 
 export default function ImageGallery({imageLinks}: ImageLinks) {
+    if (imageLinks === undefined) {
+        console.log("Image links are undefined");
+        return <Fragment/>;
+    }
+
     if (imageLinks.length == 0) {
         return <Fragment/>;
     }

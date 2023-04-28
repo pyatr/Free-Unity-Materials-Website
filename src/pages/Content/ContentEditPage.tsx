@@ -40,19 +40,23 @@ const categoryButtonStyle = {
 export default function ContentEditPage({contentNumber, contentCategory}: ContentUnitRequestData) {
     const [itemContent, setItemContent] = useState(GetDummyContent());
     useEffect(() => {
-        //Request content if it's not loaded and given contentNumber is a real post number
-        if (itemContent.number == -1 && contentNumber != -1) {
-            GetContent(contentNumber, contentCategory).then((conItem) => {
-                setItemContent({
-                    number: conItem.NUMBER,
-                    title: conItem.TITLE,
-                    categories: conItem.CATEGORIES,
-                    creationDate: conItem.CREATION_DATE,
-                    content: conItem.CONTENT
-                });
-            });
+            //Request content if it's not loaded and given contentNumber is a real post number
+            if (itemContent.number == -1 && contentNumber != -1) {
+                GetContent(contentNumber, contentCategory).then((conItem) => {
+                        const fullLinks: string[] = conItem.GALLERY[0] != 'none' ? conItem.GALLERY.map((link: string) => "http://" + window.location.host + ":8000/" + link) : [];
+                        setItemContent({
+                            number: conItem.NUMBER,
+                            title: conItem.TITLE,
+                            categories: conItem.CATEGORIES,
+                            creationDate: conItem.CREATION_DATE,
+                            content: conItem.CONTENT,
+                            gallery: fullLinks
+                        });
+                    }
+                );
+            }
         }
-    });
+    );
     //Go to editing if loaded real page or if received a non-existing contentNumber
     if (itemContent.number != -1 || contentNumber == -1) {
         return (<LoadedContentEditPage itemContent={itemContent} contentCategory={contentCategory}/>);
@@ -65,13 +69,30 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
     //Displaying category selection menu
     const [categorySelectionDisplayed, setCategorySelectionDisplay] = useState(false);
     //Content preview image as link to blob
-    const [galleryImages, setGalleryImages] = useState(Array<string>);
+    const [galleryImages, setGalleryImages] = useState(itemContent.gallery);
     //Preview image converted to Base64 string
     const [galleryImagesBase64, setGalleryImagesBase64] = useState(Array<string>);
     //Error notification message
     const [errorNotification, setErrorNotification] = useState("");
 
     const [currentItemState, setItemState] = useState<ContentUnit>(itemContent);
+
+    useEffect(() => {
+        if (currentItemState.gallery.length > 0 && galleryImagesBase64.length == 0) {
+            const loadImagesFromGallery = async () => {
+                let base64Files: string[] = [];
+                const gallery = currentItemState.gallery;
+                for (let i = 0; i < gallery.length; i++) {
+                    const image = await fetch(gallery[i]);
+                    const dataBlob = await image.blob();
+                    const blob64 = await FileToBase64(dataBlob);
+                    base64Files = base64Files.concat(blob64 as string);
+                }
+                return base64Files;
+            }
+            loadImagesFromGallery().then((base64Files: string[]) => setGalleryImagesBase64(galleryImagesBase64.concat(base64Files)));
+        }
+    })
 
     const pageTitle = currentItemState.number == -1 ? "Create new " + contentCategory : "Edit " + itemContent.title;
 
@@ -81,19 +102,20 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
     const loadImage = async (e: any) => {
         let files: FileList = e.target.files as FileList;
         e.target.value = null;
-        if (files.length > maxFileSize) {
+        if (galleryImages.length + files.length > maxFileSize) {
             setErrorNotification("Too many images! Max: " + maxFileSize);
             return;
         }
 
+        let base64files: string[] = [];
         let blobs: string[] = [];
         //FileList has no foreach
         for (let i = 0; i < files.length; i++) {
-            FileToBase64(files[i], (result: string) => {
-                setGalleryImagesBase64(galleryImagesBase64.concat(result));
-            });
+            const base64conversionResult = await FileToBase64(files[i]);
+            base64files = base64files.concat(base64conversionResult as string);
             blobs.push(URL.createObjectURL(files[i]));
         }
+        setGalleryImagesBase64(galleryImagesBase64.concat(base64files));
         setGalleryImages(galleryImages.concat(blobs));
     }
     const switchCatSelection = () => {
@@ -106,7 +128,8 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             title: event.target.value,
             categories: currentItemState.categories,
             creationDate: currentItemState.creationDate,
-            content: currentItemState.content
+            content: currentItemState.content,
+            gallery: currentItemState.gallery
         });
     }
 
@@ -116,7 +139,8 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             title: currentItemState.title,
             categories: currentItemState.categories,
             creationDate: currentItemState.creationDate,
-            content: event.target.value
+            content: event.target.value,
+            gallery: currentItemState.gallery
         });
     }
 
@@ -127,6 +151,9 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
         }
         if (currentItemState.content == "") {
             error += "No content\n";
+        }
+        if (galleryImages.length == 0) {
+            error += "Need at least one image in gallery\n";
         }
         if (error != "") {
             setErrorNotification(error);
@@ -167,7 +194,8 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             title: currentItemState.title,
             categories: newCategorySelection,
             creationDate: currentItemState.creationDate,
-            content: currentItemState.content
+            content: currentItemState.content,
+            gallery: currentItemState.gallery
         });
     }
 
@@ -199,8 +227,9 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
                     {categorySelectionDisplayed ?
                         <Fragment>
                             <AddCircle style={categoryButtonStyle} onClick={switchCatSelection}/>
-                            <ContentEditCategorySelection currentCategories={currentItemState.categories.split(", ")}
-                                                          onCategorySelected={setCategorySelection}/>
+                            <ContentEditCategorySelection
+                                currentCategories={currentItemState.categories.split(", ")}
+                                onCategorySelected={setCategorySelection}/>
                         </Fragment> :
                         <AddCircleOutline style={categoryButtonStyle} onClick={switchCatSelection}/>}
                 </Grid>
