@@ -1,7 +1,7 @@
-export default function FileToBase64(file: Blob, onLoad: Function) {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = function () {
-        onLoad(reader.result);
-    };
+export default function FileToBase64(file: Blob) {
+    return new Promise((resolve, _) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+    });
 }
