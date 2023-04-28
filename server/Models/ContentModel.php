@@ -56,7 +56,7 @@ class ContentModel extends BaseModel
             . $this::ENTRY_CONTENT . " FROM $tableName ORDER BY 1 DESC LIMIT $pageSize OFFSET $postsOffset";
         $result = $this->executeRequest($query);
         for ($i = 0; $i < count($result['content']); $i++) {
-            $result['content'][$i]['CONTENT'] = substr($result['content'][$i]['CONTENT'], 0, $this::SHORT_DESC_LENGTH);
+            $result['content'][$i]['CONTENT'] = mb_strimwidth($result['content'][$i]['CONTENT'], 0, $this::SHORT_DESC_LENGTH, "...");
         }
         $result['contentCount'] = $this->getContentCount($tableName);
         return $result;
