@@ -1,8 +1,8 @@
 import React, {Fragment} from "react";
 import {Box, Grid} from "@mui/material";
 
-export type ImageLinks = {
-    imageLinks: string[]
+export type PreparedImages = {
+    images: JSX.Element[]
 }
 
 const imageGalleryGridStyle = {
@@ -32,13 +32,10 @@ const imageBoxStyle = {
     display: "grid"
 }
 
-export default function ImageGallery({imageLinks}: ImageLinks) {
-    if (imageLinks === undefined) {
-        console.log("Image links are undefined");
-        return <Fragment/>;
-    }
+export {imageBoxStyle}
 
-    if (imageLinks.length == 0) {
+export default function ImageGallery({images}: PreparedImages) {
+    if (images.length == 0) {
         return <Fragment/>;
     }
 
@@ -48,13 +45,6 @@ export default function ImageGallery({imageLinks}: ImageLinks) {
     if (mainBox != null) {
         newWidth = (mainBox as HTMLElement).getBoundingClientRect().width - 48;
     }
-
-    const images = imageLinks.map((link: string) => {
-        return (
-            <Grid sx={imageBoxStyle}>
-                <img src={link}/>
-            </Grid>)
-    });
 
     return (
         <Box sx={[imageGalleryBoxStyle, {width: newWidth + "px"}]}>

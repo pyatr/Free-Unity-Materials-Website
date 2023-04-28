@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from "react";
-import {Box, Grid, Typography} from "@mui/material";
+import {Grid, Typography} from "@mui/material";
 import parse from 'html-react-parser';
 
 import "../../assets/HomePage.css";
@@ -8,16 +8,10 @@ import {GetDummyContent} from "../../utils/Types/Content/ContentUnit";
 import {ContentUnitContainer} from "../../utils/Types/Content/ContentUnitContainer";
 import {ContentUnitRequestData} from "../../utils/Types/Content/ContentUnitRequestData";
 import {GetContent} from "../../utils/ContentInteraction/GetContent";
-import ImageGallery from "../../components/ImageGallery";
+import ImageGallery, {imageBoxStyle} from "../../components/ImageGallery";
 import EditDeleteButtons from "./EditDeleteButtons";
 import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
 import {GoToHomePage} from "../../utils/GoToHomePage";
-
-const itemBorderStyle = {
-    width: '203px',
-    height: '203px',
-    border: '2px solid black'
-}
 
 const itemContentDisplay = {
     width: '100%',
@@ -25,8 +19,6 @@ const itemContentDisplay = {
     wordBreak: 'break-word',
     display: 'grid'
 }
-
-export {itemBorderStyle}
 
 export default function ContentPage({contentNumber, contentCategory}: ContentUnitRequestData) {
     const [rawItemContent, setRawItemContent] = useState(GetDummyContent());
@@ -62,13 +54,18 @@ function LoadedContentPage({itemContent, contentCategory}: ContentUnitContainer)
             GoToHomePage();
         });
     }
-
+    const images = itemContent.gallery.map((link: string) => {
+        return (
+            <Grid sx={imageBoxStyle}>
+                <img src={link}/>
+            </Grid>)
+    });
     let content = parse(itemContent.content);
     return (
         <Grid sx={itemContentDisplay}>
             <Typography variant="h4">{itemContent.title}</Typography>
             <Typography variant="subtitle2" color="grey">{itemContent.categories}</Typography>
-            <ImageGallery imageLinks={itemContent.gallery}/>
+            <ImageGallery images={images}/>
             <Typography sx={itemContentDisplay} variant="body1">{content}</Typography>
             <EditDeleteButtons contentNumber={itemContent.number} onDelete={confirmDelete}/>
         </Grid>);

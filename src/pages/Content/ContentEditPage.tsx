@@ -1,12 +1,11 @@
 import React, {Fragment, useEffect, useState} from "react";
-import {Button, Grid, Typography} from "@mui/material";
+import {Grid, Typography} from "@mui/material";
 import TextField from "@mui/material/TextField";
-import {AddCircle, AddCircleOutline, ErrorRounded} from "@mui/icons-material";
+import {AddCircle, AddCircleOutline} from "@mui/icons-material";
 
 import {ContentUnit, GetDummyContent} from "../../utils/Types/Content/ContentUnit";
 import {ContentUnitContainer} from "../../utils/Types/Content/ContentUnitContainer";
 import {ContentUnitRequestData} from "../../utils/Types/Content/ContentUnitRequestData";
-
 
 import ServerConnection from "../../utils/ServerConnection";
 import {GoToHomePage} from "../../utils/GoToHomePage";
@@ -21,6 +20,7 @@ import ErrorNotification from "../../components/ErrorNotification";
 import ImageGallery from "../../components/ImageGallery";
 import {GetContent} from "../../utils/ContentInteraction/GetContent";
 import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
+import {ImageInEditGallery} from "../../components/ImageInEditGallery";
 
 const itemContentDisplay = {
     width: '100%',
@@ -68,31 +68,10 @@ export default function ContentEditPage({contentNumber, contentCategory}: Conten
 function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContainer) {
     //Displaying category selection menu
     const [categorySelectionDisplayed, setCategorySelectionDisplay] = useState(false);
-    //Content preview image as link to blob
-    const [galleryImages, setGalleryImages] = useState(itemContent.gallery);
-    //Preview image converted to Base64 string
-    const [galleryImagesBase64, setGalleryImagesBase64] = useState(Array<string>);
     //Error notification message
     const [errorNotification, setErrorNotification] = useState("");
 
     const [currentItemState, setItemState] = useState<ContentUnit>(itemContent);
-
-    useEffect(() => {
-        if (currentItemState.gallery.length > 0 && galleryImagesBase64.length == 0) {
-            const loadImagesFromGallery = async () => {
-                let base64Files: string[] = [];
-                const gallery = currentItemState.gallery;
-                for (let i = 0; i < gallery.length; i++) {
-                    const image = await fetch(gallery[i]);
-                    const dataBlob = await image.blob();
-                    const blob64 = await FileToBase64(dataBlob);
-                    base64Files = base64Files.concat(blob64 as string);
-                }
-                return base64Files;
-            }
-            loadImagesFromGallery().then((base64Files: string[]) => setGalleryImagesBase64(galleryImagesBase64.concat(base64Files)));
-        }
-    })
 
     const pageTitle = currentItemState.number == -1 ? "Create new " + contentCategory : "Edit " + itemContent.title;
 
@@ -102,21 +81,17 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
     const loadImage = async (e: any) => {
         let files: FileList = e.target.files as FileList;
         e.target.value = null;
-        if (galleryImages.length + files.length > maxFileSize) {
+        if (currentItemState.gallery.length + files.length > maxFileSize) {
             setErrorNotification("Too many images! Max: " + maxFileSize);
             return;
         }
 
-        let base64files: string[] = [];
         let blobs: string[] = [];
         //FileList has no foreach
         for (let i = 0; i < files.length; i++) {
-            const base64conversionResult = await FileToBase64(files[i]);
-            base64files = base64files.concat(base64conversionResult as string);
             blobs.push(URL.createObjectURL(files[i]));
         }
-        setGalleryImagesBase64(galleryImagesBase64.concat(base64files));
-        setGalleryImages(galleryImages.concat(blobs));
+        setGallerySelection(currentItemState.gallery.concat(blobs));
     }
     const switchCatSelection = () => {
         setCategorySelectionDisplay(!categorySelectionDisplayed);
@@ -144,6 +119,29 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
         });
     }
 
+    const setCategorySelection = (category: string) => {
+        let newCategorySelection = SetCategorySelection(category, currentItemState.categories);
+        setItemState({
+            number: currentItemState.number,
+            title: currentItemState.title,
+            categories: newCategorySelection,
+            creationDate: currentItemState.creationDate,
+            content: currentItemState.content,
+            gallery: currentItemState.gallery
+        });
+    }
+
+    const setGallerySelection = (galleryImages: string[]) => {
+        setItemState({
+            number: currentItemState.number,
+            title: currentItemState.title,
+            categories: currentItemState.categories,
+            creationDate: currentItemState.creationDate,
+            content: currentItemState.content,
+            gallery: galleryImages
+        });
+    }
+
     const submitContent = async () => {
         let error: string = "";
         if (currentItemState.title == "") {
@@ -152,13 +150,31 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
         if (currentItemState.content == "") {
             error += "No content\n";
         }
-        if (galleryImages.length == 0) {
+        if (currentItemState.gallery.length == 0) {
             error += "Need at least one image in gallery\n";
         }
         if (error != "") {
             setErrorNotification(error);
             return;
         }
+
+        const galleryToBase64 = async (): Promise<string[]> => {
+            let links = currentItemState.gallery.reverse();
+
+            let base64Files: string[] = [];
+
+            const imageToBase64 = async () => {
+                if (links.length > 0)
+                    await fetch(links.pop() as string).then((image: Response) =>
+                        image.blob().then((dataBlob: Blob) =>
+                            FileToBase64(dataBlob).then((blob64) =>
+                                base64Files = base64Files.concat(blob64)))).then(() => imageToBase64());
+            }
+            await imageToBase64();
+
+            return base64Files;
+        }
+        const galleryImagesBase64: string[] = await galleryToBase64();
 
         const params = {
             title: currentItemState.title,
@@ -187,17 +203,11 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
         GoToHomePage();
     }
 
-    const setCategorySelection = (cat: string) => {
-        let newCategorySelection = SetCategorySelection(cat, currentItemState.categories);
-        setItemState({
-            number: currentItemState.number,
-            title: currentItemState.title,
-            categories: newCategorySelection,
-            creationDate: currentItemState.creationDate,
-            content: currentItemState.content,
-            gallery: currentItemState.gallery
-        });
-    }
+    const images = currentItemState.gallery.map((currentLink: string) => {
+        return <ImageInEditGallery imageLink={currentLink} onClick={() => {
+            setGallerySelection(currentItemState.gallery.filter(link => link != currentLink));
+        }}/>;
+    });
 
     return (
         <Grid style={{display: "grid", gap: "32px"}}>
@@ -207,7 +217,7 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
                 <ErrorNotification message={errorNotification} onDismiss={() => {
                     setErrorNotification("")
                 }}/>
-                <ImageGallery imageLinks={galleryImages}/>
+                <ImageGallery images={images}/>
                 <ContentEditLoadImages loadImageFunction={loadImage}/>
                 <TextField onChange={setTitle}
                            label={"Title (" + titleLimit + " characters)"}
