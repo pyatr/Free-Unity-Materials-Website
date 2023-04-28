@@ -36,7 +36,8 @@ const editBoxStyle = {
     width: '40px',
     height: '40px',
     color: 'white',
-    background: 'black'
+    background: 'black',
+    position: 'relative'
 }
 
 const editButtonStyle = {
@@ -44,6 +45,7 @@ const editButtonStyle = {
     width: '36px',
     height: '36px',
     pointerEvents: 'none',
+    position: 'absolute'
 }
 
 const editDummyBoxStyle = {
@@ -52,7 +54,8 @@ const editDummyBoxStyle = {
     cursor: 'pointer',
     pointerEvents: 'all',
     display: 'inline-block',
-    zIndex: 10
+    zIndex: 10,
+    position: 'absolute'
 }
 
 const adminButtonsStyle = {
