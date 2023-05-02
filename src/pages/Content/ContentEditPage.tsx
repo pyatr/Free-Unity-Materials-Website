@@ -13,7 +13,7 @@ import FileToBase64 from "../../utils/Files/FileToBase64";
 
 import ContentEditCategorySelection, {SetCategorySelection} from "./ContentEditCategorySelection";
 import ContentStateInteractionButtons from "./ContentStateInteractionButtons";
-import ContentEditLoadImages from "./ContentEditLoadImages";
+import FileSelection from "./FileSelection";
 
 import {AxiosResponse} from "axios/index";
 import ErrorNotification from "../../components/ErrorNotification";
@@ -21,6 +21,9 @@ import ImageGallery from "../../components/ImageGallery/ImageGallery";
 import {GetContent} from "../../utils/ContentInteraction/GetContent";
 import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
 import {ImageInEditGallery} from "../../components/ImageGallery/ImageInEditGallery";
+import DownloadLinksList from "../../components/DownloadLinks/DownloadLinksList";
+import DownloadLinksEditList from "../../components/DownloadLinks/DownloadLinksEditList";
+import {FileNameBlobPair, GetBlobsFromPairs, GetFileNamesFromPairs} from "../../utils/Types/FileNameBlobPair";
 
 const itemContentDisplay = {
     width: '100%',
@@ -37,23 +40,20 @@ const categoryButtonStyle = {
     width: "24px"
 }
 
+const categorySelectionHorizontalGrid = {
+    display: "flex",
+    alignItems: "flex-end",
+    gap: "8px",
+    width: "fit-content",
+    height: "24px",
+    maxHeight: "24px"
+}
 export default function ContentEditPage({contentNumber, contentCategory}: ContentUnitRequestData) {
     const [itemContent, setItemContent] = useState(GetDummyContent());
     useEffect(() => {
             //Request content if it's not loaded and given contentNumber is a real post number
             if (itemContent.number == -1 && contentNumber != -1) {
-                GetContent(contentNumber, contentCategory).then((conItem) => {
-                        const fullLinks: string[] = conItem.GALLERY[0] != 'none' ? conItem.GALLERY.map((link: string) => "http://" + window.location.host + ":8000/" + link) : [];
-                        setItemContent({
-                            number: conItem.NUMBER,
-                            title: conItem.TITLE,
-                            categories: conItem.CATEGORIES,
-                            creationDate: conItem.CREATION_DATE,
-                            content: conItem.CONTENT,
-                            gallery: fullLinks
-                        });
-                    }
-                );
+                GetContent(contentNumber, contentCategory).then((conItem: ContentUnit) => setItemContent(conItem));
             }
         }
     );
@@ -73,18 +73,23 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
     //Error notification message
     const [errorNotification, setErrorNotification] = useState("");
 
+    const [newFiles, setNewFiles] = useState(Array<FileNameBlobPair>);
+    const [filesToDelete, setFileDeletionState] = useState(Array<string>);
+
     const [currentItemState, setItemState] = useState<ContentUnit>(itemContent);
 
     const pageTitle = currentItemState.number == -1 ? "Create new " + contentCategory : "Edit " + itemContent.title;
 
     const titleLimit = 128;
-    const maxFileSize = 20;
+    const maxImageCount = 20;
+    const maxFileCount = 50;
+    //TODO: add max filesize. file.size / 1000 is size in kilobytes
 
-    const loadImage = async (e: any) => {
+    const uploadImages = async (e: any) => {
         let files: FileList = e.target.files as FileList;
         e.target.value = null;
-        if (currentItemState.gallery.length + files.length > maxFileSize) {
-            setErrorNotification("Too many images! Max: " + maxFileSize);
+        if (currentItemState.gallery.length + files.length > maxImageCount) {
+            setErrorNotification("Too many images! Max: " + maxImageCount);
             return;
         }
 
@@ -95,6 +100,25 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
         }
         setGallerySelection(currentItemState.gallery.concat(blobs));
     }
+
+    const uploadFiles = async (e: any) => {
+        let files: FileList = e.target.files as FileList;
+        e.target.value = null;
+        if (currentItemState.fileLinks.length + files.length > maxFileCount) {
+            setErrorNotification("Too many files! Max: " + maxFileCount);
+            return;
+        }
+
+        let blobs: FileNameBlobPair[] = [];
+        for (let i = 0; i < files.length; i++) {
+            blobs.push({
+                fileName: files[i].name,
+                blobLink: URL.createObjectURL(files[i])
+            });
+        }
+        setNewFiles(newFiles.concat(blobs));
+    }
+
     const switchCatSelection = () => {
         setCategorySelectionDisplay(!categorySelectionDisplayed);
     }
@@ -106,7 +130,8 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             categories: currentItemState.categories,
             creationDate: currentItemState.creationDate,
             content: currentItemState.content,
-            gallery: currentItemState.gallery
+            gallery: currentItemState.gallery,
+            fileLinks: currentItemState.fileLinks
         });
     }
 
@@ -117,7 +142,8 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             categories: currentItemState.categories,
             creationDate: currentItemState.creationDate,
             content: event.target.value,
-            gallery: currentItemState.gallery
+            gallery: currentItemState.gallery,
+            fileLinks: currentItemState.fileLinks
         });
     }
 
@@ -129,7 +155,8 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             categories: newCategorySelection,
             creationDate: currentItemState.creationDate,
             content: currentItemState.content,
-            gallery: currentItemState.gallery
+            gallery: currentItemState.gallery,
+            fileLinks: currentItemState.fileLinks
         });
     }
 
@@ -140,7 +167,8 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             categories: currentItemState.categories,
             creationDate: currentItemState.creationDate,
             content: currentItemState.content,
-            gallery: galleryImages
+            gallery: galleryImages,
+            fileLinks: currentItemState.fileLinks
         });
     }
 
@@ -169,9 +197,7 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             return;
         }
 
-        const galleryToBase64 = async (): Promise<string[]> => {
-            let links = currentItemState.gallery.reverse();
-
+        const filesToBase64 = async (links: string[]): Promise<string[]> => {
             let base64Files: string[] = [];
 
             const imageToBase64 = async () => {
@@ -185,7 +211,8 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
 
             return base64Files;
         }
-        const galleryImagesBase64: string[] = await galleryToBase64();
+        const galleryImagesBase64: string[] = await filesToBase64(currentItemState.gallery.reverse());
+        const filesBase64: string[] = await filesToBase64(GetBlobsFromPairs(newFiles));
 
         const params = {
             title: currentItemState.title,
@@ -193,7 +220,8 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             categories: currentItemState.categories,
             number: currentItemState.number,
             category: contentCategory,
-            gallery: galleryImagesBase64
+            gallery: galleryImagesBase64,
+            files: filesBase64
         };
 
         let serverConnection = new ServerConnection();
@@ -202,6 +230,19 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             const itemNumber = itemContent.number == -1 ? response.data.content.itemID : itemContent.number;
             window.open("http://" + window.location.host + "/" + itemNumber, "_self");
         });
+    }
+
+    const resolveFileDeletionState = (fileLink: string) => {
+        if (filesToDelete.includes(fileLink)) {
+            setFileDeletionState(filesToDelete.filter(link => link != fileLink))
+        } else {
+            const isNewFile = fileLink.startsWith("blob:");
+            if (isNewFile) {
+                setNewFiles(newFiles.filter(newFile => newFile.blobLink != fileLink))
+            } else {
+                setFileDeletionState(filesToDelete.concat(fileLink));
+            }
+        }
     }
 
     const submitDeletion = async () => {
@@ -215,33 +256,38 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
     }
 
     const images = currentItemState.gallery.map((currentLink: string) => {
-        return <ImageInEditGallery imageLink={currentLink} onClick={() => {
+        return <ImageInEditGallery imageLink={currentLink} onDeleteClick={() => {
             setGallerySelection(currentItemState.gallery.filter(link => link != currentLink));
         }}/>;
     });
+    const newFileNames = GetFileNamesFromPairs(newFiles);
 
     return (
         <Grid style={{display: "grid", gap: "32px"}}>
             {/*Content grid*/}
-            <Grid style={{display: "grid", gap: "16px"}}>
+            <Grid style={{display: "grid"}}>
                 <Typography variant="h6">{pageTitle}</Typography>
                 <ErrorNotification message={errorNotification} onDismiss={() => {
                     setErrorNotification("")
                 }}/>
                 <ImageGallery images={images}/>
-                <ContentEditLoadImages loadImageFunction={loadImage}/>
+                <FileSelection title={"Add images to gallery"}
+                               inputType={"file"}
+                               multiple={true}
+                               loadImageFunction={uploadImages}/>
+                <DownloadLinksEditList links={currentItemState.fileLinks.concat(newFileNames)}
+                                       newFiles={newFileNames}
+                                       onDeletionMarked={resolveFileDeletionState}/>
+                <FileSelection title={"Attach files"}
+                               inputType={"file"}
+                               multiple={true}
+                               loadImageFunction={uploadFiles}/>
                 <TextField onChange={setTitle}
                            label={"Title (" + titleLimit + " characters)"}
                            inputProps={{maxLength: titleLimit}}
-                           defaultValue={currentItemState.title}/>
-                <Grid style={{
-                    display: "flex",
-                    alignItems: "flex-end",
-                    gap: "8px",
-                    width: "fit-content",
-                    height: "24px",
-                    maxHeight: "24px"
-                }}>
+                           defaultValue={currentItemState.title}
+                           style={{marginTop: "16px", marginBottom: "16px"}}/>
+                <Grid style={categorySelectionHorizontalGrid}>
                     {currentItemState.categories === "" ?
                         <Typography variant="subtitle2" fontStyle="italic">Choose categories</Typography> :
                         <Typography variant="subtitle2">{currentItemState.categories}</Typography>}
@@ -258,7 +304,8 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
                            label="Content"
                            multiline={true}
                            sx={itemContentDisplay}
-                           defaultValue={currentItemState.content}/>
+                           defaultValue={currentItemState.content}
+                           style={{marginTop: "16px", marginBottom: "16px"}}/>
             </Grid>
             {/*Bottom buttons grid*/}
             <ContentStateInteractionButtons onSave={submitContent} onCancel={cancel} onDelete={submitDeletion}

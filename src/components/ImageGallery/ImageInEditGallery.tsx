@@ -1,11 +1,7 @@
 import React, {Fragment, useState} from "react";
 import {Box, Grid} from "@mui/material";
 import {Delete} from "@mui/icons-material";
-
-export type ImageInGallery = {
-    imageLink: string,
-    onClick: Function
-}
+import {ImageInGallery} from "../../utils/Types/ImageInGallery";
 
 const imageBoxStyle = {
     border: "2px solid",
@@ -21,7 +17,7 @@ const imageBoxStyle = {
     position: "relative"
 }
 
-export function ImageInEditGallery({imageLink, onClick}: ImageInGallery) {
+export function ImageInEditGallery({imageLink, onDeleteClick}: ImageInGallery) {
     const [isHovering, setHovering] = useState(false);
     return (
         <Grid sx={imageBoxStyle}
@@ -43,7 +39,7 @@ export function ImageInEditGallery({imageLink, onClick}: ImageInGallery) {
                         cursor: "pointer"
                     }}>
                         <Delete sx={{height: '36px', width: '36px'}} onClick={() => {
-                            onClick();
+                            onDeleteClick();
                         }}/>
                     </Box>
                 </Grid> :
