@@ -49,8 +49,7 @@ services:
       context: .
       dockerfile: ./dockerfiles/database/Dockerfile
     tty: true
-    restart: always
-    #TODO: try use this to start mysql entrypoint: service mysql start
+    entrypoint: ["sh","startdb.sh"]
     ports:
       - "9906:3306"
     volumes:

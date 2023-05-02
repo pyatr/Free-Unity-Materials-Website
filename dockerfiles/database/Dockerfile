@@ -10,15 +10,7 @@ RUN apt-get install -y iputils-ping
 
 RUN usermod -d /var/lib/mysql/ mysql
 
-#TODO: complete database start with commented code
-#CMD service mysql start
-#alt
-#ENTRYPOINT ["service", "mysql", "start"]
-
-#RUN mysql -u root -p root
-#RUN mysql CREATE DATABASE PrimaryDatabase;
-#alt:
-#RUN /etc/init.d/mysql start
+COPY startdb.sh /
 
 EXPOSE 3306
 EXPOSE 9906
