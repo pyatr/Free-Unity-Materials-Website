@@ -3,6 +3,8 @@ import React, {Fragment} from "react";
 import {IsMobileResolution} from "../../utils/MobileUtilities";
 import AssetItemDisplay from "../../components/AssetItemDisplay";
 import {PageLoadProps, PageParameters} from "../../utils/PageParameters/PageParameters";
+import {GetDummyContent} from "../../utils/Types/Content/ContentUnit";
+import {GetDummyPreview} from "../../utils/Types/Content/ContentUnitPreview";
 
 function GetItemStyle(pageParameters: PageParameters): React.CSSProperties {
     let itemDimensions = IsMobileResolution() ? [240, 384] : [160, 256];
@@ -39,10 +41,12 @@ export default function AssetsPage({pageData, rawContent}: PageLoadProps) {
             flexWrap: "wrap",
             justifyContent: "space-between",
             rowGap: "32px",
-            paddingLeft: "32px",
-            paddingRight: "32px"
+            paddingLeft: "16px",
+            paddingRight: "16px"
         }
-
+        for (let i = rawContent.length; i < pageData.pageSize; i++) {
+            rawContent.push(GetDummyPreview());
+        }
         let preparedContent = rawContent.map((previewData) => {
             return (<AssetItemDisplay itemData={previewData} itemStyle={boxStyle}/>);
         });

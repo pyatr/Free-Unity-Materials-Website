@@ -4,7 +4,8 @@ export type ContentUnit = {
     categories: string,
     creationDate: string,
     content: string,
-    gallery: string[]
+    gallery: string[],
+    fileLinks: string[]
 }
 
 export function GetDummyContent(): ContentUnit {
@@ -14,6 +15,7 @@ export function GetDummyContent(): ContentUnit {
         categories: "",
         creationDate: "",
         content: "",
-        gallery: []
+        gallery: [],
+        fileLinks: []
     }
 }

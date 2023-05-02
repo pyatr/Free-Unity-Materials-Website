@@ -5,3 +5,15 @@ export type ContentUnitPreview = {
     content: string,
     titlepicLink: string
 }
+
+export function GetDummyPreview(): ContentUnitPreview {
+    return (
+        {
+            number: -1,
+            title: "",
+            categories: "",
+            content: "",
+            titlepicLink: ""
+        }
+    )
+}

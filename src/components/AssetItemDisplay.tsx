@@ -83,8 +83,7 @@ export default function AssetItemDisplay({itemData, itemStyle}: AssetItemDisplay
     if (itemData.number < 0) {
         //Dummy item in case there are not enough items in row
         let newWidth = PixelSummForCSS(itemStyle.width as string, "4");
-        let newHeight = PixelSummForCSS(itemStyle.height as string, "4");
-        return (<Box width={newWidth} height={newHeight} margin="auto"/>);
+        return (<Box width={newWidth}/>);
     }
     const canEdit: boolean = CanUserEditContent();
 

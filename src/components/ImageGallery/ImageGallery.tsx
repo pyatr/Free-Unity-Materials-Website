@@ -1,5 +1,5 @@
 import React, {Fragment} from "react";
-import {Box, Grid} from "@mui/material";
+import {Box, Grid, Typography} from "@mui/material";
 
 export type PreparedImages = {
     images: JSX.Element[]
@@ -14,9 +14,7 @@ const imageGalleryGridStyle = {
 
 const imageGalleryBoxStyle = {
     border: "2px solid",
-    borderColor: "black",
-    marginTop: "16px",
-    marginBottom: "16px"
+    borderColor: "black"
 }
 
 const imageBoxStyle = {
@@ -47,9 +45,12 @@ export default function ImageGallery({images}: PreparedImages) {
     }
 
     return (
-        <Box sx={[imageGalleryBoxStyle, {width: newWidth + "px"}]}>
-            <Grid style={imageGalleryGridStyle}>
-                {images}
-            </Grid>
-        </Box>);
+        <Grid display="grid" marginTop="16px" marginBottom="16px">
+            <Typography variant="h6">Gallery</Typography>
+            <Box sx={[imageGalleryBoxStyle, {width: newWidth + "px"}]}>
+                <Grid style={imageGalleryGridStyle}>
+                    {images}
+                </Grid>
+            </Box>
+        </Grid>);
 }

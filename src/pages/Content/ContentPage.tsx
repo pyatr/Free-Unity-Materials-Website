@@ -4,7 +4,7 @@ import parse from 'html-react-parser';
 
 import "../../assets/HomePage.css";
 
-import {GetDummyContent} from "../../utils/Types/Content/ContentUnit";
+import {ContentUnit, GetDummyContent} from "../../utils/Types/Content/ContentUnit";
 import {ContentUnitContainer} from "../../utils/Types/Content/ContentUnitContainer";
 import {ContentUnitRequestData} from "../../utils/Types/Content/ContentUnitRequestData";
 import {GetContent} from "../../utils/ContentInteraction/GetContent";
@@ -12,6 +12,7 @@ import ImageGallery, {imageBoxStyle} from "../../components/ImageGallery/ImageGa
 import EditDeleteButtons from "./EditDeleteButtons";
 import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
 import {GoToHomePage} from "../../utils/GoToHomePage";
+import DownloadLinksList from "../../components/DownloadLinks/DownloadLinksList";
 
 const itemContentDisplay = {
     width: '100%',
@@ -25,17 +26,7 @@ export default function ContentPage({contentNumber, contentCategory}: ContentUni
 
     useEffect(() => {
         if (rawItemContent.number == -1) {
-            GetContent(contentNumber, contentCategory).then((conItem) => {
-                const fullLinks: string[] = conItem.GALLERY[0] != 'none' ? conItem.GALLERY.map((link: string) => "http://" + window.location.host + ":8000/" + link) : [];
-                setRawItemContent({
-                    number: conItem.NUMBER,
-                    title: conItem.TITLE,
-                    categories: conItem.CATEGORIES,
-                    content: conItem.CONTENT,
-                    creationDate: conItem.CREATION_DATE,
-                    gallery: fullLinks
-                });
-            });
+            GetContent(contentNumber, contentCategory).then((conItem: ContentUnit) => setRawItemContent(conItem));
         }
     });
 
@@ -63,9 +54,12 @@ function LoadedContentPage({itemContent, contentCategory}: ContentUnitContainer)
     let content = parse(itemContent.content);
     return (
         <Grid sx={itemContentDisplay}>
-            <Typography variant="h4">{itemContent.title}</Typography>
-            <Typography variant="subtitle2" color="grey">{itemContent.categories}</Typography>
+            <Typography variant="h3">{itemContent.title}</Typography>
+            {itemContent.categories != "" ?
+                <Typography variant="subtitle2" color="grey">{itemContent.categories}</Typography> :
+                <Fragment/>}
             <ImageGallery images={images}/>
+            <DownloadLinksList links={itemContent.fileLinks}/>
             <Typography sx={itemContentDisplay} variant="body1">{content}</Typography>
             <EditDeleteButtons contentNumber={itemContent.number} onDelete={confirmDelete}/>
         </Grid>);
