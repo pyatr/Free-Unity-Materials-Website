@@ -1,5 +1,5 @@
-import {IsMobileResolution} from "../utils/MobileUtilities";
-import {IsLoading, IsLoggedIn, LogOut} from "../utils/Login";
+import {IsMobileResolution} from "../../utils/MobileUtilities";
+import {IsLoading, IsLoggedIn, LogOut} from "../../utils/Login";
 import {Grid, Typography} from "@mui/material";
 import React, {Fragment} from "react";
 import {Link} from "react-router-dom";

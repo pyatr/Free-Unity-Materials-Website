@@ -1,6 +1,6 @@
 import {Button, Grid} from "@mui/material";
 import {Link} from "react-router-dom";
-import {IsMobileResolution} from "../utils/MobileUtilities";
+import {IsMobileResolution} from "../../utils/MobileUtilities";
 
 export default function CategoryMenu() {
     const landFontS = 14;

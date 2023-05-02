@@ -8,7 +8,7 @@ import {GetDummyContent} from "../../utils/Types/Content/ContentUnit";
 import {ContentUnitContainer} from "../../utils/Types/Content/ContentUnitContainer";
 import {ContentUnitRequestData} from "../../utils/Types/Content/ContentUnitRequestData";
 import {GetContent} from "../../utils/ContentInteraction/GetContent";
-import ImageGallery, {imageBoxStyle} from "../../components/ImageGallery";
+import ImageGallery, {imageBoxStyle} from "../../components/ImageGallery/ImageGallery";
 import EditDeleteButtons from "./EditDeleteButtons";
 import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
 import {GoToHomePage} from "../../utils/GoToHomePage";

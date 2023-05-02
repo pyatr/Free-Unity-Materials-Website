@@ -17,10 +17,10 @@ import ContentEditLoadImages from "./ContentEditLoadImages";
 
 import {AxiosResponse} from "axios/index";
 import ErrorNotification from "../../components/ErrorNotification";
-import ImageGallery from "../../components/ImageGallery";
+import ImageGallery from "../../components/ImageGallery/ImageGallery";
 import {GetContent} from "../../utils/ContentInteraction/GetContent";
 import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
-import {ImageInEditGallery} from "../../components/ImageInEditGallery";
+import {ImageInEditGallery} from "../../components/ImageGallery/ImageInEditGallery";
 
 const itemContentDisplay = {
     width: '100%',

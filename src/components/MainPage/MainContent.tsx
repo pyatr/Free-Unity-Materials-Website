@@ -1,26 +1,26 @@
 import React, {Fragment, useEffect, useState} from "react";
 import {Box, Grid} from "@mui/material";
-import {ContentProps} from "../App";
+import {ContentProps} from "../../App";
 import {Route, Routes} from "react-router-dom";
 
 import CategoryMenu from "./CategoryMenu";
 import ContentPageSwitch from "./ContentPageSwitch";
 
-import AssetsPage from "../pages/AssetsPage/AssetsPage";
-import ScriptsPage from "../pages/Scripts/ScriptsPage";
-import ArticlesPage from "../pages/Articles/ArticlesPage";
-import NonExistentPage from "../pages/NonExistent/NonExistentPage";
-import ContentPage from "../pages/Content/ContentPage";
-import ContentEditPage from "../pages/Content/ContentEditPage";
+import AssetsPage from "../../pages/AssetsPage/AssetsPage";
+import ScriptsPage from "../../pages/Scripts/ScriptsPage";
+import ArticlesPage from "../../pages/Articles/ArticlesPage";
+import NonExistentPage from "../../pages/NonExistent/NonExistentPage";
+import ContentPage from "../../pages/Content/ContentPage";
+import ContentEditPage from "../../pages/Content/ContentEditPage";
 
-import {ContentUnitPreview} from "../utils/Types/Content/ContentUnitPreview";
-import {IsMobileResolution} from "../utils/MobileUtilities";
-import {GetLastURLPart} from "../utils/GetLastURLPart";
+import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
+import {IsMobileResolution} from "../../utils/MobileUtilities";
+import {GetLastURLPart} from "../../utils/GetLastURLPart";
 
-import CreateContentButton from "./Buttons/CreateContentButton";
-import {SitePagesParameters} from "../utils/PageParameters/SitePagesParameters";
-import {PageParameters} from "../utils/PageParameters/PageParameters";
-import GetPreviews from "../utils/ContentInteraction/GetPreviews";
+import CreateContentButton from "../Buttons/CreateContentButton";
+import {SitePagesParameters} from "../../utils/PageParameters/SitePagesParameters";
+import {PageParameters} from "../../utils/PageParameters/PageParameters";
+import GetPreviews from "../../utils/ContentInteraction/GetPreviews";
 
 const mainContentGrid = {
     width: '70%',

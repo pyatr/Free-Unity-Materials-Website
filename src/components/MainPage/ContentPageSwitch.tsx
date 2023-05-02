@@ -1,6 +1,6 @@
 import {Box, Button, Grid, Typography} from "@mui/material";
 import React, {Fragment} from "react";
-import {SitePagesParameters} from "../utils/PageParameters/SitePagesParameters";
+import {SitePagesParameters} from "../../utils/PageParameters/SitePagesParameters";
 
 export type PageSwitchProps = {
     pageName: string,

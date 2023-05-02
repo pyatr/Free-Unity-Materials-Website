@@ -1,5 +1,5 @@
 import {Button, Grid} from "@mui/material";
-import {sideButtonStyle} from "../../components/MainContent";
+import {sideButtonStyle} from "../../components/MainPage/MainContent";
 import React, {Fragment} from "react";
 
 export type ItemInteractionProps = {
