@@ -159,7 +159,9 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             let count;
             let index;
             for (count = -1, index = -2; index != -1; count++, index = currentItemState.content.indexOf(symbol, index + 1)) ;
-            error += "Forbidden symbol [" + symbol + "] found " + count + " times\n";
+            if (count > 0) {
+                error += "Forbidden symbol [" + symbol + "] found " + count + " times\n";
+            }
         });
 
         if (error != "") {
