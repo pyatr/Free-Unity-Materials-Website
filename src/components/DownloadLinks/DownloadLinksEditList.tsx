@@ -2,21 +2,22 @@ import React, {Fragment, useState} from "react";
 import {Grid, Typography} from "@mui/material";
 import {CheckBox, Delete} from "@mui/icons-material";
 import {GetLastURLPart} from "../../utils/GetLastURLPart";
+import {FileNameBlobPair, GetBlobsFromPairs, GetFileNamesFromPairs} from "../../utils/Types/FileNameBlobPair";
 
 type FileListEditButtons = {
     links: string[],
-    newFiles: string[],
+    newFiles: FileNameBlobPair[],
     onDeletionMarked: Function
 }
 
 type DownloadLinkEditProp = {
+    fileName: string,
     link: string,
     isNew: boolean,
     onDeletionMarked: Function
 }
 
-function DownloadLinkEdit({link, onDeletionMarked, isNew}: DownloadLinkEditProp) {
-    const fileName = GetLastURLPart(link);
+function DownloadLinkEdit({fileName, link, onDeletionMarked, isNew}: DownloadLinkEditProp) {
     const [isMarkedForDeletion, setDeletionStatus] = useState(false);
     const textStyleMarked = {
         color: isNew ? "blue" : "red",
@@ -40,17 +41,27 @@ function DownloadLinkEdit({link, onDeletionMarked, isNew}: DownloadLinkEditProp)
                 }}/>}
             <Typography style={isMarkedForDeletion ? textStyleMarked : textStyleUnmarked}>{fileName}</Typography>
         </Grid>);
-
 }
 
-export default function DownloadLinksEditList({links, onDeletionMarked, newFiles}: FileListEditButtons) {
+export default function DownloadLinksEditList({links, newFiles, onDeletionMarked}: FileListEditButtons) {
     if (links.length == 0) {
         return (<Fragment/>);
     }
+    const newFileBlobs = GetBlobsFromPairs(newFiles);
 
-    const preparedLinks = links.map((link: string) => <DownloadLinkEdit link={link}
-                                                                        isNew={newFiles.includes(link)}
-                                                                        onDeletionMarked={onDeletionMarked}/>);
+    links = links.concat(newFileBlobs)
+    const preparedLinks = links.map((link: string) => {
+        const isNew = newFileBlobs.includes(link);
+        let fileName = isNew ? newFiles.filter(pair => pair.blobLink == link)[0].fileName : GetLastURLPart(link);
+        return (<DownloadLinkEdit
+            key={fileName}
+            fileName={fileName}
+            link={link}
+            isNew={isNew}
+            onDeletionMarked={onDeletionMarked}
+        />);
+    });
+
 
     return (
         <Grid display="grid" marginTop="16px" marginBottom="16px">

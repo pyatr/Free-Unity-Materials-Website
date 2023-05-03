@@ -47,7 +47,7 @@ function LoadedContentPage({itemContent, contentCategory}: ContentUnitContainer)
     }
     const images = itemContent.gallery.map((link: string) => {
         return (
-            <Grid sx={imageBoxStyle}>
+            <Grid key={link} sx={imageBoxStyle}>
                 <img src={link}/>
             </Grid>)
     });

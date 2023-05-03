@@ -39,7 +39,7 @@ export default function DownloadLinksList({links}: LinksList) {
         return (<Fragment/>);
     }
 
-    const preparedLinks = links.map((link: string) => <DownloadLink link={link}/>);
+    const preparedLinks = links.map((link: string) => <DownloadLink key={link} link={link}/>);
 
     return (
         <Grid display="grid" marginTop="16px" marginBottom="16px">

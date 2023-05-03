@@ -21,7 +21,6 @@ import ImageGallery from "../../components/ImageGallery/ImageGallery";
 import {GetContent} from "../../utils/ContentInteraction/GetContent";
 import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
 import {ImageInEditGallery} from "../../components/ImageGallery/ImageInEditGallery";
-import DownloadLinksList from "../../components/DownloadLinks/DownloadLinksList";
 import DownloadLinksEditList from "../../components/DownloadLinks/DownloadLinksEditList";
 import {FileNameBlobPair, GetBlobsFromPairs, GetFileNamesFromPairs} from "../../utils/Types/FileNameBlobPair";
 
@@ -212,7 +211,12 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             return base64Files;
         }
         const galleryImagesBase64: string[] = await filesToBase64(currentItemState.gallery.reverse());
+        const fileNames: string[] = GetFileNamesFromPairs(newFiles);
         const filesBase64: string[] = await filesToBase64(GetBlobsFromPairs(newFiles));
+        let filesArray = [];
+        for (let i = 0; i < fileNames.length; i++) {
+            filesArray.push({fileName: fileNames[i], fileContent: filesBase64[i]});
+        }
 
         const params = {
             title: currentItemState.title,
@@ -221,7 +225,7 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             number: currentItemState.number,
             category: contentCategory,
             gallery: galleryImagesBase64,
-            files: filesBase64
+            files: filesArray
         };
 
         let serverConnection = new ServerConnection();
@@ -260,7 +264,6 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             setGallerySelection(currentItemState.gallery.filter(link => link != currentLink));
         }}/>;
     });
-    const newFileNames = GetFileNamesFromPairs(newFiles);
 
     return (
         <Grid style={{display: "grid", gap: "32px"}}>
@@ -275,8 +278,8 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
                                inputType={"file"}
                                multiple={true}
                                loadImageFunction={uploadImages}/>
-                <DownloadLinksEditList links={currentItemState.fileLinks.concat(newFileNames)}
-                                       newFiles={newFileNames}
+                <DownloadLinksEditList links={currentItemState.fileLinks}
+                                       newFiles={newFiles}
                                        onDeletionMarked={resolveFileDeletionState}/>
                 <FileSelection title={"Attach files"}
                                inputType={"file"}
