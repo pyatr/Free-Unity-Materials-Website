@@ -13,6 +13,7 @@ import EditDeleteButtons from "./EditDeleteButtons";
 import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
 import {GoToHomePage} from "../../utils/GoToHomePage";
 import DownloadLinksList from "../../components/DownloadLinks/DownloadLinksList";
+import {CanUserEditContent} from "../../utils/Login";
 
 const itemContentDisplay = {
     width: '100%',
@@ -51,6 +52,7 @@ function LoadedContentPage({itemContent, contentCategory}: ContentUnitContainer)
                 <img src={link}/>
             </Grid>)
     });
+    const canEdit = CanUserEditContent();
     let content = parse(itemContent.content);
     return (
         <Grid sx={itemContentDisplay}>
@@ -61,6 +63,6 @@ function LoadedContentPage({itemContent, contentCategory}: ContentUnitContainer)
             <ImageGallery images={images}/>
             <DownloadLinksList links={itemContent.fileLinks}/>
             <Typography sx={itemContentDisplay} variant="body1">{content}</Typography>
-            <EditDeleteButtons contentNumber={itemContent.number} onDelete={confirmDelete}/>
+            {canEdit ? <EditDeleteButtons contentNumber={itemContent.number} onDelete={confirmDelete}/> : <Fragment/>}
         </Grid>);
 }
