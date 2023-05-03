@@ -6,11 +6,13 @@ class APIEndpointController
 {
     private UserController $userController;
     private ContentController $contentController;
+    private CommentController $commentController;
 
     function __construct()
     {
         $this->userController = new UserController();
         $this->contentController = new ContentController();
+        $this->commentController = new CommentController();
     }
 
     public function parseRequest(): void
@@ -44,6 +46,15 @@ class APIEndpointController
                     break;
                 case 'getPreviews':
                     $this->respond($this->contentController->getContentPreviews($params));
+                    break;
+                case 'addComment':
+                    $this->respond($this->commentController->addComment($params));
+                    break;
+                case 'getComments':
+                    $this->respond($this->commentController->getComments($params));
+                    break;
+                case 'getCommentCount':
+                    $this->respond($this->commentController->getCommentCount($params));
                     break;
                 default:
                     break;

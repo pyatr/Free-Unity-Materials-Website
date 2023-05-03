@@ -71,6 +71,7 @@ class UserController extends BaseController
             if ($loginStatus) {
                 $response['loginStatus'] = 'success';
                 $response['userName'] = $this->userModel->getUserName($email);
+                $response['userEmail'] = $email;
                 $response['userRole'] = $this->userModel->getUserRole($email);
             }
         }
