@@ -25,6 +25,7 @@ export function CommentSection({contentNumber, contentCategory}: ContentUnitRequ
     const sendComment = async () => {
         SendComment(contentNumber, contentCategory, userComment).then((response: string) => {
             if (response === 'success') {
+                setUserComment("");
                 setComments([]);
                 setCommentCount(-1);
             } else {
@@ -56,18 +57,22 @@ export function CommentSection({contentNumber, contentCategory}: ContentUnitRequ
                                                                   userName={comment.userName}
                                                                   content={comment.content}
                                                                   creationDate={comment.creationDate}/>);
-    if (comments.length == 0) {
-        return (<Typography variant="h6" marginTop="16px" marginBottom="16px">Nobody commented yet</Typography>);
-    }
+
     return (
         <Grid marginTop="16px" marginBottom="16px" display="grid">
-            <Typography color="gray">{commentCount} comments</Typography>
-            <Grid gap="8px" border="1px solid" borderColor="black" display="grid" padding="4px" marginBottom="16px">
-                {preparedComments}
-            </Grid>
+            {comments.length == 0 ?
+                <Typography variant="h6" marginTop="16px" marginBottom="16px">Nobody commented yet</Typography> :
+                <Fragment>
+                    <Typography color="gray">{commentCount} comments</Typography>
+                    <Grid gap="8px" border="1px solid" borderColor="black" display="grid" padding="4px"
+                          marginBottom="16px">
+                        {preparedComments}
+                    </Grid>
+                </Fragment>}
             {isLoggedIn ?
                 <TextField onChange={onCommentInputChange}
                            label={"Add comment"}
+                           defaultValue={userComment}
                            style={{marginTop: "16px", marginBottom: "16px"}}/> :
                 <Fragment/>}
             {userComment != "" ?
