@@ -1,5 +1,5 @@
 import {IsMobileResolution} from "../../utils/MobileUtilities";
-import {IsLoading, IsLoggedIn, LogOut} from "../../utils/Login";
+import {GetUserName, IsLoading, IsLoggedIn, LogOut} from "../../utils/Login";
 import {Grid, Typography} from "@mui/material";
 import React, {Fragment} from "react";
 import {Link} from "react-router-dom";
@@ -28,7 +28,7 @@ export default function UserBarDisplay() {
                 <Typography style={fontStyle}>Loading...</Typography> :
                 isLoggedIn ?
                     <Fragment>
-                        <Typography style={fontStyle}>{sessionStorage.getItem("userName")}</Typography>
+                        <Typography style={fontStyle}>{GetUserName()}</Typography>
                         <Link style={fontStyle} to="/assets" onClick={LogOut}>Log out</Link>
                     </Fragment> :
                     <Fragment>

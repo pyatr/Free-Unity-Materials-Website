@@ -14,6 +14,7 @@ import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
 import {GoToHomePage} from "../../utils/GoToHomePage";
 import DownloadLinksList from "../../components/DownloadLinks/DownloadLinksList";
 import {CanUserEditContent} from "../../utils/Login";
+import {CommentSection} from "../../components/Comments/CommentSection";
 
 const itemContentDisplay = {
     width: '100%',
@@ -64,5 +65,6 @@ function LoadedContentPage({itemContent, contentCategory}: ContentUnitContainer)
             <DownloadLinksList links={itemContent.fileLinks}/>
             <Typography sx={itemContentDisplay} variant="body1">{content}</Typography>
             {canEdit ? <EditDeleteButtons contentNumber={itemContent.number} onDelete={confirmDelete}/> : <Fragment/>}
+            <CommentSection contentNumber={itemContent.number} contentCategory={contentCategory}></CommentSection>
         </Grid>);
 }

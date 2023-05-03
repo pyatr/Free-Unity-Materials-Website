@@ -1,6 +1,5 @@
 import Cookies from "universal-cookie";
 import ServerConnection from "./ServerConnection";
-import {AxiosResponse} from "axios/index";
 import {GoToHomePage} from "./GoToHomePage";
 
 export async function TryCookieLogin() {
@@ -21,6 +20,7 @@ export async function TryCookieLogin() {
         } else {
             sessionStorage.setItem("userLoginStatus", loginStatus);
             sessionStorage.setItem("userName", data.userName);
+            sessionStorage.setItem("userEmail", data.userEmail);
             sessionStorage.setItem("userRole", data.userRole);
         }
     }
@@ -61,6 +61,14 @@ export function LogOut() {
     GoToHomePage();
 }
 
+export function GetUserName(): string {
+    return sessionStorage.getItem("userName") as string;
+}
+
+export function GetUserEmail(): string {
+    return sessionStorage.getItem("userEmail") as string;
+}
+
 export function CanUserEditContent(): boolean {
     const editorRoles = Array("ADMIN", "EDITOR");
     let userRole = sessionStorage.getItem("userRole");
@@ -74,5 +82,6 @@ export function ClearUserData() {
     cookies.remove("userLogin");
     sessionStorage.removeItem("userLoginStatus");
     sessionStorage.removeItem("userName");
+    sessionStorage.removeItem("userEmail");
     sessionStorage.removeItem("userRole");
 }
