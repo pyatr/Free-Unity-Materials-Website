@@ -179,7 +179,8 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
         if (currentItemState.content == "") {
             error += "No content\n";
         }
-        if (currentItemState.gallery.length == 0) {
+        //Only assets need images
+        if (currentItemState.gallery.length == 0 && contentCategory == "asset") {
             error += "Need at least one image in gallery\n";
         }
         forbiddenSymbols.forEach((symbol: string) => {
@@ -217,6 +218,11 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
         for (let i = 0; i < fileNames.length; i++) {
             filesArray.push({fileName: fileNames[i], fileContent: filesBase64[i]});
         }
+        let filesToDeleteNumbers: string[] = [];
+        filesToDelete.forEach((fileLink: string) => {
+            let splitLink = fileLink.split('/');
+            filesToDeleteNumbers.push(splitLink[splitLink.length - 2]);
+        });
 
         const params = {
             title: currentItemState.title,
@@ -225,7 +231,8 @@ function LoadedContentEditPage({itemContent, contentCategory}: ContentUnitContai
             number: currentItemState.number,
             category: contentCategory,
             gallery: galleryImagesBase64,
-            files: filesArray
+            files: filesArray,
+            deleteFiles: filesToDeleteNumbers
         };
 
         let serverConnection = new ServerConnection();

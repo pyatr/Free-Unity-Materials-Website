@@ -44,12 +44,12 @@ function DownloadLinkEdit({fileName, link, onDeletionMarked, isNew}: DownloadLin
 }
 
 export default function DownloadLinksEditList({links, newFiles, onDeletionMarked}: FileListEditButtons) {
-    if (links.length == 0) {
+    if (links.length == 0 && newFiles.length == 0) {
         return (<Fragment/>);
     }
     const newFileBlobs = GetBlobsFromPairs(newFiles);
 
-    links = links.concat(newFileBlobs)
+    links = links.concat(newFileBlobs);
     const preparedLinks = links.map((link: string) => {
         const isNew = newFileBlobs.includes(link);
         let fileName = isNew ? newFiles.filter(pair => pair.blobLink == link)[0].fileName : GetLastURLPart(link);
