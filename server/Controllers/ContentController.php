@@ -33,9 +33,9 @@ class ContentController extends BaseController
         $lastID = $this->contentModel->getLastPostID();
         if ($response['result'] == 'success') {
             $folder = $this->foldersForCategories[$category];
-            $files = $this->tryGetValue($params, 'files');
             $gallery = $this->tryGetValue($params, 'gallery');
-            $this->saveImages($gallery, $lastID, $folder);
+            $this->saveImages($gallery, $folder, $lastID);
+            $files = $this->tryGetValue($params, 'files');
             $this->saveFiles($files, $lastID);
         }
         $response['content']['itemID'] = $lastID;
@@ -50,8 +50,13 @@ class ContentController extends BaseController
 
         $contentNumber = $this->tryGetValue($params, 'number');
         $result = $this->contentModel->deleteContent($tableName, $contentNumber);
-        if (file_exists("$this->serverRoot/Images/$folder/$contentNumber")) {
-            FileManager::DeleteFolder("$this->serverRoot/Images/$folder/$contentNumber");
+        $imageFolder = "$this->serverRoot/Images/$folder/$contentNumber";
+        if (file_exists($imageFolder)) {
+            FileManager::DeleteFolder($imageFolder);
+        }
+        $filesFolder = "$this->serverRoot/FileStorage/Assets/$contentNumber";
+        if (file_exists($filesFolder)) {
+            FileManager::DeleteFolder($filesFolder);
         }
         return $result;
     }
@@ -74,6 +79,10 @@ class ContentController extends BaseController
             }
             $gallery = $this->tryGetValue($params, 'gallery');
             $this->saveImages($gallery, $folder, $contentNumber);
+            $deleteFiles = $this->tryGetValue($params, 'deleteFiles');
+            $this->deleteFiles($deleteFiles, $contentNumber);
+            $files = $this->tryGetValue($params, 'files');
+            $this->saveFiles($files, $contentNumber);
         }
         return $response;
     }
@@ -118,6 +127,9 @@ class ContentController extends BaseController
 
     private function saveImages(array $gallery, string $folder, int $contentNumber)
     {
+        if (count($gallery) == 0) {
+            return;
+        }
         $currentContentImageDirectory = "$this->serverRoot/Images/$folder/$contentNumber";
         $galleryDirectory = "$currentContentImageDirectory/Gallery";
 
@@ -148,26 +160,53 @@ class ContentController extends BaseController
 
     private function saveFiles(array $files, int $contentNumber)
     {
+        if (count($files) == 0) {
+            return;
+        }
+
         $currentContentFileDirectory = "$this->serverRoot/FileStorage/Assets/$contentNumber";
-        mkdir($currentContentFileDirectory);
-
+        if (!is_dir($currentContentFileDirectory)) {
+            mkdir($currentContentFileDirectory);
+        }
+        $existingFiles = scandir($currentContentFileDirectory);
+        sort($existingFiles, SORT_NUMERIC);
+        $fileCount = count($existingFiles);
         $fileNumber = 1;
-        foreach ($files as $file) {
-            $fileName = $this->tryGetValue($file, 'fileName');
-            $fileContent = $this->tryGetValue($file, 'fileContent');
-            $fileExtension = $this->tryGetValue($file, 'fileExtension');
+        if ($fileCount - 2 > 0) {
+            $lastFile = $existingFiles[$fileCount - 1];
+            $fileNumber = $lastFile + 1;
+        }
 
+        foreach ($files as $file) {
+            $fileAsArray = get_object_vars($file);
+            $fileName = $this->tryGetValue($fileAsArray, 'fileName');
+            $fileContent = $this->tryGetValue($fileAsArray, 'fileContent');
             if ($fileName == "") {
                 $fileName = GUIDCreator::GUIDv4();
-            }
-            if ($fileExtension != "") {
-                $fileExtension = ".$fileExtension";
             }
             $fileName = str_replace(" ", "_", $fileName);
             //Putting files in folders, so they would be ordered in a way they were placed
             mkdir("$currentContentFileDirectory/$fileNumber");
-            file_put_contents("$currentContentFileDirectory/$fileNumber/$fileName$fileExtension", file_get_contents($fileContent));
+            file_put_contents("$currentContentFileDirectory/$fileNumber/$fileName", file_get_contents($fileContent));
             $fileNumber++;
+        }
+    }
+
+    private function deleteFiles(array $fileNumbers, int $contentNumber)
+    {
+        if (count($fileNumbers) == 0) {
+            return;
+        }
+
+        $currentContentFileDirectory = "$this->serverRoot/FileStorage/Assets/$contentNumber";
+        if (!is_dir($currentContentFileDirectory)) {
+            return;
+        }
+
+        foreach ($fileNumbers as $fileNumber) {
+            if (is_dir("$currentContentFileDirectory/$fileNumber")) {
+                FileManager::DeleteFolder("$currentContentFileDirectory/$fileNumber");
+            }
         }
     }
 
@@ -178,12 +217,12 @@ class ContentController extends BaseController
         $fullFilePath = "$this->serverRoot/$currentContentFileDirectory";
         if (is_dir($fullFilePath)) {
             $filesInContentDirectory = scandir($fullFilePath);
-            $fileCount = count($filesInContentDirectory) - 2;
-            if ($fileCount > 0) {
+            $fileCount = count($filesInContentDirectory);
+            if ($fileCount > 2) {
                 sort($filesInContentDirectory, SORT_NUMERIC);
-                for ($i = 1; $i <= $fileCount; $i++) {
-                    $fileName = scandir("$fullFilePath/$i")[2];
-                    $links[$i - 1] = "$currentContentFileDirectory/$i/$fileName";
+                for ($i = 2; $i < $fileCount; $i++) {
+                    $fileName = scandir("$fullFilePath/$filesInContentDirectory[$i]")[2];
+                    $links[$i - 2] = "$currentContentFileDirectory/$filesInContentDirectory[$i]/$fileName";
                 }
             }
         }
