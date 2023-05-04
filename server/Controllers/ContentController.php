@@ -73,10 +73,7 @@ class ContentController extends BaseController
         $categories = $this->tryGetValue($params, 'categories');
         $response = $this->contentModel->updateContent($tableName, $contentNumber, $title, $content, $categories);
         if ($response['result'] == 'success') {
-            $galleryFolderName = "$this->serverRoot/Images/$folder/$contentNumber";
-            if (file_exists($galleryFolderName)) {
-                FileManager::DeleteFolder($galleryFolderName);
-            }
+            $this->deleteAllImages($folder, $contentNumber);
             $gallery = $this->tryGetValue($params, 'gallery');
             $this->saveImages($gallery, $folder, $contentNumber);
             $deleteFiles = $this->tryGetValue($params, 'deleteFiles');
@@ -116,10 +113,14 @@ class ContentController extends BaseController
         for ($i = 0; $i < $resultCount; $i++) {
             $contentNumber = $result['content'][$i]['NUMBER'];
             $galleryDirectory = "Images/$folder/$contentNumber/Gallery";
-            $filesInDirectory = scandir("$this->serverRoot/$galleryDirectory/");
-            if (count($filesInDirectory) > 2) {
-                $previewName = $filesInDirectory[2];
-                $result['content'][$i]['titlepicLink'] = "$galleryDirectory/$previewName";
+            if (is_dir("$this->serverRoot/$galleryDirectory/")) {
+                $filesInDirectory = scandir("$this->serverRoot/$galleryDirectory/");
+                if (count($filesInDirectory) > 2) {
+                    $previewName = $filesInDirectory[2];
+                    $result['content'][$i]['titlepicLink'] = "$galleryDirectory/$previewName";
+                }
+            } else {
+                $result['content'][$i]['titlepicLink'] = "noimages";
             }
         }
         return $result;
@@ -135,11 +136,21 @@ class ContentController extends BaseController
 
         mkdir($currentContentImageDirectory);
         mkdir($galleryDirectory);
-        $imageNumber = 1;
+        $fileNumber = 1;
+        //Add guid to file name so that old cached version would not display after changes
+        $guid = GUIDCreator::GUIDv4();
         foreach ($gallery as $image) {
             //Alternative name: $guid = GUIDCreator::GUIDv4();
-            file_put_contents("$galleryDirectory/$imageNumber.png", file_get_contents($image));
-            $imageNumber++;
+            file_put_contents("$galleryDirectory/$fileNumber$guid.png", file_get_contents($image));
+            $fileNumber++;
+        }
+    }
+
+    private function deleteAllImages(string $folder, int $contentNumber)
+    {
+        $galleryFolderName = "$this->serverRoot/Images/$folder/$contentNumber";
+        if (file_exists($galleryFolderName)) {
+            FileManager::DeleteFolder($galleryFolderName);
         }
     }
 
@@ -147,12 +158,15 @@ class ContentController extends BaseController
     {
         $links[0] = 'none';
         $galleryDirectory = "Images/$folder/$contentNumber/Gallery";
-        $imagesInGallery = scandir("$this->serverRoot/$galleryDirectory/");
-        $imagesCount = count($imagesInGallery) - 2;
-        if ($imagesCount > 0) {
-            sort($imagesInGallery, SORT_NUMERIC);
-            for ($i = 0; $i < $imagesCount; $i++) {
-                $links[$i] = "$galleryDirectory/" . $imagesInGallery[$i + 2];
+        if (is_dir("$this->serverRoot/$galleryDirectory/")) {
+            $imagesInGallery = glob("$this->serverRoot/$galleryDirectory/*.png");
+            $imagesCount = count($imagesInGallery);
+            if ($imagesCount > 0) {
+                for ($i = 0; $i < $imagesCount; $i++) {
+                    $fileNameSplit = explode('/', $imagesInGallery[$i]);
+                    $fileName = $fileNameSplit[count($fileNameSplit) - 1];
+                    $links[$i] = "$galleryDirectory/" . $fileName;
+                }
             }
         }
         return $links;
