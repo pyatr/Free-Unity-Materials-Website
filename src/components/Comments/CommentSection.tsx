@@ -73,10 +73,12 @@ export function CommentSection({contentNumber, contentCategory}: ContentUnitRequ
                 <TextField onChange={onCommentInputChange}
                            label={"Add comment"}
                            defaultValue={userComment}
+                           value={userComment}
                            style={{marginTop: "16px", marginBottom: "16px"}}/> :
                 <Fragment/>}
             {userComment != "" ?
-                <Button onClick={() => sendComment()} style={sideButtonStyle}>
+                <Button onClick={() => sendComment()} style={sideButtonStyle}
+                        sx={{width: "fit-content", paddingLeft: "16px", paddingRight: "16px"}}>
                     Submit
                 </Button> :
                 <Fragment/>}
