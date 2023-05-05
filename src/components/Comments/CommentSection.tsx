@@ -9,7 +9,7 @@ import {sideButtonStyle} from "../MainPage/MainContent";
 import {SendComment} from "../../utils/ContentInteraction/SendComment";
 import {GetCommentCount} from "../../utils/ContentInteraction/GetCommentCount";
 
-export function CommentSection({contentNumber, contentCategory}: ContentUnitRequestData) {
+export function CommentSection({requestedContentID, requestedContentCategory}: ContentUnitRequestData) {
     const [userComment, setUserComment] = useState("");
     const [comments, setComments] = useState(Array<UserCommentProps>);
     const [commentCount, setCommentCount] = useState(-1);
@@ -23,7 +23,7 @@ export function CommentSection({contentNumber, contentCategory}: ContentUnitRequ
     }
 
     const sendComment = async () => {
-        SendComment(contentNumber, contentCategory, userComment).then((response: string) => {
+        SendComment(requestedContentID, requestedContentCategory, userComment).then((response: string) => {
             if (response === 'success') {
                 setUserComment("");
                 setComments([]);
@@ -37,7 +37,7 @@ export function CommentSection({contentNumber, contentCategory}: ContentUnitRequ
     useEffect(() => {
             if (comments.length == 0) {
                 //TODO: Request limited amount of comments
-                GetComments(contentNumber, contentCategory).then((comments: Array<UserCommentProps>) => {
+                GetComments(requestedContentID, requestedContentCategory).then((comments: Array<UserCommentProps>) => {
                         setComments(comments);
                     }
                 );
@@ -47,7 +47,7 @@ export function CommentSection({contentNumber, contentCategory}: ContentUnitRequ
 
     useEffect(() => {
         if (commentCount == -1) {
-            GetCommentCount(contentNumber, contentCategory).then((commentCount: number) => setCommentCount(commentCount));
+            GetCommentCount(requestedContentID, requestedContentCategory).then((commentCount: number) => setCommentCount(commentCount));
         }
     });
 

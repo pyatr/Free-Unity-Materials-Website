@@ -4,18 +4,14 @@ import React, {Fragment} from "react";
 
 import {sideButtonStyle} from "../MainPage/MainContent";
 
-import {GetLastURLPart} from "../../utils/GetLastURLPart";
 import {CanUserEditContent} from "../../utils/Login";
+import {GenericStringProp} from "../../utils/Types/GenericProps/GenericStringProp";
 
-export default function CreateContentButton() {
-    const lastUrlPart = GetLastURLPart();
-    const cleanLastUrlPart = lastUrlPart.length > 0 ? "/" + lastUrlPart : "";
-    const permittedCreationLinks = ["", "/articles", "/scripts"];
-    const canShowCreateButton = permittedCreationLinks.includes(cleanLastUrlPart);
+export default function CreateContentButton({propValue}: GenericStringProp) {
     return (
         <Fragment>
-            {CanUserEditContent() && canShowCreateButton ?
-                <Button sx={sideButtonStyle} component={Link} to={cleanLastUrlPart + "/create"}>Add new item</Button> :
+            {CanUserEditContent() ?
+                <Button sx={sideButtonStyle} component={Link} to={propValue}>Add new item</Button> :
                 <Fragment/>}
         </Fragment>);
 }

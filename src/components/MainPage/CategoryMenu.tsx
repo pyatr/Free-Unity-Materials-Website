@@ -1,8 +1,9 @@
 import {Button, Grid} from "@mui/material";
 import {Link} from "react-router-dom";
 import {IsMobileResolution} from "../../utils/MobileUtilities";
+import {GenericStringProp} from "../../utils/Types/GenericProps/GenericStringProp";
 
-export default function CategoryMenu() {
+export default function CategoryMenu({propValue}: GenericStringProp) {
     const landFontS = 14;
     const portFontS = 11;
     const isPortrait = IsMobileResolution();
@@ -12,7 +13,6 @@ export default function CategoryMenu() {
         borderStyle: "solid",
         borderRadius: 1
     }
-    //Add color: "white" to make highlight for selected category button, not used right now
     const buttonStyle = {
         ':hover': hoverButtonStyle,
         fontSize: fontSize,
@@ -43,11 +43,9 @@ export default function CategoryMenu() {
         width: 'auto'
     };
     const links = [["/", "Assets"], ["/articles", "Articles"], ["/scripts", "Scripts"]];
-    const path: string = window.location.pathname;
-    let usedPath: string = path;
-    usedPath = '/' + path.split("/")[1];
+    let usedPath = '/' + propValue;
     //TODO: rework this
-    if (path === '/create' || !isNaN(parseInt(path.split("/")[1]))) {
+    if (propValue == 'create' || propValue == 'edit' || !isNaN(parseInt(propValue.split("/")[1]))) {
         usedPath = '/';
     }
     const buttons = links.map((link) => <Button variant="outlined" key={link[0]} component={Link} to={link[0]}

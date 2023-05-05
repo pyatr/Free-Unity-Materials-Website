@@ -10,8 +10,8 @@ import AssetsPage from "../../pages/AssetsPage/AssetsPage";
 import ScriptsPage from "../../pages/Scripts/ScriptsPage";
 import ArticlesPage from "../../pages/Articles/ArticlesPage";
 import NonExistentPage from "../../pages/NonExistent/NonExistentPage";
-import ContentPage from "../../pages/Content/ContentPage";
-import ContentEditPage from "../../pages/Content/ContentEditPage";
+import ContentUnitPage from "../../pages/Content/ContentUnitPage";
+import ContentUnitEditForm from "../../pages/ContentEdit/ContentUnitEditForm";
 
 import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
 import {IsMobileResolution} from "../../utils/MobileUtilities";
@@ -32,7 +32,6 @@ const mainContentGrid = {
 const mainContentBox = {
     width: '100%',
     border: '2px solid',
-    //Works in border property in ItemPage but not here. Why?
     borderColor: 'primary.main',
     borderRadius: '4px',
     padding: '16px'
@@ -58,91 +57,106 @@ export default function MainContent({mainElement}: ContentProps) {
 
     const elementPageData: PageParameters = SitePagesParameters.page[mainElement];
 
+    let shouldUpdate = false;
+    if (elementPageData != undefined) {
+        shouldUpdate = elementPageData.currentPage != currentPage;
+        elementPageData.currentPage = currentPage;
+    }
+
     const setPageNum = (newNum: number) => {
         if (elementPageData.currentPage != newNum) {
             setCurrentPage(newNum);
         }
     }
 
-    const clickBack = () => {
-        setPageNum(Math.max(1, elementPageData.currentPage - 1));
-    }
+    const clickBack = () => setPageNum(Math.max(1, elementPageData.currentPage - 1));
 
-    const clickForward = () => {
-        setPageNum(Math.min(elementPageData.getPagesCount(), elementPageData.currentPage + 1));
-    }
+    const clickForward = () => setPageNum(Math.min(elementPageData.getPagesCount(), elementPageData.currentPage + 1));
 
-    let shouldUpdate = false;
-    if (elementPageData != undefined) {
-        shouldUpdate = elementPageData.currentPage != currentPage;
-        elementPageData.currentPage = currentPage;
-    }
-    useEffect(() => {
+    const loadPreviews = () => {
         if ((previewContent.length == 0 || shouldUpdate) && elementPageData !== undefined) {
-            GetPreviews(elementPageData).then((rawPreviews) => {
-                const preparedPreviews: ContentUnitPreview[] = [];
-                rawPreviews.content.forEach((contentUnit: any) =>
-                    preparedPreviews.push({
-                            number: contentUnit.NUMBER,
-                            title: contentUnit.TITLE,
-                            categories: contentUnit.CATEGORIES,
-                            content: contentUnit.CONTENT,
-                            titlepicLink: "http://" + window.location.host + ":8000/" + contentUnit.titlepicLink
-                        }
-                    )
-                );
-                elementPageData.setPostsCount(rawPreviews.contentCount);
+            GetPreviews(elementPageData).then((previews: ContentUnitPreview[]) => {
                 window.scrollTo(0, 0);
-                setPreviewContent(preparedPreviews);
+                setPreviewContent(previews);
             });
         }
+    }
+
+    useEffect(() => {
+        loadPreviews();
     });
 
-    const elements = new Map();
+    const pages = new Map();
     if (elementPageData != undefined) {
-        elements.set("AssetsPage", <AssetsPage pageData={elementPageData} rawContent={previewContent}/>);
-        elements.set("ArticlesPage", <ArticlesPage/>);
-        elements.set("ScriptsPage", <ScriptsPage/>);
-        elements.set("NonExistentPage", <NonExistentPage/>);
+        pages.set("AssetsPage", <AssetsPage pageData={elementPageData} rawContent={previewContent}/>);
+        pages.set("ArticlesPage", <ArticlesPage/>);
+        pages.set("ScriptsPage", <ScriptsPage/>);
+        pages.set("NonExistentPage", <NonExistentPage/>);
     }
 
-    let pageFinishedLoading = previewContent.length > 0;
-    const lastUrlPart = GetLastURLPart();
-    const lastPart = Number(lastUrlPart);
-    let itemNum = -1;
-    if (!isNaN(lastPart)) {
-        itemNum = lastPart;
+    const currentPathnameSplit = window.location.pathname.split('/');
+    let currentCategory = "";
+    let currentContentID = -1;
+    if (!isNaN(Number(currentPathnameSplit[1]))) {
+        currentContentID = Number(currentPathnameSplit[1]);
+    } else {
+        currentCategory = currentPathnameSplit[1];
     }
+    if (!isNaN(Number(currentPathnameSplit[2]))) {
+        currentCategory = currentPathnameSplit[1];
+        currentContentID = Number(currentPathnameSplit[2]);
+    }
+
+    const permittedCreationLinks = ["", "articles", "scripts"];
+    const canShowCreateButton = permittedCreationLinks.includes(currentCategory) && currentPathnameSplit.length <= 2;
+
     return (
         <Grid display="flex" padding="8px" gap="8px" paddingTop="16px">
+            {/*Menu on the left*/}
             <Grid display="grid" width={selectedWidth} height="fit-content" gap="8px">
-                <CategoryMenu/>
-                <CreateContentButton/>
+                <CategoryMenu propValue={currentCategory}/>
+                {canShowCreateButton ?
+                    <CreateContentButton
+                        propValue={(currentCategory === "" ? "" : "/") + currentCategory + "/create"}/> :
+                    <Fragment/>}
             </Grid>
+            {/*Content selection and display*/}
             <Grid sx={mainContentGrid}>
                 <Box sx={mainContentBox} id="mainElementBox">
                     <Routes>
-                        <Route path="/" element={elements.get(mainElement)}/>
-                        <Route path={"/" + itemNum}
-                               element={<ContentPage contentCategory={"asset"} contentNumber={itemNum}/>}/>
-                        <Route path={"/articles/" + itemNum}
-                               element={<ContentPage contentCategory={"article"} contentNumber={itemNum}/>}/>
-                        <Route path={"/scripts/" + itemNum}
-                               element={<ContentPage contentCategory={"script"} contentNumber={itemNum}/>}/>
+                        <Route path="/" element={pages.get(mainElement)}/>
+                        <Route path={"/" + currentContentID}
+                               element={<ContentUnitPage requestedContentCategory={"asset"}
+                                                         requestedContentID={currentContentID}/>}/>
+                        <Route path={"/articles/" + currentContentID}
+                               element={<ContentUnitPage requestedContentCategory={"article"}
+                                                         requestedContentID={currentContentID}/>}/>
+                        <Route path={"/scripts/" + currentContentID}
+                               element={<ContentUnitPage requestedContentCategory={"script"}
+                                                         requestedContentID={currentContentID}/>}/>
 
-                        <Route path={"/edit/" + itemNum}
-                               element={<ContentEditPage contentNumber={itemNum}
-                                                         contentCategory={"asset"}/>}/>
+                        <Route path={"/edit/" + currentContentID}
+                               element={<ContentUnitEditForm requestedContentID={currentContentID}
+                                                             requestedContentCategory={"asset"}/>}/>
+                        <Route path={"/articles/edit/" + currentContentID}
+                               element={<ContentUnitEditForm requestedContentID={currentContentID}
+                                                             requestedContentCategory={"article"}/>}/>
+                        <Route path={"/scripts/edit/" + currentContentID}
+                               element={<ContentUnitEditForm requestedContentID={currentContentID}
+                                                             requestedContentCategory={"script"}/>}/>
 
                         <Route path={"/create"}
-                               element={<ContentEditPage contentCategory={"asset"} contentNumber={-1}/>}/>
+                               element={<ContentUnitEditForm requestedContentCategory={"asset"}
+                                                             requestedContentID={-1}/>}/>
                         <Route path={"/articles/create"}
-                               element={<ContentEditPage contentCategory={"article"} contentNumber={-1}/>}/>
+                               element={<ContentUnitEditForm requestedContentCategory={"article"}
+                                                             requestedContentID={-1}/>}/>
                         <Route path={"/scripts/create"}
-                               element={<ContentEditPage contentCategory={"script"} contentNumber={-1}/>}/>
+                               element={<ContentUnitEditForm requestedContentCategory={"script"}
+                                                             requestedContentID={-1}/>}/>
                     </Routes>
                 </Box>
-                {pageFinishedLoading ?
+                {previewContent.length > 0 ?
                     <ContentPageSwitch pageName={mainElement} onClickBack={clickBack} onClickForward={clickForward}
                                        onClickNum={setPageNum}/> :
                     <Fragment/>}

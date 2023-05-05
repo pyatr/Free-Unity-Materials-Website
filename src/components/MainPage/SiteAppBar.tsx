@@ -30,6 +30,5 @@ export default function SiteAppBar() {
                     <UserBarDisplay/>
                 </Toolbar>
             </AppBar>
-        </Box>
-    );
+        </Box>);
 }
