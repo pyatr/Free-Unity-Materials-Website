@@ -1,18 +1,18 @@
 export type ContentUnitPreview = {
-    number: number,
+    contentID: number,
     title: string,
     categories: string,
-    content: string,
+    body: string,
     titlepicLink: string
 }
 
 export function GetDummyPreview(): ContentUnitPreview {
     return (
         {
-            number: -1,
+            contentID: -1,
             title: "",
             categories: "",
-            content: "",
+            body: "",
             titlepicLink: ""
         }
     )

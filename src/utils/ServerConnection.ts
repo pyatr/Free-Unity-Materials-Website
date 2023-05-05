@@ -9,10 +9,10 @@ export default class ServerConnection {
         this.serverConnection = "http://" + window.location.host + ":" + this.serverPort;
     }
 
-    public async SendPostRequestPromise(requestName: string, requestParams: {}): Promise<AxiosResponse> {
+    public async SendPostRequestPromise(requestName: string, requestProperties: {}): Promise<AxiosResponse> {
         const response = await axios.post(this.serverConnection, {
             request: requestName,
-            params: requestParams
+            params: requestProperties
         });
         return response;
     }

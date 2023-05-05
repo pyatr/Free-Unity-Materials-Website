@@ -1,21 +1,21 @@
 export type ContentUnit = {
-    number: number,
+    contentID: number,
     title: string,
     categories: string,
     creationDate: string,
-    content: string,
-    gallery: string[],
+    body: string,
+    galleryImageLinks: string[],
     fileLinks: string[]
 }
 
-export function GetDummyContent(): ContentUnit {
+export function GetDummyContentUnit(): ContentUnit {
     return {
-        number: -1,
+        contentID: -1,
         title: "",
         categories: "",
         creationDate: "",
-        content: "",
-        gallery: [],
+        body: "",
+        galleryImageLinks: [],
         fileLinks: []
     }
 }
