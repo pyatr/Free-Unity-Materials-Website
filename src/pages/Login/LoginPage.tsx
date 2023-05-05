@@ -15,14 +15,14 @@ export default function LoginPage() {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         let email;
-        let emdata = data.get("email");
-        if (emdata != null) {
-            email = emdata.toString();
+        const emailData = data.get("email");
+        if (emailData != null) {
+            email = emailData.toString();
         }
         let password;
-        let pdata = data.get("password");
-        if (pdata != null) {
-            password = pdata.toString();
+        const passwordData = data.get("password");
+        if (passwordData != null) {
+            password = passwordData.toString();
         }
         if (email != null && password != null) {
             await TryLogin(email, password);
@@ -31,14 +31,13 @@ export default function LoginPage() {
 
     return (
         <Container component="main">
-            <Box
-                width="100%"
-                sx={{
-                    marginTop: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}>
+            <Box sx={{
+                marginTop: 8,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                width: '100%'
+            }}>
                 <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
                     <LockOutlinedIcon/>
                 </Avatar>
@@ -70,6 +69,5 @@ export default function LoginPage() {
                         fullWidth>Submit</Button>
                 </Box>
             </Box>
-        </Container>
-    );
+        </Container>);
 }

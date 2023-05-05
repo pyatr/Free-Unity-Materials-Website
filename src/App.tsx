@@ -25,9 +25,7 @@ export default function App() {
         }
     });
 
-    const updateWidthAndHeight = () => {
-        setWidthHeight([window.innerWidth, window.innerHeight]);
-    };
+    const updateWidthAndHeight = () => setWidthHeight([window.innerWidth, window.innerHeight]);
 
     useEffect(() => {
         window.addEventListener("resize", updateWidthAndHeight);

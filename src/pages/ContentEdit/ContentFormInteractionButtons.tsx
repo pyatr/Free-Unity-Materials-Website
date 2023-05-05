@@ -1,20 +1,22 @@
 import {Button, Grid} from "@mui/material";
-import {sideButtonStyle} from "../../components/MainPage/MainContent";
 import React, {Fragment} from "react";
 
-export type ItemInteractionProps = {
+import {sideButtonStyle} from "../../components/MainPage/MainContent";
+
+type ContentFormInteractionProps = {
     onSave: Function,
     onCancel: Function,
     onDelete: Function,
     enableDelete: boolean
 }
 
-export default function ContentStateInteractionButtons({onSave, onCancel, onDelete, enableDelete}: ItemInteractionProps) {
+export default function ContentFormInteractionButtons({onSave, onCancel, onDelete, enableDelete}: ContentFormInteractionProps) {
     return (
-        <Grid style={{display: "flex", gap: "16px", width: "100%", justifyContent: "space-between"}}>
+        <Grid
+            style={{display: "flex", gap: "16px", width: "100%", justifyContent: "space-between"}}>
             {/*Left grid*/}
             <Grid style={{display: "flex", gap: "16px"}}>
-                {/*Using ()=> to ensure its not called when bound*/}
+                {/*Using ()=> to ensure it's not called when bound*/}
                 <Button onClick={() => onSave()} style={sideButtonStyle}>Save</Button>
                 <Button onClick={() => onCancel()} style={sideButtonStyle}>Cancel</Button>
             </Grid>

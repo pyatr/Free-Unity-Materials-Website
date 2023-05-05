@@ -1,13 +1,13 @@
 import {Grid, Typography} from "@mui/material";
 import React, {Fragment} from "react";
 import {IsMobileResolution} from "../../utils/MobileUtilities";
-import AssetItemDisplay from "../../components/AssetItemDisplay";
+import AssetUnitPreview from "./AssetUnitPreview";
 import {PageLoadProps, PageParameters} from "../../utils/PageParameters/PageParameters";
-import {GetDummyContent} from "../../utils/Types/Content/ContentUnit";
+import {GetDummyContentUnit} from "../../utils/Types/Content/ContentUnit";
 import {GetDummyPreview} from "../../utils/Types/Content/ContentUnitPreview";
 
 function GetItemStyle(pageParameters: PageParameters): React.CSSProperties {
-    let itemDimensions = IsMobileResolution() ? [240, 384] : [160, 256];
+    let previewDisplayDimensions = IsMobileResolution() ? [240, 384] : [160, 256];
     const sizeRatio = 0.575;
 
     const rowColumnCount = IsMobileResolution() ? pageParameters.mobileRowColumnCount : pageParameters.landscapeRowColumnCount;
@@ -16,13 +16,13 @@ function GetItemStyle(pageParameters: PageParameters): React.CSSProperties {
 
     if (mainBox != null) {
         let boxWidth = (mainBox as HTMLElement).getBoundingClientRect().width;
-        itemDimensions[0] = boxWidth / (rowColumnCount[1] + 1);
-        itemDimensions[1] = itemDimensions[0] / sizeRatio;
+        previewDisplayDimensions[0] = boxWidth / (rowColumnCount[1] + 1);
+        previewDisplayDimensions[1] = previewDisplayDimensions[0] / sizeRatio;
     }
 
     return ({
-        width: itemDimensions[0] + "px",
-        height: itemDimensions[1] + "px",
+        width: previewDisplayDimensions[0] + "px",
+        height: previewDisplayDimensions[1] + "px",
         border: "2px",
         borderStyle: "solid",
         borderColor: "primary.main",
@@ -48,7 +48,7 @@ export default function AssetsPage({pageData, rawContent}: PageLoadProps) {
             rawContent.push(GetDummyPreview());
         }
         let preparedContent = rawContent.map((previewData) => {
-            return (<AssetItemDisplay itemData={previewData} itemStyle={boxStyle}/>);
+            return (<AssetUnitPreview contentUnitPreview={previewData} contentUnitPreviewStyle={boxStyle}/>);
         });
         return (<Grid sx={gridStyle}>{preparedContent}</Grid>);
     } else {

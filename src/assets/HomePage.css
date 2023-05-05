@@ -45,16 +45,3 @@ mainContentBox {
     border-radius: 4px;
     padding: 16px;
 }
-
-itemContentImageContainer {
-    width: 203px;
-    height: 203px;
-    border: 2px solid black;
-}
-
-itemContentDisplay {
-    width: 100%;
-    height: 100%;
-    word-break: break-word;
-    display: grid;
-}
