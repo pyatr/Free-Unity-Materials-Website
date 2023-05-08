@@ -14,7 +14,7 @@ export default async function GetPreviews(pageParameters: PageParameters): Promi
     const {data} = await serverConnection.SendPostRequestPromise("getPreviews", params);
 
     const previews: ContentUnitPreview[] = [];
-    data.content.forEach((rawContentUnit: any) =>
+    data.body.forEach((rawContentUnit: any) =>
         previews.push({
                 contentID: rawContentUnit.NUMBER,
                 title: rawContentUnit.TITLE,

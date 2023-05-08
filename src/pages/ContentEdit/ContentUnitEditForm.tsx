@@ -61,24 +61,25 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
 
     const uploadImages = async (e: any) => {
         let files: FileList = e.target.files as FileList;
-        e.target.value = null;
         if (contentUnitState.galleryImageLinks.length + files.length > maxImageCount) {
+            e.target.value = null;
             setErrorMessage("Too many images! Max: " + maxImageCount);
             return;
         }
-
         let blobs: string[] = [];
         //FileList has no foreach
         for (let i = 0; i < files.length; i++) {
             blobs.push(URL.createObjectURL(files[i]));
         }
+        //On some browsers it can delete uploaded files even if they were stored somewhere else
+        e.target.value = null;
         setGalleryImageLinks(contentUnitState.galleryImageLinks.concat(blobs));
     }
 
     const uploadFiles = async (e: any) => {
         let files: FileList = e.target.files as FileList;
-        e.target.value = null;
         if (contentUnitState.fileLinks.length + files.length > maxFileCount) {
+            e.target.value = null;
             setErrorMessage("Too many files! Max: " + maxFileCount);
             return;
         }
@@ -90,6 +91,7 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
                 blobLink: URL.createObjectURL(files[i])
             });
         }
+        e.target.value = null;
         setNewFiles(newFiles.concat(blobs));
     }
 
@@ -169,7 +171,7 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
         let serverConnection = new ServerConnection();
         await serverConnection.SendPostRequestPromise(contentUnitState.contentID == -1 ? "createContent" : "updateContent", requestProperties).then((response: AxiosResponse) => {
             //TODO: open for all categories
-            const currentContentUnitID = contentUnitState.contentID == -1 ? response.data.content.itemID : contentUnitState.contentID;
+            const currentContentUnitID = contentUnitState.contentID == -1 ? response.data.body.itemID : contentUnitState.contentID;
             window.open("http://" + window.location.host + "/" + currentContentUnitID, "_self");
         });
     }
