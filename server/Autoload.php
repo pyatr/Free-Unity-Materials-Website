@@ -4,7 +4,8 @@ spl_autoload_register(function ($className) {
     $directories = [
         'Controllers',
         'Models',
-        'Utilities'
+        'Utilities',
+        'QueryBuilders'
     ];
     $projectDir = __DIR__ . '\\';
     $prefix = 'Server\\';

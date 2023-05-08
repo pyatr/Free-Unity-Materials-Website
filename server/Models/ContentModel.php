@@ -16,8 +16,10 @@ class ContentModel extends BaseModel
 
     public function createContent(string $tableName, string $title, string $content, string $categories): array
     {
-        $query = "INSERT INTO $tableName (" . $this::ENTRY_TITLE . "," . $this::ENTRY_CONTENT . "," . $this::ENTRY_CATEGORIES . ") VALUES('$title', '$content', '$categories')";
-        return $this->executeRequest($query);
+        $selectQueryObject = new InsertQueryBuilder();
+        $selectQueryObject->
+        insert($tableName, [$this::ENTRY_TITLE, $this::ENTRY_CONTENT, $this::ENTRY_CATEGORIES], [$title, $content, $categories]);
+        return $this->executeRequest($selectQueryObject->getQuery());
     }
 
     public function updateContent(string $tableName, int $contentNumber, string $title, string $content, string $categories): array
@@ -37,32 +39,39 @@ class ContentModel extends BaseModel
 
     public function getContent(string $tableName, int $contentNumber): array
     {
-        $query = "SELECT * FROM $tableName WHERE NUMBER = $contentNumber";
-        return $this->executeRequest($query);
+        $selectQueryObject = new SelectQueryBuilder();
+        $selectQueryObject->
+        select(['*'])->
+        from($tableName)->
+        where([$this::ENTRY_NUMBER, '=', $contentNumber]);
+        return $this->executeRequest($selectQueryObject->getQuery());
     }
 
     public function getLastPostID(): string
     {
         $query = "SELECT LAST_INSERT_ID();";
-        return $this->executeRequest($query)['content'][0]['LAST_INSERT_ID()'];
+        return $this->executeRequest($query)['body'][0]['LAST_INSERT_ID()'];
     }
 
     public function getContentPreviews(string $tableName, int $pageSize, int $page): array
     {
         $postsOffset = $pageSize * ($page - 1);
-        $query = "SELECT " . $this::ENTRY_NUMBER . ","
-            . $this::ENTRY_TITLE . ","
-            . $this::ENTRY_CATEGORIES . ","
-            . $this::ENTRY_CONTENT . " FROM $tableName ORDER BY 1 DESC LIMIT $pageSize OFFSET $postsOffset";
-        $result = $this->executeRequest($query);
-        for ($i = 0; $i < count($result['content']); $i++) {
-            $result['content'][$i]['CONTENT'] = mb_strimwidth($result['content'][$i]['CONTENT'], 0, $this::SHORT_DESC_LENGTH, "...");
+        $selectQueryObject = new SelectQueryBuilder();
+        $selectQueryObject->
+        select([$this::ENTRY_NUMBER, $this::ENTRY_TITLE, $this::ENTRY_CATEGORIES, $this::ENTRY_CONTENT])->
+        from($tableName)->
+        orderBy('1', 'DESC')->
+        limit($pageSize)->
+        offset($postsOffset);
+        $result = $this->executeRequest($selectQueryObject->getQuery());
+        for ($i = 0; $i < count($result['body']); $i++) {
+            $result['body'][$i]['CONTENT'] = mb_strimwidth($result['body'][$i]['CONTENT'], 0, $this::SHORT_DESC_LENGTH, "...");
         }
         $result['contentCount'] = $this->getContentCount($tableName);
         return $result;
     }
 
-    public function getContentCount(string $tableName,)
+    public function getContentCount(string $tableName)
     {
         $query = "SELECT COUNT(*) FROM $tableName;";
         $req = $this->DBConn->prepare($query);
@@ -80,7 +89,7 @@ class ContentModel extends BaseModel
             $response['requesterror'] = $e;
             $response['result'] = 'failed';
         }
-        $response['content'] = $req->fetchAll(PDO::FETCH_NAMED);
+        $response['body'] = $req->fetchAll(PDO::FETCH_NAMED);
         $response['code'] = $req->errorCode();
         return $response;
     }

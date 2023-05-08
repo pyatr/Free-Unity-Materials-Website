@@ -38,7 +38,7 @@ class ContentController extends BaseController
             $files = $this->tryGetValue($params, 'files');
             $this->saveFiles($files, $lastID);
         }
-        $response['content']['itemID'] = $lastID;
+        $response['body']['itemID'] = $lastID;
         return $response;
     }
 
@@ -93,8 +93,8 @@ class ContentController extends BaseController
         //Creating empty gallery array
         $folder = $this->foldersForCategories[$category];
         if ($response['result'] == 'success') {
-            $response['content'][0]['GALLERY'] = $this->getImageLinks($folder, $contentNumber);
-            $response['content'][0]['FILE_LINKS'] = $this->getFileLinks($contentNumber);
+            $response['body'][0]['GALLERY'] = $this->getImageLinks($folder, $contentNumber);
+            $response['body'][0]['FILE_LINKS'] = $this->getFileLinks($contentNumber);
         }
         return $response;
     }
@@ -107,20 +107,20 @@ class ContentController extends BaseController
         $page = $this->tryGetValue($params, 'page');
         $result = $this->contentModel->getContentPreviews($tableName, $pageSize, $page);
 
-        $resultCount = count($result['content']);
+        $resultCount = count($result['body']);
         $folder = $this->foldersForCategories[$category];
 
         for ($i = 0; $i < $resultCount; $i++) {
-            $contentNumber = $result['content'][$i]['NUMBER'];
+            $contentNumber = $result['body'][$i]['NUMBER'];
             $galleryDirectory = "Images/$folder/$contentNumber/Gallery";
             if (is_dir("$this->serverRoot/$galleryDirectory/")) {
                 $filesInDirectory = scandir("$this->serverRoot/$galleryDirectory/");
                 if (count($filesInDirectory) > 2) {
                     $previewName = $filesInDirectory[2];
-                    $result['content'][$i]['titlepicLink'] = "$galleryDirectory/$previewName";
+                    $result['body'][$i]['titlepicLink'] = "$galleryDirectory/$previewName";
                 }
             } else {
-                $result['content'][$i]['titlepicLink'] = "noimages";
+                $result['body'][$i]['titlepicLink'] = "noimages";
             }
         }
         return $result;
