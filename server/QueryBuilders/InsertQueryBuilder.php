@@ -16,4 +16,9 @@ class InsertQueryBuilder extends AbstractQueryBuilder
         $this->insert = "INSERT INTO $table ($columnsAsString) VALUES($valuesAsString)";
         return $this;
     }
+
+    protected function getRequestParts(): array
+    {
+        return [$this->insert];
+    }
 }

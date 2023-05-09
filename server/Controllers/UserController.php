@@ -17,11 +17,11 @@ class UserController extends BaseController
         $this->userModel = new UserModel();
     }
 
-    public function tryLogin($params): array
+    public function tryLogin($attributes): array
     {
-        $response = array('loginStatus' => 'failed');
-        $email = $this->tryGetValue($params, 'email');
-        $password = $this->tryGetValue($params, 'password');
+        $response = ['loginStatus' => 'failed'];
+        $email = $this->tryGetValue($attributes, 'email');
+        $password = $this->tryGetValue($attributes, 'password');
         if ($email != null && $password != null) {
             $loginStatus = $this->doesUserExist($email, $password);
             if ($loginStatus) {
@@ -42,7 +42,7 @@ class UserController extends BaseController
 
     public function tryLoginWithCookie(): array
     {
-        $response = array('loginStatus' => 'failed');
+        $response = ['loginStatus' => 'failed'];
         $cookies = explode('; ', $_SERVER['HTTP_COOKIE']);
         $cookie = null;
         foreach ($cookies as $kvp) {
@@ -85,7 +85,7 @@ class UserController extends BaseController
 
     private function doesUserExist(string $email, string $password): bool
     {
-        return $this->userModel->elementWithParametersExists(
+        return $this->userModel->elementWithAttributeValuesExists(
             'USERS',
             ['EMAIL', 'PASSWORD'],
             [$email, $password]

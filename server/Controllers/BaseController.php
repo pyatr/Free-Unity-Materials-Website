@@ -2,9 +2,9 @@
 
 namespace Server;
 
-class BaseController
+abstract class BaseController
 {
-    protected function tryGetValue($array, $key)
+    protected function tryGetValue(array $array, $key)
     {
         return (array_key_exists($key, $array)) ? $array[$key] : null;
     }

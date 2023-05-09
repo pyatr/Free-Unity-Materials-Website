@@ -17,15 +17,6 @@ class UserModel extends BaseModel
     private const ENTRY_EMAIL = 'EMAIL';
     private const ENTRY_STATUS = 'STATUS';
 
-
-    private function getUserTableColumns(): string
-    {
-        return '(`' . UserModel::ENTRY_USERNAME .
-            '`, `' . UserModel::ENTRY_PASSWORD .
-            '`, `' . UserModel::ENTRY_EMAIL .
-            '`, `' . UserModel::ENTRY_STATUS . '`)';
-    }
-
     public function doesUserExist(string $key): bool
     {
         return $this->DBConn->query("SELECT COUNT(1) FROM " . $this::TABLE_USERS . " WHERE unique_key = $key") > 0;
@@ -33,32 +24,36 @@ class UserModel extends BaseModel
 
     //How to change username: UPDATE USERS SET USERNAME = 'newname' WHERE USERNAME = 'oldname';
 
-    public function getUserParam(string $email, string $param): string
+    public function getUserAttribute(string $email, string $attribute): string
     {
-        $query = "SELECT $param FROM " . $this::TABLE_USERS . " WHERE " . $this::ENTRY_EMAIL . " = '$email'";
-        $req = $this->DBConn->prepare($query);
-        $req->execute();
-        return $req->fetch(PDO::FETCH_NAMED)[$param];
+        $selectQueryObject = new SelectQueryBuilder();
+        $selectQueryObject->
+        select([$attribute])->
+        from($this::TABLE_USERS)->
+        where([$this::ENTRY_EMAIL, '=', $email]);
+        $request = $this->DBConn->prepare($selectQueryObject->getQuery());
+        $request->execute();
+        return $request->fetch(PDO::FETCH_NAMED)[$attribute];
     }
 
     public function getUserName(string $email): string
     {
-        return $this->getUserParam($email, $this::ENTRY_USERNAME);
+        return $this->getUserAttribute($email, $this::ENTRY_USERNAME);
     }
 
     public function getUserRole(string $email): string
     {
-        return $this->getUserParam($email, $this::ENTRY_STATUS);
+        return $this->getUserAttribute($email, $this::ENTRY_STATUS);
     }
 
     public function createNewUser(string $newName, string $password, string $email): void
     {
         if (!$this->doesUserExist($email)) {
             $hashedPassword = hash(BaseModel::HASHING_ALGORITHM, $password);
-            $this->performQuery();
-            $this->DBConn->query(
-                "INSERT INTO " . UserModel::TABLE_USERS . " {$this::getUserTableColumns()} VALUES ('$newName', '$hashedPassword', '$email', '" . UserModel::ROLE_USER . "');"
-            );
+            $insertQueryObject = new InsertQueryBuilder();
+            $insertQueryObject->
+            insert($this::TABLE_USERS, [$this::ENTRY_USERNAME, $this::ENTRY_PASSWORD, $this::ENTRY_EMAIL, $this::ENTRY_STATUS], [$newName, $hashedPassword, $email, $this::ROLE_USER]);
+            $this->DBConn->query($insertQueryObject->getQuery());
         }
     }
 }

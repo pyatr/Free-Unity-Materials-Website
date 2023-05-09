@@ -24,17 +24,20 @@ class ContentModel extends BaseModel
 
     public function updateContent(string $tableName, int $contentNumber, string $title, string $content, string $categories): array
     {
-        $query = "UPDATE $tableName SET "
-            . $this::ENTRY_TITLE . "='$title',"
-            . $this::ENTRY_CONTENT . "='$content',"
-            . $this::ENTRY_CATEGORIES . "='$categories' WHERE " . $this::ENTRY_NUMBER . " = '$contentNumber'";
-        return $this->executeRequest($query);
+        $updateQueryObject = new UpdateQueryBuilder();
+        $updateQueryObject->
+        update($tableName, [$this::ENTRY_TITLE, $this::ENTRY_CONTENT, $this::ENTRY_CATEGORIES], [$title, $content, $categories])->
+        where([$this::ENTRY_NUMBER, '=', $contentNumber]);
+        return $this->executeRequest($updateQueryObject->getQuery());
     }
 
     public function deleteContent(string $tableName, int $contentNumber): array
     {
-        $query = "DELETE FROM $tableName WHERE " . $this::ENTRY_NUMBER . " = '$contentNumber'";
-        return $this->executeRequest($query);
+        $deleteQueryObject = new DeleteQueryBuilder();
+        $deleteQueryObject->
+        delete($tableName)->
+        where([$this::ENTRY_NUMBER, '=', $contentNumber]);
+        return $this->executeRequest($deleteQueryObject->getQuery());
     }
 
     public function getContent(string $tableName, int $contentNumber): array
@@ -49,8 +52,13 @@ class ContentModel extends BaseModel
 
     public function getLastPostID(): string
     {
-        $query = "SELECT LAST_INSERT_ID();";
-        return $this->executeRequest($query)['body'][0]['LAST_INSERT_ID()'];
+        $selectQueryObject = new SelectQueryBuilder();
+        //TODO: Is ; necessary for sql requests?
+        $selectQueryObject->select(["LAST_INSERT_ID();"]);
+        $request = $this->DBConn->prepare($selectQueryObject->getQuery());
+        $request->execute();
+        //Should request LAST_INSERT_ID();
+        return $request->fetch(PDO::FETCH_NAMED);
     }
 
     public function getContentPreviews(string $tableName, int $pageSize, int $page): array
@@ -64,8 +72,8 @@ class ContentModel extends BaseModel
         limit($pageSize)->
         offset($postsOffset);
         $result = $this->executeRequest($selectQueryObject->getQuery());
-        for ($i = 0; $i < count($result['body']); $i++) {
-            $result['body'][$i]['CONTENT'] = mb_strimwidth($result['body'][$i]['CONTENT'], 0, $this::SHORT_DESC_LENGTH, "...");
+        foreach ($result['body'] as $resultBody) {
+            $resultBody['CONTENT'] = mb_strimwidth($resultBody['CONTENT'], 0, $this::SHORT_DESC_LENGTH, "...");
         }
         $result['contentCount'] = $this->getContentCount($tableName);
         return $result;
@@ -73,24 +81,27 @@ class ContentModel extends BaseModel
 
     public function getContentCount(string $tableName)
     {
-        $query = "SELECT COUNT(*) FROM $tableName;";
-        $req = $this->DBConn->prepare($query);
-        $req->execute();
-        return $req->fetch(PDO::FETCH_NAMED)['COUNT(*)'];
+        $selectQueryObject = new SelectQueryBuilder();
+        $selectQueryObject->
+        select(["COUNT(*)"])->
+        from($tableName);
+        $request = $this->DBConn->prepare($selectQueryObject->getQuery());
+        $request->execute();
+        return $request->fetch(PDO::FETCH_NAMED)['COUNT(*)'];
     }
 
     protected function executeRequest($query): array
     {
         $response = array('result' => 'success');
-        $req = $this->DBConn->prepare($query);
+        $request = $this->DBConn->prepare($query);
         try {
-            $req->execute();
+            $request->execute();
         } catch (Throwable $e) {
             $response['requesterror'] = $e;
             $response['result'] = 'failed';
         }
-        $response['body'] = $req->fetchAll(PDO::FETCH_NAMED);
-        $response['code'] = $req->errorCode();
+        $response['body'] = $request->fetchAll(PDO::FETCH_NAMED);
+        $response['code'] = $request->errorCode();
         return $response;
     }
 }

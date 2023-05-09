@@ -13,25 +13,39 @@ class CommentModel extends BaseModel
 
     public function addComment($email, $content, $parentNumber, $tableName): string
     {
-        $query = "INSERT INTO $tableName (" . $this::ENTRY_EMAIL . ',' . $this::ENTRY_CONTENT . ',' . $this::ENTRY_PARENTNUMBER . ") VALUES ('$email', '$content', '$parentNumber');";
-        $request = $this->DBConn->prepare($query);
+        $content = urlencode($content);
+        $insertQueryObject = new InsertQueryBuilder();
+        $insertQueryObject->
+        insert($tableName, [$this::ENTRY_EMAIL, $this::ENTRY_CONTENT, $this::ENTRY_PARENTNUMBER], [$email, $content, $parentNumber]);
+        $request = $this->DBConn->prepare($insertQueryObject->getQuery());
         $request->execute();
         return $request->errorCode() == '00000' ? 'success' : 'failure';
     }
 
     public function getComments($parentNumber, $tableName): array
     {
-        $query = "SELECT " . $this::ENTRY_EMAIL . ',' . $this::ENTRY_CONTENT . ',' . $this::ENTRY_CREATION_DATE . " FROM $tableName WHERE " . $this::ENTRY_PARENTNUMBER . "=$parentNumber ORDER BY " . $this::ENTRY_CREATION_DATE . " ASC;";
-        $request = $this->DBConn->prepare($query);
+        $selectQueryObject = new SelectQueryBuilder();
+        $selectQueryObject->
+        select([$this::ENTRY_EMAIL, $this::ENTRY_CONTENT, $this::ENTRY_CREATION_DATE])->
+        from($tableName)->
+        where([$this::ENTRY_PARENTNUMBER, '=', $parentNumber])->
+        orderBy($this::ENTRY_CREATION_DATE);
+
+        $request = $this->DBConn->prepare($selectQueryObject->getQuery());
         $request->execute();
         return $request->fetchAll(PDO::FETCH_NAMED);
     }
 
     public function getCommentCount($parentNumber, $tableName): int
     {
-        $query = "SELECT COUNT(*) FROM $tableName WHERE " . $this::ENTRY_PARENTNUMBER . "=$parentNumber;";
-        $req = $this->DBConn->prepare($query);
-        $req->execute();
-        return $req->fetch()[0];
+        $selectQueryObject = new SelectQueryBuilder();
+        $selectQueryObject->
+        select(["COUNT(*)"])->
+        from($tableName)->
+        where([$this::ENTRY_PARENTNUMBER, '=', $parentNumber]);
+
+        $request = $this->DBConn->prepare($selectQueryObject->getQuery());
+        $request->execute();
+        return $request->fetch()[0];
     }
 }

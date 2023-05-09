@@ -4,7 +4,7 @@ namespace Server;
 
 use PDO;
 
-class BaseModel
+abstract class BaseModel
 {
     protected const HOST_NAME = 'fum-db';
     protected const DATABASE_NAME = 'PrimaryDatabase';
@@ -27,22 +27,17 @@ class BaseModel
         );
     }
 
-    public function elementWithParametersExists(
-        string $tableName,
-        $parameters,
-        $values
-    ): bool {
-        if (!is_array($parameters) || !is_array($values)) {
-            return false;
-        }
-        $paramCount = count($parameters);
+    public function elementWithAttributeValuesExists(string $tableName, array $attributes, array $values): bool
+    {
+        $attributeCount = count($attributes);
         $valuesCount = count($values);
-        if ($paramCount != $valuesCount || $paramCount == 0 || $valuesCount == 0) {
+        if ($attributeCount != $valuesCount || $attributeCount == 0 || $valuesCount == 0) {
             return false;
         }
-        $query = "SELECT COUNT(1) FROM $tableName WHERE $parameters[0] = '$values[0]'";
-        for ($i = 1; $i < $paramCount; $i++) {
-            $query = $query . " AND $parameters[$i] = '$values[$i]'";
+        //TODO: Add multiple WHERE support for QueryBuilders and rewrite this
+        $query = "SELECT COUNT(1) FROM $tableName WHERE $attributes[0] = '$values[0]'";
+        for ($i = 1; $i < $attributeCount; $i++) {
+            $query = $query . " AND $attributes[$i] = '$values[$i]'";
         }
 
         $result = $this->DBConn->query($query);

@@ -6,7 +6,6 @@ class SelectQueryBuilder extends AbstractQueryBuilder
 {
     private string $select = '';
     private string $from = '';
-    private string $where = '';
     private string $orderBy = '';
     private string $limit = '';
 
@@ -29,13 +28,6 @@ class SelectQueryBuilder extends AbstractQueryBuilder
         return $this;
     }
 
-    public function where(array $conditions)
-    {
-        $conditionsAsString = implode($conditions);
-        $this->where = "WHERE $conditionsAsString";
-        return $this;
-    }
-
     public function orderBy(string $field = '1', string $order = 'ASC')
     {
         //Order by 1 means ordering by first column
@@ -53,5 +45,10 @@ class SelectQueryBuilder extends AbstractQueryBuilder
     {
         $this->offset = "OFFSET $offset";
         return $this;
+    }
+
+    protected function getRequestParts(): array
+    {
+        return [$this->select, $this->from, $this->where, $this->orderBy, $this->limit, $this->offset];
     }
 }
