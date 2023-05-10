@@ -48,12 +48,3 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 ## Display errors in php
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
-
-## Test requests on server
-
-$api->parseRequest(array("request" => "login", "params" => array("email" => "admin", "password" => "admin")));
-$api->parseRequest(array("request" => "createPost", "params" => array("title" => "The afsdf", "shortTitle" => "Short title","content" => "Very cool thing", "categories" => "none")));
-$api->parseRequest(array("request" => "deletePost", "params" => array("number" => "17")));
-$api->parseRequest(array("request" => "updatePost", "params" => array("number" => "3", "title" => "Newer title", "shortTitle" => "Shorter title","content" => "Mediocre thing", "categories" => "scripts")));
-$api->parseRequest(array("request" => "getPost", "params" => array("number" => "1")));
-$api->parseRequest(array("request" => "getPosts", "params" => array("pageSize" => "6", "page"=>"2")));
