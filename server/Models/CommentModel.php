@@ -6,14 +6,22 @@ use PDO;
 
 class CommentModel extends BaseModel
 {
+    static private array $tablesForCategories = [
+        "asset" => "ASSETS_COMMENTS",
+        "article" => "ARTICLES_COMMENTS",
+        "script" => "SCRIPTS_COMMENTS"
+    ];
+
     private const ENTRY_EMAIL = 'EMAIL';
     private const ENTRY_CONTENT = 'CONTENT';
     private const ENTRY_PARENTNUMBER = 'PARENTNUMBER';
     private const ENTRY_CREATION_DATE = 'CREATION_DATE';
 
-    public function addComment($email, $content, $parentNumber, $tableName): string
+    public function addComment(string $category, string $email, string $content, int $parentNumber): string
     {
+        $tableName = self::$tablesForCategories[$category];
         $content = urlencode($content);
+
         $insertQueryObject = new InsertQueryBuilder();
         $insertQueryObject->
         insert($tableName, [$this::ENTRY_EMAIL, $this::ENTRY_CONTENT, $this::ENTRY_PARENTNUMBER], [$email, $content, $parentNumber]);
@@ -22,8 +30,10 @@ class CommentModel extends BaseModel
         return $request->errorCode() == '00000' ? 'success' : 'failure';
     }
 
-    public function getComments($parentNumber, $tableName): array
+    public function getComments(string $category, int $parentNumber): array
     {
+        $tableName = self::$tablesForCategories[$category];
+
         $selectQueryObject = new SelectQueryBuilder();
         $selectQueryObject->
         select([$this::ENTRY_EMAIL, $this::ENTRY_CONTENT, $this::ENTRY_CREATION_DATE])->
@@ -33,11 +43,17 @@ class CommentModel extends BaseModel
 
         $request = $this->DBConn->prepare($selectQueryObject->getQuery());
         $request->execute();
-        return $request->fetchAll(PDO::FETCH_NAMED);
+        $response = $request->fetchAll(PDO::FETCH_NAMED);
+        foreach ($response as &$commentData) {
+            $commentData['CONTENT'] = urldecode($commentData['CONTENT']);
+        }
+        return $response;
     }
 
-    public function getCommentCount($parentNumber, $tableName): int
+    public function getCommentCount(string $category, int $parentNumber)
     {
+        $tableName = self::$tablesForCategories[$category];
+
         $selectQueryObject = new SelectQueryBuilder();
         $selectQueryObject->
         select(["COUNT(*)"])->
