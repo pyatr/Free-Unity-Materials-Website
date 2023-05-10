@@ -4,17 +4,6 @@ namespace Server;
 
 class APIEndpointController
 {
-    private UserController $userController;
-    private ContentController $contentController;
-    private CommentController $commentController;
-
-    function __construct()
-    {
-        $this->userController = new UserController();
-        $this->contentController = new ContentController();
-        $this->commentController = new CommentController();
-    }
-
     public function parseRequest(): void
     {
         if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
@@ -23,38 +12,53 @@ class APIEndpointController
         $data = (array)json_decode(file_get_contents('php://input'));
 
         $request = $data['request'];
-        $params = (array)$data['params'];
+        $attributes = (array)$data['params'];
         if ($request != null) {
+            $controllers = array(
+                'login' => "Server\\UserController",
+                'loginCookie' => "Server\\UserController",
+                'createContent' => "Server\\ContentController",
+                'deleteContent' => "Server\\ContentController",
+                'updateContent' => "Server\\ContentController",
+                'getContent' => "Server\\ContentController",
+                'getPreviews' => "Server\\ContentController",
+                'addComment' => "Server\\CommentController",
+                'getComments' => "Server\\CommentController",
+                'getCommentCount' => "Server\\CommentController"
+            );
+            //Choosing controller for request
+            $reflection = new \ReflectionClass($controllers[$request]);
+            $controller = $reflection->newInstance();
             switch ($request) {
                 case 'login':
-                    $this->respond($this->userController->tryLogin($params));
+                    $this->respond($controller->tryLogin($attributes));
                     break;
                 case 'loginCookie':
-                    $this->respond($this->userController->tryLoginWithCookie());
+                    $this->respond($controller->tryLoginWithCookie());
                     break;
                 case 'createContent':
-                    $this->respond($this->contentController->createContent($params));
+                    $this->respond($controller->createContent($attributes));
                     break;
                 case 'deleteContent':
-                    $this->respond($this->contentController->deleteContent($params));
+                    $this->respond($controller->deleteContent($attributes));
                     break;
                 case 'updateContent':
-                    $this->respond($this->contentController->updateContent($params));
+                    $this->respond($controller->updateContent($attributes));
                     break;
                 case 'getContent':
-                    $this->respond($this->contentController->getContent($params));
+                    $this->respond($controller->getContent($attributes));
                     break;
                 case 'getPreviews':
-                    $this->respond($this->contentController->getContentPreviews($params));
+                    $this->respond($controller->getContentPreviews($attributes));
                     break;
                 case 'addComment':
-                    $this->respond($this->commentController->addComment($params));
+                    $this->respond($controller->addComment($attributes));
                     break;
                 case 'getComments':
-                    $this->respond($this->commentController->getComments($params));
+                    $this->respond($controller->getComments($attributes));
                     break;
                 case 'getCommentCount':
-                    $this->respond($this->commentController->getCommentCount($params));
+                    $this->respond($controller->getCommentCount($attributes));
                     break;
                 default:
                     break;

@@ -2,12 +2,8 @@
 
 namespace Server;
 
-use Couchbase\User;
-
 class CommentController extends BaseController
 {
-    private array $tablesForCategories;
-
     private CommentModel $commentModel;
     private UserModel $userModel;
 
@@ -15,36 +11,32 @@ class CommentController extends BaseController
     {
         $this->commentModel = new CommentModel();
         $this->userModel = new UserModel();
-        $this->tablesForCategories = array("asset" => "ASSETS_COMMENTS", "article" => "ARTICLES_COMMENTS", "script" => "SCRIPTS_COMMENTS");
     }
 
-    public function addComment(array $params): string
+    public function addComment(array $attributes): string
     {
-        $email = $this->tryGetValue($params, 'email');
-        $content = $this->tryGetValue($params, 'content');
-        $category = $this->tryGetValue($params, 'category');
-        $parentNumber = $this->tryGetValue($params, 'parentNumber');
-        $tableName = $this->tablesForCategories[$category];
-        return $this->commentModel->addComment($email, $content, $parentNumber, $tableName);
+        $email = $this->tryGetValue($attributes, 'email');
+        $content = $this->tryGetValue($attributes, 'content');
+        $category = $this->tryGetValue($attributes, 'category');
+        $parentNumber = $this->tryGetValue($attributes, 'parentNumber');
+        return $this->commentModel->addComment($category, $email, $content, $parentNumber);
     }
 
-    public function getComments(array $params): array
+    public function getComments(array $attributes): array
     {
-        $category = $this->tryGetValue($params, 'category');
-        $parentNumber = $this->tryGetValue($params, 'parentNumber');
-        $tableName = $this->tablesForCategories[$category];
-        $comments = $this->commentModel->getComments($parentNumber, $tableName);
+        $category = $this->tryGetValue($attributes, 'category');
+        $parentNumber = $this->tryGetValue($attributes, 'parentNumber');
+        $comments = $this->commentModel->getComments($category, $parentNumber);
         for ($i = 0; $i < count($comments); $i++) {
             $comments[$i]['USERNAME'] = $this->userModel->getUserName($comments[$i]['EMAIL']);
         }
         return $comments;
     }
 
-    public function getCommentCount(array $params): int
+    public function getCommentCount(array $attributes): int
     {
-        $category = $this->tryGetValue($params, 'category');
-        $parentNumber = $this->tryGetValue($params, 'parentNumber');
-        $tableName = $this->tablesForCategories[$category];
-        return $this->commentModel->getCommentCount($parentNumber, $tableName);
+        $category = $this->tryGetValue($attributes, 'category');
+        $parentNumber = $this->tryGetValue($attributes, 'parentNumber');
+        return $this->commentModel->getCommentCount($category, $parentNumber);
     }
 }
