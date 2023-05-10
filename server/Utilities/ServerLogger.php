@@ -9,10 +9,9 @@ class ServerLogger
         //Log folder and permissions have to be created manually
         $logFileFolder = 'Logs';
         $logFileName = date('d-m-y') . '_log.txt';
-        $logFile = fopen($_SERVER['DOCUMENT_ROOT'] . "/$logFileFolder/$logFileName", 'w');
-        if ($logFile) {
-            fwrite($logFile, $message . '\n');
-            fclose($logFile);
-        }
+        $logFilePath = $_SERVER['DOCUMENT_ROOT'] . "/$logFileFolder/$logFileName";
+        $logFile = file_get_contents($logFilePath);
+        $logFile .= "$message\r\n";
+        file_put_contents($logFilePath, $logFile, FILE_APPEND);
     }
 }
