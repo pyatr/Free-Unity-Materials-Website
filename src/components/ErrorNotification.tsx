@@ -16,6 +16,8 @@ export default function ErrorNotification({message, onDismiss}: ErrorNotificatio
             borderStyle: "solid",
             borderRadius: "4px",
             padding: "16px",
+            marginTop: "16px",
+            marginBottom: "16px",
             width: "100%",
             alignItems: "center",
             justifyContent: "space-between"

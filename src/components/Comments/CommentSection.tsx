@@ -35,7 +35,7 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
     }
 
     useEffect(() => {
-            if (comments.length == 0) {
+            if (commentCount == -1) {
                 //TODO: Request limited amount of comments
                 GetComments(requestedContentID, requestedContentCategory).then((comments: Array<UserCommentProps>) => {
                         setComments(comments);
