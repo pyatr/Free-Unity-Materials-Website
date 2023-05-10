@@ -44,6 +44,8 @@ class ContentModel extends BaseModel
     public function deleteContent(string $category, int $contentID): array
     {
         $tableName = self::$tablesForCategories[$category];
+        $commentModel = new CommentModel();
+        $commentModel->deleteCommentsFromContent($category, $contentID);
 
         $deleteQueryObject = new DeleteQueryBuilder();
         $deleteQueryObject->

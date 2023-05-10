@@ -14,18 +14,26 @@ class APIEndpointController
         $request = $data['request'];
         $attributes = (array)$data['params'];
         if ($request != null) {
-            $controllers = array(
-                'login' => "Server\\UserController",
-                'loginCookie' => "Server\\UserController",
-                'createContent' => "Server\\ContentController",
-                'deleteContent' => "Server\\ContentController",
-                'updateContent' => "Server\\ContentController",
-                'getContent' => "Server\\ContentController",
-                'getPreviews' => "Server\\ContentController",
-                'addComment' => "Server\\CommentController",
-                'getComments' => "Server\\CommentController",
-                'getCommentCount' => "Server\\CommentController"
-            );
+            $userControllerName = "Server\\UserController";
+            $contentControllerName = "Server\\ContentController";
+            $commentControllerName = "Server\\CommentController";
+
+            $controllers = [
+                'login' => $userControllerName,
+                'loginCookie' => $userControllerName,
+
+                'createContent' => $contentControllerName,
+                'deleteContent' => $contentControllerName,
+                'updateContent' => $contentControllerName,
+                'getContent' => $contentControllerName,
+                'getPreviews' => $contentControllerName,
+
+                'addComment' => $commentControllerName,
+                'deleteComment' => $commentControllerName,
+                'updateComment' => $commentControllerName,
+                'getComments' => $commentControllerName,
+                'getCommentCount' => $commentControllerName
+            ];
             //Choosing controller for request
             $reflection = new \ReflectionClass($controllers[$request]);
             $controller = $reflection->newInstance();
@@ -53,6 +61,9 @@ class APIEndpointController
                     break;
                 case 'addComment':
                     $this->respond($controller->addComment($attributes));
+                    break;
+                case 'deleteComment':
+                    $this->respond($controller->deleteComment($attributes));
                     break;
                 case 'getComments':
                     $this->respond($controller->getComments($attributes));

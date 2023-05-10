@@ -39,4 +39,11 @@ class CommentController extends BaseController
         $parentNumber = $this->tryGetValue($attributes, 'parentNumber');
         return $this->commentModel->getCommentCount($category, $parentNumber);
     }
+
+    public function deleteComment(array $attributes)
+    {
+        $category = $this->tryGetValue($attributes, 'category');
+        $commentID = $this->tryGetValue($attributes, 'commentID');
+        $this->commentModel->deleteComment($category, $commentID);
+    }
 }
