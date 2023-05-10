@@ -25,6 +25,7 @@ import ImageGallery from "../../components/ImageGallery/ImageGallery";
 import EditFileList from "../../components/DownloadLinks/EditFileList";
 import ErrorNotification from "../../components/ErrorNotification";
 import {ContentCategorySelection} from "../../pages/ContentEdit/ContentCategorySelection";
+import MessageBoxYesNo from "../../components/MessageBoxes/MessageBoxYesNo";
 
 const bodyStyle = {
     width: '100%',
@@ -38,6 +39,7 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
     const [newFiles, setNewFiles] = useState(Array<FileNameBlobPair>);
     const [filesToDelete, setFileDeletionState] = useState(Array<string>);
     const [contentUnitState, setContentUnitState] = useState<ContentUnit>(GetDummyContentUnit());
+    const [deleteWindowOpen, setDeleteWindowStatus] = useState(false);
 
     const loadContentIfEmpty = () => {
         //Request content if it's not loaded and given contentNumber is a real post number
@@ -126,6 +128,12 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
         changeContentUnitProperty("galleryImageLinks", newGalleryImageLinks);
     }
 
+    const openDeleteWindow = () => setDeleteWindowStatus(true)
+
+    const closeDeleteWindow = () => setDeleteWindowStatus(false)
+
+    const confirmDelete = () => DeleteContent(contentUnitState.contentID, requestedContentCategory).then(() => GoToHomePage());
+
     const submitContent = async () => {
         let errorMessage: string = "";
         if (contentUnitState.title == "") {
@@ -198,6 +206,14 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
         <Grid style={{display: "grid", gap: "32px"}}>
             {/*Content grid*/}
             <Grid style={{display: "grid"}}>
+                {deleteWindowOpen ?
+                    <MessageBoxYesNo
+                        message={"Delete " + contentUnitState.title + "?"}
+                        onConfirm={confirmDelete}
+                        onCancel={closeDeleteWindow}
+                        parentWidth={"512px"}
+                        parentHeight={"512px"}/> :
+                    <Fragment/>}
                 <Typography variant="h6">{pageTitle}</Typography>
                 <ErrorNotification message={errorMessage} onDismiss={() => setErrorMessage("")}/>
                 <ImageGallery images={images}/>
@@ -230,7 +246,7 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
             <ContentFormInteractionButtons
                 onSave={submitContent}
                 onCancel={() => GoToHomePage()}
-                onDelete={() => DeleteContent(contentUnitState.contentID, requestedContentCategory).then(() => GoToHomePage())}
+                onDelete={() => openDeleteWindow()}
                 enableDelete={contentUnitState.contentID != -1}/>
         </Grid>
     );

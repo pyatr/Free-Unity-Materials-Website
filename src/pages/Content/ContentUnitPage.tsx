@@ -13,6 +13,7 @@ import DownloadLinksList from "../../components/DownloadLinks/DownloadLinksList"
 import {CommentSection} from "../../components/Comments/CommentSection";
 import ContentUnitEditorButtons from "./ContentUnitEditorButtons";
 import {GetContentUnit} from "../../utils/ContentInteraction/GetContentUnit";
+import MessageBoxYesNo from "../../components/MessageBoxes/MessageBoxYesNo";
 
 const itemContentDisplay = {
     width: '100%',
@@ -23,6 +24,7 @@ const itemContentDisplay = {
 
 export default function ContentUnitPage({requestedContentID, requestedContentCategory}: ContentUnitRequestData) {
     const [contentUnit, setContentUnit] = useState(GetDummyContentUnit());
+    const [deleteWindowOpen, setDeleteWindowStatus] = useState(false);
 
     const loadContent = () => {
         if (contentUnit.contentID == -1) {
@@ -40,6 +42,10 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
 
     window.scrollTo(0, 0);
 
+    const openDeleteWindow = () => setDeleteWindowStatus(true)
+
+    const closeDeleteWindow = () => setDeleteWindowStatus(false)
+
     const confirmDelete = () => DeleteContent(contentUnit.contentID, requestedContentCategory).then(() => GoToHomePage());
 
     const images = contentUnit.galleryImageLinks.map((link: string) =>
@@ -49,6 +55,14 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
 
     return (
         <Grid sx={itemContentDisplay}>
+            {deleteWindowOpen ?
+                <MessageBoxYesNo
+                    message={"Delete " + contentUnit.title + "?"}
+                    onConfirm={confirmDelete}
+                    onCancel={closeDeleteWindow}
+                    parentWidth={"512px"}
+                    parentHeight={"512px"}/> :
+                <Fragment/>}
             <Typography variant="h3">{contentUnit.title}</Typography>
             {contentUnit.categories != "" ?
                 <Typography variant="subtitle2" color="grey">{contentUnit.categories}</Typography> :
@@ -56,7 +70,7 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
             <ImageGallery images={images}/>
             <DownloadLinksList links={contentUnit.fileLinks}/>
             <Typography sx={itemContentDisplay} variant="body1">{contentBody}</Typography>
-            <ContentUnitEditorButtons contentID={contentUnit.contentID} onDelete={confirmDelete}/>
+            <ContentUnitEditorButtons contentID={contentUnit.contentID} onDelete={openDeleteWindow}/>
             <CommentSection requestedContentID={contentUnit.contentID}
                             requestedContentCategory={requestedContentCategory}></CommentSection>
         </Grid>);

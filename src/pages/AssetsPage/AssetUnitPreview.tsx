@@ -106,6 +106,8 @@ export default function AssetUnitPreview({contentUnitPreview, contentUnitPreview
 
     const askToDelete = () => setDeleteWindowStatus(true);
 
+    const closeDeleteWindow = () => setDeleteWindowStatus(false);
+
     const confirmDelete = () => DeleteContent(contentUnitPreview.contentID, "asset").then(() => window.location.reload());
 
     const imageStyle = {
@@ -144,7 +146,7 @@ export default function AssetUnitPreview({contentUnitPreview, contentUnitPreview
                     <MessageBoxYesNo
                         message={"Delete " + contentUnitPreview.title + "?"}
                         onConfirm={confirmDelete}
-                        onCancel={hideAdminButtons}
+                        onCancel={closeDeleteWindow}
                         parentWidth={imageStyle.width as string}
                         parentHeight={imageStyle.width as string}/> :
                     <Fragment/>}

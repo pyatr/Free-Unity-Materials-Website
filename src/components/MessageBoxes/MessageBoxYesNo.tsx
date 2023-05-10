@@ -9,12 +9,20 @@ const messageBoxButtonsStyle = {
     height: '40px'
 }
 
-export default function MessageBoxYesNo({message, onConfirm, onCancel, parentWidth, parentHeight}: MessageBoxYesNoProps) {
+export default function MessageBoxYesNo({
+                                            message,
+                                            onConfirm,
+                                            onCancel,
+                                            parentWidth,
+                                            parentHeight
+                                        }: MessageBoxYesNoProps) {
     return (<Box padding='8px'
                  position='absolute'
                  zIndex='11'
-                 width={PixelSummForCSS(parentWidth, "-16px")}
-                 height={PixelSummForCSS(parentHeight, "-16px")}>
+                 justifySelf='center'
+                 margin='8px'
+                 maxWidth={parentWidth}
+                 maxHeight={parentHeight}>
         <Box style={{border: '2px', borderStyle: 'solid', background: 'white'}}>
             <Grid style={{display: 'grid', padding: '16px', gap: '32px'}}>
                 <Typography variant="h5" sx={{textOverflow: "ellipsis", overflow: "hidden"}}>{message}</Typography>
