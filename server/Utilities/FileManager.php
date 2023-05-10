@@ -22,7 +22,7 @@ class FileManager
         //Add guid to file name so that old cached version would not display after changes
         $guid = GUIDCreator::GUIDv4();
         foreach ($gallery as $image) {
-            file_put_contents("$galleryDirectory/$guid-$fileNumber.png", file_get_contents($image));
+            file_put_contents("$galleryDirectory/$fileNumber-$guid.png", file_get_contents($image));
             $fileNumber++;
         }
     }
@@ -37,38 +37,38 @@ class FileManager
     public static function getImageLinks(string $category, int $contentID): array
     {
         $folder = self::$foldersForCategories[$category];
-        $links[0] = 'none';
+        $links = [];
         $galleryDirectory = "Images/$folder/$contentID/Gallery";
         if (is_dir($_SERVER['DOCUMENT_ROOT'] . "/$galleryDirectory/")) {
-            $imagesInGallery = glob($_SERVER['DOCUMENT_ROOT'] . "/$galleryDirectory/*.png");
-            $imagesCount = count($imagesInGallery);
-            if ($imagesCount > 0) {
-                for ($i = 0; $i < $imagesCount; $i++) {
-                    $fileNameSplit = explode('/', $imagesInGallery[$i]);
-                    $fileName = $fileNameSplit[count($fileNameSplit) - 1];
-                    $links[$i] = "$galleryDirectory/" . $fileName;
-                }
+            $imagesInGallery = glob($_SERVER['DOCUMENT_ROOT'] . "/$galleryDirectory/*.png", GLOB_NOSORT);
+            sort($imagesInGallery, SORT_NATURAL);
+            foreach ($imagesInGallery as $image) {
+                $fileNameSplit = explode('/', $image);
+                $fileName = $fileNameSplit[count($fileNameSplit) - 1];
+                $links[] = "$galleryDirectory/$fileName";
             }
+        }
+        if (count($links) == 0) {
+            $links[0] = 'none';
         }
         return $links;
     }
 
     public static function loadImagesForPreviews(&$loadPreviewsResponse, $category): void
     {
-        $resultCount = count($loadPreviewsResponse['body']);
         $folder = self::$foldersForCategories[$category];
 
-        for ($i = 0; $i < $resultCount; $i++) {
-            $contentID = $loadPreviewsResponse['body'][$i]['NUMBER'];
+        foreach ($loadPreviewsResponse['body'] as &$preview) {
+            $contentID = $preview['NUMBER'];
             $galleryDirectory = "Images/$folder/$contentID/Gallery";
             if (is_dir($_SERVER['DOCUMENT_ROOT'] . "/$galleryDirectory/")) {
                 $filesInDirectory = scandir($_SERVER['DOCUMENT_ROOT'] . "/$galleryDirectory/");
                 if (count($filesInDirectory) > 2) {
                     $previewName = $filesInDirectory[2];
-                    $loadPreviewsResponse['body'][$i]['titlepicLink'] = "$galleryDirectory/$previewName";
+                    $preview['titlepicLink'] = "$galleryDirectory/$previewName";
                 }
             } else {
-                $loadPreviewsResponse['body'][$i]['titlepicLink'] = "noimages";
+                $preview['titlepicLink'] = "noimages";
             }
         }
     }
@@ -128,19 +128,20 @@ class FileManager
     public static function getFileLinks(string $category, int $contentID): array
     {
         $folder = self::$foldersForCategories[$category];
-        $links[0] = 'none';
+        $links = [];
         $currentContentFileDirectory = "FileStorage/$folder/$contentID";
         $fullFilePath = $_SERVER['DOCUMENT_ROOT'] . "/$currentContentFileDirectory";
         if (is_dir($fullFilePath)) {
-            $filesInContentDirectory = scandir($fullFilePath);
-            $fileCount = count($filesInContentDirectory);
-            if ($fileCount > 2) {
-                sort($filesInContentDirectory, SORT_NUMERIC);
-                for ($i = 2; $i < $fileCount; $i++) {
-                    $fileName = scandir("$fullFilePath/$filesInContentDirectory[$i]")[2];
-                    $links[$i - 2] = "$currentContentFileDirectory/$filesInContentDirectory[$i]/$fileName";
-                }
+            $fileFoldersInContentDirectory = glob("$fullFilePath/*", GLOB_NOSORT);
+
+            sort($fileFoldersInContentDirectory, SORT_NATURAL);
+            foreach ($fileFoldersInContentDirectory as $fileFolder) {
+                $fileName = scandir("$fileFolder")[2];
+                $links[] = "$fileFolder/$fileName";
             }
+        }
+        if (count($links) == 0) {
+            $links[0] = 'none';
         }
         return $links;
     }

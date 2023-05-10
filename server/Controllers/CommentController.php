@@ -27,8 +27,8 @@ class CommentController extends BaseController
         $category = $this->tryGetValue($attributes, 'category');
         $parentNumber = $this->tryGetValue($attributes, 'parentNumber');
         $comments = $this->commentModel->getComments($category, $parentNumber);
-        for ($i = 0; $i < count($comments); $i++) {
-            $comments[$i]['USERNAME'] = $this->userModel->getUserName($comments[$i]['EMAIL']);
+        foreach ($comments as &$comment) {
+            $comment['USERNAME'] = $this->userModel->getUserName($comment['EMAIL']);
         }
         return $comments;
     }
