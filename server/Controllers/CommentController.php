@@ -13,13 +13,15 @@ class CommentController extends BaseController
         $this->userModel = new UserModel();
     }
 
-    public function addComment(array $attributes): string
+    public function addComment(array $attributes): array
     {
         $email = $this->tryGetValue($attributes, 'email');
         $content = $this->tryGetValue($attributes, 'content');
         $category = $this->tryGetValue($attributes, 'category');
         $parentNumber = $this->tryGetValue($attributes, 'parentNumber');
-        return $this->commentModel->addComment($category, $email, $content, $parentNumber);
+        $comment = $this->commentModel->addComment($category, $email, $content, $parentNumber);
+        $comment['body'][0]['USERNAME'] = $this->userModel->getUserName($comment['body'][0]['EMAIL']);
+        return $comment;
     }
 
     public function getComments(array $attributes): array
@@ -27,7 +29,7 @@ class CommentController extends BaseController
         $category = $this->tryGetValue($attributes, 'category');
         $parentNumber = $this->tryGetValue($attributes, 'parentNumber');
         $comments = $this->commentModel->getComments($category, $parentNumber);
-        foreach ($comments as &$comment) {
+        foreach ($comments['body'] as &$comment) {
             $comment['USERNAME'] = $this->userModel->getUserName($comment['EMAIL']);
         }
         return $comments;
