@@ -4,14 +4,14 @@ import {ContentUnitPreview} from "../Types/Content/ContentUnitPreview";
 
 export default async function GetPreviews(pageParameters: PageParameters): Promise<ContentUnitPreview[]> {
     const serverConnection = new ServerConnection();
-    const params = {
+    const attributes = {
         pageSize: pageParameters.pageSize,
         page: pageParameters.currentPage,
         category: pageParameters.getCategoryName()
     };
 
     //Use response.data.code for SQL request code and response.data.requesterror for error details
-    const {data} = await serverConnection.SendPostRequestPromise("getPreviews", params);
+    const {data} = await serverConnection.SendPostRequestPromise("getPreviews", attributes);
 
     const previews: ContentUnitPreview[] = [];
     data.body.forEach((rawContentUnit: any) =>
