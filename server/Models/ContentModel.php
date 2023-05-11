@@ -111,19 +111,4 @@ class ContentModel extends BaseModel
         //Should request LAST_INSERT_ID();
         return $request->fetch(PDO::FETCH_NAMED)['LAST_INSERT_ID()'];
     }
-
-    protected function executeRequest($query): array
-    {
-        $response = array('result' => 'success');
-        $request = $this->DBConn->prepare($query);
-        try {
-            $request->execute();
-        } catch (Throwable $e) {
-            $response['requesterror'] = $e;
-            $response['result'] = 'failed';
-        }
-        $response['body'] = $request->fetchAll(PDO::FETCH_NAMED);
-        $response['code'] = $request->errorCode();
-        return $response;
-    }
 }
