@@ -35,8 +35,22 @@ class CommentModel extends BaseModel
         $response = $this->executeRequest($selectQueryObject->getQuery());
 
         $lastCommentID = $response['body'][0]['LAST_INSERT_ID()'];
-        $comment = $this->getComment($category, $lastCommentID);
-        return $comment;
+        return $this->getComment($category, $lastCommentID);
+    }
+
+    public function updateComment(string $category, string $content, int $commentNumber): array
+    {
+        $tableName = self::$tablesForCategories[$category];
+        $content = urlencode($content);
+
+        $updateQueryObject = new UpdateQueryBuilder();
+        $updateQueryObject->
+        update($tableName, [$this::ENTRY_CONTENT], [$content])->
+        where([$this::ENTRY_ID, '=', $commentNumber]);
+
+        $this->executeRequest($updateQueryObject->getQuery());
+
+        return $this->getComment($category, $commentNumber);
     }
 
     public function getComment(string $category, int $commentNumber): array

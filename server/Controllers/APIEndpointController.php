@@ -62,6 +62,9 @@ class APIEndpointController
                 case 'addComment':
                     $this->respond($controller->addComment($attributes));
                     break;
+                case 'updateComment':
+                    $this->respond($controller->updateComment($attributes));
+                    break;
                 case 'deleteComment':
                     $this->respond($controller->deleteComment($attributes));
                     break;

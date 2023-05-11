@@ -24,6 +24,17 @@ class CommentController extends BaseController
         return $comment;
     }
 
+    public function updateComment(array $attributes): array
+    {
+        $category = $this->tryGetValue($attributes, 'category');
+        $content = $this->tryGetValue($attributes, 'content');
+        $commentID = $this->tryGetValue($attributes, 'commentID');
+
+        $comment = $this->commentModel->updateComment($category, $content, $commentID);
+        $comment['body'][0]['USERNAME'] = $this->userModel->getUserName($comment['body'][0]['EMAIL']);
+        return $comment;
+    }
+
     public function getComments(array $attributes): array
     {
         $category = $this->tryGetValue($attributes, 'category');
