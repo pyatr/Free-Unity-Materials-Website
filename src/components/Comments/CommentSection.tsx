@@ -8,7 +8,7 @@ import {UserCommentProps} from "../../utils/Types/UserCommentProps";
 import {sideButtonStyle} from "../MainPage/MainContent";
 import {SendComment} from "../../utils/Comments/SendComment";
 import {GetCommentCount} from "../../utils/Comments/GetCommentCount";
-import DeleteComment from "../../utils/Comments/DeleteComment";
+import {DeleteComment} from "../../utils/Comments/DeleteComment";
 
 export function CommentSection({requestedContentID, requestedContentCategory}: ContentUnitRequestData) {
     const [userComment, setUserComment] = useState("");

@@ -1,7 +1,5 @@
 import React, {Fragment} from "react";
 import {Box, Button, Grid, Typography} from "@mui/material";
-import {UserCommentProps} from "../../utils/Types/UserCommentProps";
-import DeleteComment from "../../utils/Comments/DeleteComment";
 import {IsUserAdmin, GetUserEmail} from "../../utils/Login";
 
 const editButtonStyle = {
