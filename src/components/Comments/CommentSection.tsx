@@ -9,15 +9,12 @@ import {sideButtonStyle} from "../MainPage/MainContent";
 import {SendComment} from "../../utils/Comments/SendComment";
 import {GetCommentCount} from "../../utils/Comments/GetCommentCount";
 import {DeleteComment} from "../../utils/Comments/DeleteComment";
+import {UpdateComment} from "../../utils/Comments/UpdateComment";
 
 export function CommentSection({requestedContentID, requestedContentCategory}: ContentUnitRequestData) {
     const [userComment, setUserComment] = useState("");
     const [comments, setComments] = useState(Array<UserCommentProps>);
     const [commentCount, setCommentCount] = useState(-1);
-
-    const [commentsPage, setCommentPage] = useState(0);
-
-    const commentsPerPage = 10;
 
     const onCommentInputChange = (event: any) => {
         setUserComment(event.target.value);
@@ -30,7 +27,22 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
         });
     };
 
-    const editComment = async (commentID: number) => console.log("Will edit " + commentID);
+    const editComment = async (currentCommentID: number, newComment: string) => {
+        UpdateComment(currentCommentID, requestedContentCategory, newComment).then((updatedComment: UserCommentProps) => {
+            let oldCommentIndex = -1;
+            for (let i = 0; i < comments.length; i++) {
+                if (currentCommentID === comments[i].commentID) {
+                    oldCommentIndex = i;
+                    break;
+                }
+            }
+            if (oldCommentIndex != -1) {
+                let updatedComments = [...comments];
+                updatedComments[oldCommentIndex] = updatedComment;
+                setComments(updatedComments);
+            }
+        });
+    }
 
     const sendComment = async () => {
         SendComment(requestedContentID, requestedContentCategory, userComment).then((newComment: UserCommentProps) => {
@@ -40,22 +52,25 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
         });
     }
 
-    useEffect(() => {
-            if (commentCount == -1) {
-                //TODO: Request limited amount of comments
-                GetComments(requestedContentID, requestedContentCategory).then((comments: Array<UserCommentProps>) => {
-                        setComments(comments);
-                    }
-                );
-            }
+    const loadComments = () => {
+        if (commentCount == -1) {
+            //TODO: Request limited amount of comments
+            GetComments(requestedContentID, requestedContentCategory).then((comments: Array<UserCommentProps>) => {
+                    setComments(comments);
+                }
+            );
         }
-    );
+    }
 
-    useEffect(() => {
+    const loadCommentCount = () => {
         if (commentCount == -1) {
             GetCommentCount(requestedContentID, requestedContentCategory).then((commentCount: number) => setCommentCount(commentCount));
         }
-    });
+    }
+
+    useEffect(() => loadComments());
+
+    useEffect(() => loadCommentCount());
 
     const isLoggedIn = IsLoggedIn();
 
@@ -73,7 +88,7 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
                 <Typography variant="h6" marginTop="16px" marginBottom="16px">Nobody commented yet</Typography> :
                 <Fragment>
                     <Typography color="gray">{commentCount} comments</Typography>
-                    <Grid gap="8px" border="1px solid" borderColor="black" display="grid" padding="4px"
+                    <Grid gap="8px" display="grid" padding="4px"
                           marginBottom="16px">
                         {preparedComments}
                     </Grid>
@@ -82,6 +97,7 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
                 <TextField onChange={onCommentInputChange}
                            label={"Add comment"}
                            value={userComment}
+                           multiline={true}
                            style={{marginTop: "16px", marginBottom: "16px"}}/> :
                 <Fragment/>}
             {userComment != "" ?
