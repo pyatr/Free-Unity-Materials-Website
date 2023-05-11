@@ -2,12 +2,13 @@ import React, {Fragment, useEffect, useState} from "react";
 import {Button, Grid, TextField, Typography} from "@mui/material";
 import {IsLoggedIn} from "../../utils/Login";
 import {UserComment} from "./UserComment";
-import {GetComments} from "../../utils/ContentInteraction/GetComments";
+import {GetComments} from "../../utils/Comments/GetComments";
 import {ContentUnitRequestData} from "../../utils/Types/Content/ContentUnitRequestData";
 import {UserCommentProps} from "../../utils/Types/UserCommentProps";
 import {sideButtonStyle} from "../MainPage/MainContent";
-import {SendComment} from "../../utils/ContentInteraction/SendComment";
-import {GetCommentCount} from "../../utils/ContentInteraction/GetCommentCount";
+import {SendComment} from "../../utils/Comments/SendComment";
+import {GetCommentCount} from "../../utils/Comments/GetCommentCount";
+import DeleteComment from "../../utils/Comments/DeleteComment";
 
 export function CommentSection({requestedContentID, requestedContentCategory}: ContentUnitRequestData) {
     const [userComment, setUserComment] = useState("");
@@ -22,15 +23,20 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
         setUserComment(event.target.value);
     }
 
+    const deleteComment = async (commentIDtoDelete: number) => {
+        return DeleteComment(commentIDtoDelete, requestedContentCategory).then(() => {
+            setComments(comments.filter(comment => comment.commentID !== commentIDtoDelete));
+            setCommentCount(comments.length - 1);
+        });
+    };
+
+    const editComment = async (commentID: number) => console.log("Will edit " + commentID);
+
     const sendComment = async () => {
-        SendComment(requestedContentID, requestedContentCategory, userComment).then((response: string) => {
-            if (response === 'success') {
-                setUserComment("");
-                setComments([]);
-                setCommentCount(-1);
-            } else {
-                console.log("Failed to send comment");
-            }
+        SendComment(requestedContentID, requestedContentCategory, userComment).then((newComment: UserCommentProps) => {
+            setUserComment("");
+            setComments(comments.concat(newComment));
+            setCommentCount(comments.length + 1);
         });
     }
 
@@ -56,7 +62,10 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
     const preparedComments = comments.map(comment => <UserComment userEmail={comment.userEmail}
                                                                   userName={comment.userName}
                                                                   content={comment.content}
-                                                                  creationDate={comment.creationDate}/>);
+                                                                  creationDate={comment.creationDate}
+                                                                  commentID={comment.commentID}
+                                                                  onEdit={editComment}
+                                                                  onDelete={deleteComment}/>);
 
     return (
         <Grid marginTop="16px" marginBottom="16px" display="grid">
@@ -72,7 +81,6 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
             {isLoggedIn ?
                 <TextField onChange={onCommentInputChange}
                            label={"Add comment"}
-                           defaultValue={userComment}
                            value={userComment}
                            style={{marginTop: "16px", marginBottom: "16px"}}/> :
                 <Fragment/>}

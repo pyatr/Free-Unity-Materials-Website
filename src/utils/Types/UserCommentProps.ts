@@ -2,5 +2,6 @@ export type UserCommentProps = {
     userEmail: string,
     userName: string,
     content: string,
-    creationDate: string
+    creationDate: string,
+    commentID: number
 }

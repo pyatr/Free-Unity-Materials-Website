@@ -77,6 +77,10 @@ export function CanUserEditContent(): boolean {
     return editorRoles.includes(userRole);
 }
 
+export function IsUserAdmin(): boolean {
+    return sessionStorage.getItem("userRole") == "ADMIN";
+}
+
 export function ClearUserData() {
     const cookies = new Cookies();
     cookies.remove("userLogin");
