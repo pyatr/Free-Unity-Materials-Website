@@ -2,7 +2,7 @@ import React, {Fragment, useState} from "react";
 import {Box, Grid, Typography} from "@mui/material";
 import PixelSummForCSS from "../../utils/PixelSummForCSS";
 import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
-import {StripHTMLFromString} from "../../utils/StripHTMLFromString";
+import {StripHTMLFromString} from "../../utils/Strings/StripHTMLFromString";
 import {CanUserEditContent} from "../../utils/Login";
 import {Delete} from "@mui/icons-material";
 import {Create} from "@mui/icons-material";

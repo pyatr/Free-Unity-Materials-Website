@@ -1,6 +1,6 @@
 import {Button, Grid} from "@mui/material";
 import React from "react";
-import {StringArrayToString} from "../../utils/StringArrayToString";
+import {StringArrayToString} from "../../utils/Strings/StringArrayToString";
 import {ContentUnitEditCommonProps} from "./ContentUnitEditForm";
 
 export default function ContentCategorySelectionMenu({

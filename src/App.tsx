@@ -10,6 +10,7 @@ import NonExistentPage from "./pages/NonExistent/NonExistentPage";
 import MainContent from "./components/MainPage/MainContent";
 import {IsLoggedIn, TryCookieLogin} from "./utils/Login";
 import {useEffect, useState} from "react";
+import {RegisterPage} from "./pages/Register/RegisterPage";
 
 export type ContentProps = {
     mainElement: string
@@ -42,7 +43,7 @@ export default function App() {
             <SiteAppBar/>
             <Routes>
                 <Route path="login" element={<LoginPage/>}/>
-                <Route path="register" element={<LoginPage/>}/>
+                <Route path="register" element={<RegisterPage/>}/>
                 <Route path="articles" element={<MainContent mainElement={articles}/>}/>
                 <Route path="scripts" element={<MainContent mainElement={scripts}/>}/>
                 <Route path="/" element={<MainContent mainElement={assets}/>}/>
