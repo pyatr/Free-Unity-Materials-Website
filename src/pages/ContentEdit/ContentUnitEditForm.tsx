@@ -1,12 +1,9 @@
 import React, {Fragment, useEffect, useState} from "react";
 import {Grid, Typography} from "@mui/material";
-import TextField from "@mui/material/TextField";
 
 import {AxiosResponse} from "axios/index";
 
-import ContentFormInteractionButtons from "../../pages/ContentEdit/ContentFormInteractionButtons";
-import {SetCategorySelection} from "../../pages/ContentEdit/ContentCategorySelectionMenu";
-import FileSelection from "./FileSelection";
+import ContentEditFormInteractionButtons from "./ContentEditFormInteractionButtons";
 
 import {ContentUnitRequestData} from "../../utils/Types/Content/ContentUnitRequestData";
 import {ContentUnit, GetDummyContentUnit} from "../../utils/Types/Content/ContentUnit";
@@ -20,25 +17,24 @@ import ServerConnection from "../../utils/ServerConnection";
 import {GoToHomePage} from "../../utils/GoToHomePage";
 import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
 
-import {ImageInEditFormGallery} from "../../components/ImageGallery/ImageInEditFormGallery";
-import ImageGallery from "../../components/ImageGallery/ImageGallery";
-import EditFileList from "../../components/DownloadLinks/EditFileList";
 import ErrorNotification from "../../components/ErrorNotification";
-import {ContentCategorySelection} from "../../pages/ContentEdit/ContentCategorySelection";
+import {ContentUnitEditCategory} from "./ContentUnitEditCategory";
 import MessageBoxYesNo from "../../components/MessageBoxes/MessageBoxYesNo";
-import {GalleryFullView} from "../../components/ImageGallery/GalleryFullView";
+import {ContentUnitEditImages} from "./ContentUnitEditImages";
+import ContentUnitEditFiles from "./ContentUnitEditFiles";
+import {ContentUnitEditTitle} from "./ContentUnitEditTitle";
+import {ContentUnitEditBody} from "./ContentUnitEditBody";
 
-const bodyStyle = {
-    width: '100%',
-    height: '100%',
-    wordBreak: 'break-word',
-    display: 'grid'
+export type ContentUnitEditCommonProps = {
+    setContentUnitProperty: Function,
+    setErrorMessage: Function,
+    contentUnitState: ContentUnit
 }
 
 export default function ContentUnitEditForm({requestedContentID, requestedContentCategory}: ContentUnitRequestData) {
     const [errorMessage, setErrorMessage] = useState("");
-    const [newFiles, setNewFiles] = useState(Array<FileNameBlobPair>);
-    const [filesToDelete, setFileDeletionState] = useState(Array<string>);
+    const [newFileLinks, setNewFileLinks] = useState<FileNameBlobPair[]>([]);
+    const [linksToFilesMarkedForDeletion, setFileDeletionState] = useState<string[]>([]);
     const [contentUnitState, setContentUnitState] = useState<ContentUnit>(GetDummyContentUnit());
     const [deleteWindowOpen, setDeleteWindowStatus] = useState(false);
 
@@ -55,50 +51,9 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
         return (<Fragment/>);
     }
 
-    const pageTitle = contentUnitState.contentID == -1 ? "Create new " + requestedContentCategory : "Edit " + contentUnitState.title;
+    const editFormTitle = contentUnitState.contentID == -1 ? "Create new " + requestedContentCategory : "Edit " + contentUnitState.title;
 
-    const titleLimit = 128;
-    const maxImageCount = 20;
-    const maxFileCount = 50;
-    //TODO: add max filesize. file.size / 1000 is size in kilobytes
-
-    const uploadImages = async (e: any) => {
-        let files: FileList = e.target.files as FileList;
-        if (contentUnitState.galleryImageLinks.length + files.length > maxImageCount) {
-            e.target.value = null;
-            setErrorMessage("Too many images! Max: " + maxImageCount);
-            return;
-        }
-        let blobs: string[] = [];
-        //FileList has no foreach
-        for (let i = 0; i < files.length; i++) {
-            blobs.push(URL.createObjectURL(files[i]));
-        }
-        //On some browsers it can delete uploaded files even if they were stored somewhere else
-        e.target.value = null;
-        setGalleryImageLinks(contentUnitState.galleryImageLinks.concat(blobs));
-    }
-
-    const uploadFiles = async (e: any) => {
-        let files: FileList = e.target.files as FileList;
-        if (contentUnitState.fileLinks.length + files.length > maxFileCount) {
-            e.target.value = null;
-            setErrorMessage("Too many files! Max: " + maxFileCount);
-            return;
-        }
-
-        let blobs: FileNameBlobPair[] = [];
-        for (let i = 0; i < files.length; i++) {
-            blobs.push({
-                fileName: files[i].name,
-                blobLink: URL.createObjectURL(files[i])
-            });
-        }
-        e.target.value = null;
-        setNewFiles(newFiles.concat(blobs));
-    }
-
-    const changeContentUnitProperty = (propertyName: string, propertyValue: string | string[] | number) => {
+    const setContentUnitProperty = (propertyName: string, propertyValue: string | string[] | number) => {
         let newContentUnit: any = {
             contentID: contentUnitState.contentID,
             title: contentUnitState.title,
@@ -112,30 +67,13 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
         setContentUnitState(newContentUnit);
     }
 
-    const setTitle = (event: any) => {
-        changeContentUnitProperty("title", event.target.value);
-    }
-
-    const setBody = (event: any) => {
-        changeContentUnitProperty("body", event.target.value);
-    }
-
-    const setCategorySelection = (categoryToAddOrDelete: string) => {
-        let newCategorySelection = SetCategorySelection(categoryToAddOrDelete, contentUnitState.categories);
-        changeContentUnitProperty("categories", newCategorySelection);
-    }
-
-    const setGalleryImageLinks = (newGalleryImageLinks: string[]) => {
-        changeContentUnitProperty("galleryImageLinks", newGalleryImageLinks);
-    }
-
     const openDeleteWindow = () => setDeleteWindowStatus(true)
 
     const closeDeleteWindow = () => setDeleteWindowStatus(false)
 
     const confirmDelete = () => DeleteContent(contentUnitState.contentID, requestedContentCategory).then(() => GoToHomePage());
 
-    const submitContent = async () => {
+    const checkContentValidity = () => {
         let errorMessage: string = "";
         if (contentUnitState.title == "") {
             errorMessage += "Title is not defined\n";
@@ -150,18 +88,24 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
 
         if (errorMessage != "") {
             setErrorMessage(errorMessage);
-            return;
+            return false;
         }
+        return true;
+    }
+
+    const submitContent = async () => {
+        if (!checkContentValidity())
+            return;
 
         const galleryImagesBase64: string[] = await MultipleFilesToBase64(contentUnitState.galleryImageLinks.reverse());
-        const fileNames: string[] = GetFileNamesFromPairs(newFiles);
-        const filesBase64: string[] = await MultipleFilesToBase64(GetBlobsFromPairs(newFiles));
+        const fileNames: string[] = GetFileNamesFromPairs(newFileLinks);
+        const filesBase64: string[] = await MultipleFilesToBase64(GetBlobsFromPairs(newFileLinks));
         let filesArray = [];
         for (let i = 0; i < fileNames.length; i++) {
             filesArray.push({fileName: fileNames[i], fileContent: filesBase64[i]});
         }
         let filesToDeleteNumbers: string[] = [];
-        filesToDelete.forEach((fileLink: string) => {
+        linksToFilesMarkedForDeletion.forEach((fileLink: string) => {
             let splitLink = fileLink.split('/');
             filesToDeleteNumbers.push(splitLink[splitLink.length - 2]);
         });
@@ -185,25 +129,6 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
         });
     }
 
-    const resolveFileDeletionState = (fileLink: string) => {
-        if (filesToDelete.includes(fileLink)) {
-            setFileDeletionState(filesToDelete.filter(link => link != fileLink))
-        } else {
-            const isNewFile = fileLink.startsWith("blob:");
-            if (isNewFile) {
-                setNewFiles(newFiles.filter(newFile => newFile.blobLink != fileLink))
-            } else {
-                setFileDeletionState(filesToDelete.concat(fileLink));
-            }
-        }
-    }
-
-    const mapImage = (currentLink: string, onClick: Function) =>
-        (<ImageInEditFormGallery
-            imageLink={currentLink}
-            onClick={onClick}
-            onDeleteClick={() => setGalleryImageLinks(contentUnitState.galleryImageLinks.filter(link => link != currentLink))}/>);
-
     return (
         <Grid style={{display: "grid", gap: "32px"}}>
             {/*Content grid*/}
@@ -216,36 +141,34 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
                         parentWidth={"512px"}
                         parentHeight={"512px"}/> :
                     <Fragment/>}
-                <Typography variant="h6">{pageTitle}</Typography>
+                <Typography variant="h6">{editFormTitle}</Typography>
                 <ErrorNotification message={errorMessage} onDismiss={() => setErrorMessage("")}/>
-                <ImageGallery imageLinks={contentUnitState.galleryImageLinks} imageMapper={mapImage}/>
-                <FileSelection title={"Add images to gallery"}
-                               inputType={"file"}
-                               multiple={true}
-                               loadImageFunction={uploadImages}/>
-                <EditFileList links={contentUnitState.fileLinks}
-                              newFiles={newFiles}
-                              onDeletionMarked={resolveFileDeletionState}/>
-                <FileSelection title={"Attach files"}
-                               inputType={"file"}
-                               multiple={true}
-                               loadImageFunction={uploadFiles}/>
-                <TextField onChange={setTitle}
-                           label={"Title (" + titleLimit + " characters)"}
-                           inputProps={{maxLength: titleLimit}}
-                           defaultValue={contentUnitState.title}
-                           style={{marginTop: "16px", marginBottom: "16px"}}/>
-                <ContentCategorySelection contentUnitCategories={contentUnitState.categories}
-                                          onCategorySelected={setCategorySelection}/>
-                <TextField onChange={setBody}
-                           label="Content"
-                           multiline={true}
-                           sx={bodyStyle}
-                           defaultValue={contentUnitState.body}
-                           style={{marginTop: "16px", marginBottom: "16px"}}/>
+                <ContentUnitEditImages setContentUnitProperty={setContentUnitProperty}
+                                       setErrorMessage={setErrorMessage}
+                                       contentUnitState={contentUnitState}/>
+
+                <ContentUnitEditFiles setContentUnitProperty={setContentUnitProperty}
+                                      setErrorMessage={setErrorMessage}
+                                      contentUnitState={contentUnitState}
+                                      newFileLinks={newFileLinks}
+                                      linksToFilesMarkedForDeletion={linksToFilesMarkedForDeletion}
+                                      setNewFileLinks={setNewFileLinks}
+                                      setFileDeletionState={setFileDeletionState}/>
+
+                <ContentUnitEditTitle setContentUnitProperty={setContentUnitProperty}
+                                      setErrorMessage={setErrorMessage}
+                                      contentUnitState={contentUnitState}/>
+
+                <ContentUnitEditCategory setContentUnitProperty={setContentUnitProperty}
+                                         setErrorMessage={setErrorMessage}
+                                         contentUnitState={contentUnitState}/>
+
+                <ContentUnitEditBody setContentUnitProperty={setContentUnitProperty}
+                                     setErrorMessage={setErrorMessage}
+                                     contentUnitState={contentUnitState}/>
             </Grid>
             {/*Bottom buttons grid*/}
-            <ContentFormInteractionButtons
+            <ContentEditFormInteractionButtons
                 onSave={submitContent}
                 onCancel={() => GoToHomePage()}
                 onDelete={() => openDeleteWindow()}

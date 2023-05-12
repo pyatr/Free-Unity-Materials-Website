@@ -10,7 +10,7 @@ type ContentFormInteractionProps = {
     enableDelete: boolean
 }
 
-export default function ContentFormInteractionButtons({onSave, onCancel, onDelete, enableDelete}: ContentFormInteractionProps) {
+export default function ContentEditFormInteractionButtons({onSave, onCancel, onDelete, enableDelete}: ContentFormInteractionProps) {
     return (
         <Grid
             style={{display: "flex", gap: "16px", width: "100%", justifyContent: "space-between"}}>

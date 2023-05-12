@@ -1,7 +1,8 @@
 import {Grid, Typography} from "@mui/material";
 import React, {Fragment, useState} from "react";
 import {AddCircle, AddCircleOutline} from "@mui/icons-material";
-import ContentCategorySelectionMenu, {CategorySelectionProps} from "../../pages/ContentEdit/ContentCategorySelectionMenu";
+import ContentCategorySelectionMenu from "../../pages/ContentEdit/ContentCategorySelectionMenu";
+import {ContentUnitEditCommonProps} from "./ContentUnitEditForm";
 
 const categoryButtonStyle = {
     cursor: 'pointer',
@@ -11,7 +12,11 @@ const categoryButtonStyle = {
     width: "24px"
 }
 
-export function ContentCategorySelection({contentUnitCategories, onCategorySelected}: CategorySelectionProps) {
+export function ContentUnitEditCategory({
+                                             setContentUnitProperty,
+                                             setErrorMessage,
+                                             contentUnitState
+                                         }: ContentUnitEditCommonProps) {
     //Displaying category selection menu
     const [isCategorySelectionDisplayed, setCategorySelectionDisplay] = useState(false);
 
@@ -25,17 +30,18 @@ export function ContentCategorySelection({contentUnitCategories, onCategorySelec
                 height: "24px",
                 maxHeight: "24px"
             }}>
-            {contentUnitCategories == "" ?
+            {contentUnitState.categories == "" ?
                 <Typography variant="subtitle2" fontStyle="italic">Choose categories</Typography> :
-                <Typography variant="subtitle2">{contentUnitCategories}</Typography>}
+                <Typography variant="subtitle2">{contentUnitState.categories}</Typography>}
             {isCategorySelectionDisplayed ?
                 <Fragment>
                     <AddCircle
                         style={categoryButtonStyle}
                         onClick={() => setCategorySelectionDisplay(!isCategorySelectionDisplayed)}/>
                     <ContentCategorySelectionMenu
-                        contentUnitCategories={contentUnitCategories}
-                        onCategorySelected={onCategorySelected}/>
+                        setContentUnitProperty={setContentUnitProperty}
+                        setErrorMessage={setErrorMessage}
+                        contentUnitState={contentUnitState}/>
                 </Fragment> :
                 <AddCircleOutline
                     style={categoryButtonStyle}

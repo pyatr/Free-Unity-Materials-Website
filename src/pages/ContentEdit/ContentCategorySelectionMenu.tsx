@@ -1,21 +1,26 @@
 import {Button, Grid} from "@mui/material";
 import React from "react";
 import {StringArrayToString} from "../../utils/StringArrayToString";
+import {ContentUnitEditCommonProps} from "./ContentUnitEditForm";
 
-export type CategorySelectionProps = {
-    contentUnitCategories: string,
-    onCategorySelected: Function
-}
+export default function ContentCategorySelectionMenu({
+                                                         setContentUnitProperty,
+                                                         setErrorMessage,
+                                                         contentUnitState
+                                                     }: ContentUnitEditCommonProps) {
+    const setCategorySelection = (categoryToAddOrDelete: string) => {
+        let newCategorySelection = SetCategorySelection(categoryToAddOrDelete, contentUnitState.categories);
+        setContentUnitProperty("categories", newCategorySelection);
+    }
 
-export default function ContentCategorySelectionMenu({contentUnitCategories, onCategorySelected}: CategorySelectionProps) {
     const selectedButtonStyle = {color: "white", background: "black"};
     const nonSelectedButtonStyle = {color: "black", background: "white"};
     const availableCategories = ["Scripts", "Graphics", "Models", "UI", "Shaders", "Text"];
-    const splitCategories = contentUnitCategories.split(", ");
+    const splitCategories = contentUnitState.categories.split(", ");
     let categorySelectionButtons = availableCategories.map((currentCategory) =>
         <Button
             style={splitCategories.includes(currentCategory) ? selectedButtonStyle : nonSelectedButtonStyle}
-            onClick={() => onCategorySelected(currentCategory)}>
+            onClick={() => setCategorySelection(currentCategory)}>
             {currentCategory}
         </Button>);
     return (
