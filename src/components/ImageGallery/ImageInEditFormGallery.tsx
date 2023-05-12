@@ -1,7 +1,12 @@
 import React, {Fragment, useState} from "react";
 import {Box, Grid} from "@mui/material";
 import {Delete} from "@mui/icons-material";
-import {ImageInGallery} from "../../utils/Types/ImageInGallery";
+
+type ImageInEditGallery = {
+    imageLink: string,
+    onClick: Function,
+    onDeleteClick: Function
+}
 
 const imageFrameStyle = {
     border: "2px solid",
@@ -14,7 +19,8 @@ const imageFrameStyle = {
     minHeight: "300px",
     boxSizing: "unset",
     display: "grid",
-    position: "relative"
+    position: "relative",
+    cursor: "pointer"
 }
 
 const editButtonFrameStyle = {
@@ -26,16 +32,12 @@ const editButtonFrameStyle = {
     cursor: "pointer"
 }
 
-export function ImageInEditFormGallery({imageLink, onDeleteClick}: ImageInGallery) {
+export function ImageInEditFormGallery({imageLink, onClick, onDeleteClick}: ImageInEditGallery) {
     const [isHovering, setHovering] = useState(false);
     return (
         <Grid sx={imageFrameStyle}
-              onMouseEnter={() => {
-                  setHovering(true);
-              }}
-              onMouseLeave={() => {
-                  setHovering(false);
-              }}>
+              onMouseEnter={() => setHovering(true)}
+              onMouseLeave={() => setHovering(false)}>
             {isHovering ?
                 <Grid sx={{position: "absolute", padding: "16px", display: "flex"}}>
                     <Box sx={editButtonFrameStyle}>
@@ -44,7 +46,6 @@ export function ImageInEditFormGallery({imageLink, onDeleteClick}: ImageInGaller
                 </Grid> :
                 <Fragment/>
             }
-            <img src={imageLink}/>
+            <img src={imageLink} onClick={() => onClick()}/>
         </Grid>);
-    //TODO: add full screen image display on image click
 }

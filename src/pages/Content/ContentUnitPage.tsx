@@ -14,6 +14,7 @@ import {CommentSection} from "../../components/Comments/CommentSection";
 import ContentUnitEditorButtons from "./ContentUnitEditorButtons";
 import {GetContentUnit} from "../../utils/ContentInteraction/GetContentUnit";
 import MessageBoxYesNo from "../../components/MessageBoxes/MessageBoxYesNo";
+import {GalleryFullView} from "../../components/ImageGallery/GalleryFullView";
 
 const itemContentDisplay = {
     width: '100%',
@@ -42,14 +43,16 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
 
     window.scrollTo(0, 0);
 
-    const openDeleteWindow = () => setDeleteWindowStatus(true)
+    const openDeleteWindow = () => setDeleteWindowStatus(true);
 
-    const closeDeleteWindow = () => setDeleteWindowStatus(false)
+    const closeDeleteWindow = () => setDeleteWindowStatus(false);
 
     const confirmDelete = () => DeleteContent(contentUnit.contentID, requestedContentCategory).then(() => GoToHomePage());
 
-    const images = contentUnit.galleryImageLinks.map((link: string) =>
-        (<Grid key={link} sx={imageBoxStyle}> <img src={link}/> </Grid>));
+    const mapImage = (currentLink: string, onClick: Function) =>
+        (<Grid key={currentLink} sx={imageBoxStyle}>
+            <img src={currentLink} onClick={() => onClick()}/>
+        </Grid>);
 
     let contentBody = parse(contentUnit.body);
 
@@ -67,7 +70,7 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
             {contentUnit.categories != "" ?
                 <Typography variant="subtitle2" color="grey">{contentUnit.categories}</Typography> :
                 <Fragment/>}
-            <ImageGallery images={images}/>
+            <ImageGallery imageLinks={contentUnit.galleryImageLinks} imageMapper={mapImage}/>
             <DownloadLinksList links={contentUnit.fileLinks}/>
             <Typography sx={itemContentDisplay} variant="body1">{contentBody}</Typography>
             <ContentUnitEditorButtons contentID={contentUnit.contentID} onDelete={openDeleteWindow}/>

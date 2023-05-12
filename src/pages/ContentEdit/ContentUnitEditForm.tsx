@@ -26,6 +26,7 @@ import EditFileList from "../../components/DownloadLinks/EditFileList";
 import ErrorNotification from "../../components/ErrorNotification";
 import {ContentCategorySelection} from "../../pages/ContentEdit/ContentCategorySelection";
 import MessageBoxYesNo from "../../components/MessageBoxes/MessageBoxYesNo";
+import {GalleryFullView} from "../../components/ImageGallery/GalleryFullView";
 
 const bodyStyle = {
     width: '100%',
@@ -197,9 +198,10 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
         }
     }
 
-    const images = contentUnitState.galleryImageLinks.map((currentLink: string) =>
-        <ImageInEditFormGallery
+    const mapImage = (currentLink: string, onClick: Function) =>
+        (<ImageInEditFormGallery
             imageLink={currentLink}
+            onClick={onClick}
             onDeleteClick={() => setGalleryImageLinks(contentUnitState.galleryImageLinks.filter(link => link != currentLink))}/>);
 
     return (
@@ -216,7 +218,7 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
                     <Fragment/>}
                 <Typography variant="h6">{pageTitle}</Typography>
                 <ErrorNotification message={errorMessage} onDismiss={() => setErrorMessage("")}/>
-                <ImageGallery images={images}/>
+                <ImageGallery imageLinks={contentUnitState.galleryImageLinks} imageMapper={mapImage}/>
                 <FileSelection title={"Add images to gallery"}
                                inputType={"file"}
                                multiple={true}
