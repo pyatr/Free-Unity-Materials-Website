@@ -17,13 +17,14 @@ class UserModel extends BaseModel
     private const ENTRY_EMAIL = 'EMAIL';
     private const ENTRY_STATUS = 'STATUS';
 
-    public function doesUserExist(string $key): bool
+    public function doesUserExist(string $email): bool
     {
         $selectQueryObject = new SelectQueryBuilder();
         $selectQueryObject->
         select(["COUNT(1)"])->
         from($this::TABLE_USERS)->
-        where(['unique_key', '=', $key]);
+        where(['EMAIL', '=', "'$email'"]);
+        ServerLogger::Log($selectQueryObject->getQuery());
         $request = $this->DBConn->prepare($selectQueryObject->getQuery());
         $request->execute();
         return $request->fetch(PDO::FETCH_NAMED)[0] > 0;
@@ -53,7 +54,7 @@ class UserModel extends BaseModel
         return $this->getUserAttribute($email, $this::ENTRY_STATUS);
     }
 
-    public function createNewUser(string $newName, string $password, string $email): void
+    public function createNewUser(string $newName, string $password, string $email): bool
     {
         $email = urlencode($email);
 
@@ -70,6 +71,9 @@ class UserModel extends BaseModel
                 [$newName, $hashedPassword, $email, $this::ROLE_USER]
             );
             $this->DBConn->query($insertQueryObject->getQuery());
+            //TODO: Check if insert was successful
+            return true;
         }
+        return false;
     }
 }

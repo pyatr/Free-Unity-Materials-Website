@@ -23,7 +23,9 @@ class UserController extends BaseController
         $email = $this->tryGetValue($attributes, 'email');
         $password = $this->tryGetValue($attributes, 'password');
         if ($email != null && $password != null) {
-            $loginStatus = $this->doesUserExist($email, $password);
+            $email = urlencode($email);
+            $password = hash("md5", urlencode($password));
+            $loginStatus = $this->doesUserWithPasswordExist($email, $password);
             if ($loginStatus) {
                 //Should hash with User IP
                 $hashedData = openssl_encrypt(
@@ -67,7 +69,7 @@ class UserController extends BaseController
             $decoded = json_decode($dehashed);
             $email = $decoded[0];
             $password = $decoded[1];
-            $loginStatus = $this->doesUserExist($email, $password);
+            $loginStatus = $this->doesUserWithPasswordExist($email, $password);
             if ($loginStatus) {
                 $response['loginStatus'] = 'success';
                 $response['userName'] = $this->userModel->getUserName($email);
@@ -78,12 +80,29 @@ class UserController extends BaseController
         return $response;
     }
 
+    public function createNewUser($attributes)
+    {
+        $username = $this->tryGetValue($attributes, 'username');
+        $password = $this->tryGetValue($attributes, 'password');
+        $email = $this->tryGetValue($attributes, 'email');
+        if ($this->userModel->createNewUser($username, $password, $email)) {
+            return $this->tryLogin($attributes);
+        }
+    }
+
     private function getUserRole(string $email): string
     {
         return $this->userModel->getUserRole($email);
     }
 
-    private function doesUserExist(string $email, string $password): bool
+    private function doesUserExist(string $email): bool
+    {
+        return $this->userModel->elementWithAttributeValuesExists(
+            'USERS', ['EMAIL'], [$email]
+        );
+    }
+
+    private function doesUserWithPasswordExist(string $email, string $password): bool
     {
         return $this->userModel->elementWithAttributeValuesExists(
             'USERS',

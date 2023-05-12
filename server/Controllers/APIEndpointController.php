@@ -19,6 +19,7 @@ class APIEndpointController
             $commentControllerName = "Server\\CommentController";
 
             $controllers = [
+                'createNewUser' => $userControllerName,
                 'login' => $userControllerName,
                 'loginCookie' => $userControllerName,
 
@@ -38,6 +39,9 @@ class APIEndpointController
             $reflection = new \ReflectionClass($controllers[$request]);
             $controller = $reflection->newInstance();
             switch ($request) {
+                case 'createNewUser':
+                    $this->respond($controller->createNewUser($attributes));
+                    break;
                 case 'login':
                     $this->respond($controller->tryLogin($attributes));
                     break;
