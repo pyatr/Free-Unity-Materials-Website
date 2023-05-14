@@ -22,23 +22,27 @@ class UserController extends BaseController
         $response = ['loginStatus' => 'failed'];
         $email = $this->tryGetValue($attributes, 'email');
         $password = $this->tryGetValue($attributes, 'password');
-        if ($email != null && $password != null) {
-            $email = urlencode($email);
-            $password = hash("md5", urlencode($password));
-            $loginStatus = $this->doesUserWithPasswordExist($email, $password);
-            if ($loginStatus) {
-                //Should hash with User IP
-                $hashedData = openssl_encrypt(
-                    json_encode([$email, $password]),
-                    self::CIPHERING_METHOD,
-                    $this->cipherCode,
-                    OPENSSL_ZERO_PADDING,
-                    $this->initializationVector
-                );
-                $response['loginStatus'] = 'success';
-                $response['loginCookie'] = $hashedData;
-            }
+        if ($email == null || $password == null) {
+            $response['loginStatus'] = 'no email or password';
+            return $response;
         }
+        $loginStatus = $this->userModel->tryLogin($email, $password);
+        if (!$loginStatus) {
+            $response['loginStatus'] = 'could not login';
+            return $response;
+        }
+
+        //Should hash with User IP
+        $hashedData = openssl_encrypt(
+            json_encode([$email, $password]),
+            self::CIPHERING_METHOD,
+            $this->cipherCode,
+            OPENSSL_ZERO_PADDING,
+            $this->initializationVector
+        );
+        $response['loginStatus'] = 'success';
+        $response['loginCookie'] = $hashedData;
+
         return $response;
     }
 
@@ -49,34 +53,37 @@ class UserController extends BaseController
         $cookie = null;
         foreach ($cookies as $kvp) {
             $result = explode('=', $kvp);
-            if (count($result) > 1) {
-                $cookieName = 'userLogin';
-                $stringEquality = strcmp($result[0], $cookieName);
-                if ($stringEquality == 0) {
-                    //Decode to add special symbols back
-                    $cookie = urldecode($result[1]);
-                }
+            if (count($result) <= 1) {
+                continue;
+            }
+            $cookieName = 'userLogin';
+            $stringEquality = strcmp($result[0], $cookieName);
+            if ($stringEquality == 0) {
+                //Decode to add special symbols back
+                $cookie = urldecode($result[1]);
             }
         }
-        if ($cookie != null) {
-            $dehashed = openssl_decrypt(
-                $cookie,
-                self::CIPHERING_METHOD,
-                $this->cipherCode,
-                OPENSSL_ZERO_PADDING,
-                $this->initializationVector
-            );
-            $decoded = json_decode($dehashed);
-            $email = $decoded[0];
-            $password = $decoded[1];
-            $loginStatus = $this->doesUserWithPasswordExist($email, $password);
-            if ($loginStatus) {
-                $response['loginStatus'] = 'success';
-                $response['userName'] = $this->userModel->getUserName($email);
-                $response['userEmail'] = $email;
-                $response['userRole'] = $this->userModel->getUserRole($email);
-            }
+        if ($cookie == null) {
+            return $response;
         }
+        $dehashed = openssl_decrypt(
+            $cookie,
+            self::CIPHERING_METHOD,
+            $this->cipherCode,
+            OPENSSL_ZERO_PADDING,
+            $this->initializationVector
+        );
+        $decoded = json_decode($dehashed);
+        $email = $decoded[0];
+        $password = $decoded[1];
+        $loginStatus = $this->userModel->tryLogin($email, $password);
+        if ($loginStatus) {
+            $response['loginStatus'] = 'success';
+            $response['userName'] = $this->userModel->getUserName($email);
+            $response['userEmail'] = $email;
+            $response['userRole'] = $this->userModel->getUserRole($email);
+        }
+
         return $response;
     }
 
@@ -85,29 +92,13 @@ class UserController extends BaseController
         $username = $this->tryGetValue($attributes, 'username');
         $password = $this->tryGetValue($attributes, 'password');
         $email = $this->tryGetValue($attributes, 'email');
+
+        if ($this->userModel->doesUserExist($email)) {
+            return "userExists";
+        }
+
         if ($this->userModel->createNewUser($username, $password, $email)) {
             return $this->tryLogin($attributes);
         }
-    }
-
-    private function getUserRole(string $email): string
-    {
-        return $this->userModel->getUserRole($email);
-    }
-
-    private function doesUserExist(string $email): bool
-    {
-        return $this->userModel->elementWithAttributeValuesExists(
-            'USERS', ['EMAIL'], [$email]
-        );
-    }
-
-    private function doesUserWithPasswordExist(string $email, string $password): bool
-    {
-        return $this->userModel->elementWithAttributeValuesExists(
-            'USERS',
-            ['EMAIL', 'PASSWORD'],
-            [$email, $password]
-        );
     }
 }

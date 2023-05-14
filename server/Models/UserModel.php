@@ -19,21 +19,37 @@ class UserModel extends BaseModel
 
     public function doesUserExist(string $email): bool
     {
+        $email = urlencode($email);
         $selectQueryObject = new SelectQueryBuilder();
         $selectQueryObject->
         select(["COUNT(1)"])->
         from($this::TABLE_USERS)->
         where(['EMAIL', '=', "'$email'"]);
-        ServerLogger::Log($selectQueryObject->getQuery());
         $request = $this->DBConn->prepare($selectQueryObject->getQuery());
         $request->execute();
-        return $request->fetch(PDO::FETCH_NAMED)[0] > 0;
+        return $request->fetchAll(PDO::FETCH_NUM)[0][0] > 0;
+    }
+
+    public function tryLogin(string $email, string $password): bool
+    {
+        $password = urlencode($password);
+        //TODO: Still no multiple 'where' support
+        if (!$this->doesUserExist($email)) {
+            return false;
+        }
+        $givenHashedPassword = hash(BaseModel::HASHING_ALGORITHM, $password);
+        $hashedPassword = $this->getUserAttribute($email, $this::ENTRY_PASSWORD);
+        if ($givenHashedPassword == $hashedPassword) {
+            return true;
+        }
+        return false;
     }
 
     //How to change username: UPDATE USERS SET USERNAME = 'newname' WHERE USERNAME = 'oldname';
 
     public function getUserAttribute(string $email, string $attribute): string
     {
+        $email = urlencode($email);
         $selectQueryObject = new SelectQueryBuilder();
         $selectQueryObject->
         select([$attribute])->
