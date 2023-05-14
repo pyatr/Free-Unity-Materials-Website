@@ -1,6 +1,5 @@
 import {Button, Grid} from "@mui/material";
 import React from "react";
-import {StringArrayToString} from "../../utils/Strings/StringArrayToString";
 import {ContentUnitEditCommonProps} from "./ContentUnitEditForm";
 
 export default function ContentCategorySelectionMenu({
@@ -53,7 +52,7 @@ export function SetCategorySelection(newCategory: string, categorySelection: str
     if (indexOfNewCategory != -1) {
         //If given existing category, remove
         categoryArray.splice(indexOfNewCategory, 1);
-        newCategorySelection = StringArrayToString(categoryArray);
+        newCategorySelection = categoryArray.join(", ");
     } else {
         //If category is not in list, include
         newCategorySelection = categorySelection + ", " + newCategory;

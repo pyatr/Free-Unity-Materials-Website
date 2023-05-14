@@ -10,6 +10,7 @@ import {IsStringNullOrEmpty} from "../../utils/Strings/IsStringNullOrEmpty";
 import {StringContainsOneOfSymbols} from "../../utils/Strings/StringContainsOneOfSymbols";
 import {AxiosResponse} from "axios";
 import {TryLogin} from "../../utils/Login";
+import {LoadingOverlay} from "../../components/LoadingOverlay";
 
 const textFieldStyle = {
     marginTop: "16px",
@@ -75,7 +76,11 @@ export function RegisterPage() {
                 password: password,
                 username: username
             }
+            setLoadingStatus(true);
             await serverConnection.SendPostRequestPromise("createNewUser", attributes).then((response: AxiosResponse) => {
+                if (response.data == "userExists") {
+                    setErrorMessage("That email is already used");
+                }
                 if (response.data.loginStatus === "success") {
                     TryLogin(email, password);
                 }
@@ -84,7 +89,9 @@ export function RegisterPage() {
             setErrorMessage(errorMessage);
         }
     }
-
+    if (isLoading) {
+        return (<LoadingOverlay/>);
+    }
 
     return (
         <Box sx={containerBoxStyle}>
