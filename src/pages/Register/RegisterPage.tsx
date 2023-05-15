@@ -80,6 +80,7 @@ export function RegisterPage() {
             await serverConnection.SendPostRequestPromise("createNewUser", attributes).then((response: AxiosResponse) => {
                 if (response.data == "userExists") {
                     setErrorMessage("That email is already used");
+                    setLoadingStatus(false);
                 }
                 if (response.data.loginStatus === "success") {
                     TryLogin(email, password);
@@ -90,7 +91,7 @@ export function RegisterPage() {
         }
     }
     if (isLoading) {
-        return (<LoadingOverlay/>);
+        return (<LoadingOverlay position={"fixed"}/>);
     }
 
     return (
