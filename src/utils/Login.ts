@@ -29,11 +29,11 @@ export async function TryCookieLogin() {
 export async function TryLogin(email: string, password: string) {
     let serverConnection: ServerConnection = new ServerConnection();
 
-    const params = {
+    const attributes = {
         email: email,
         password: password
     };
-    const {data} = await serverConnection.SendPostRequestPromise("login", params);
+    const {data} = await serverConnection.SendPostRequestPromise("login", attributes);
     try {
         if (data.loginStatus !== "success") {
             return;

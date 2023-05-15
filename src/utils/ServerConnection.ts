@@ -12,7 +12,7 @@ export default class ServerConnection {
     public async SendPostRequestPromise(requestName: string, requestProperties: {}): Promise<AxiosResponse> {
         const response = await axios.post(this.serverConnection, {
             request: requestName,
-            params: requestProperties
+            attributes: requestProperties
         });
         return response;
     }

@@ -2,7 +2,7 @@ import {ContentUnitPreview} from "../Types/Content/ContentUnitPreview";
 
 export type PageLoadProps = {
     pageData: PageParameters,
-    rawContent: ContentUnitPreview[]
+    previewContent: ContentUnitPreview[]
 }
 
 export class PageParameters {
