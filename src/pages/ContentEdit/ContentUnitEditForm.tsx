@@ -24,6 +24,8 @@ import {ContentUnitEditImages} from "./ContentUnitEditImages";
 import ContentUnitEditFiles from "./ContentUnitEditFiles";
 import {ContentUnitEditTitle} from "./ContentUnitEditTitle";
 import {ContentUnitEditBody} from "./ContentUnitEditBody";
+import {useParams} from "react-router-dom";
+import {LoadingOverlay} from "../../components/LoadingOverlay";
 
 export type ContentUnitEditCommonProps = {
     setContentUnitProperty: Function,
@@ -37,18 +39,21 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
     const [linksToFilesMarkedForDeletion, setFileDeletionState] = useState<string[]>([]);
     const [contentUnitState, setContentUnitState] = useState<ContentUnit>(GetDummyContentUnit());
     const [deleteWindowOpen, setDeleteWindowStatus] = useState(false);
+    const [isLoading, setLoadingStatus] = useState(false);
+
+    let {currentContentID} = useParams();
 
     const loadContentIfEmpty = () => {
         //Request content if it's not loaded and given contentNumber is a real post number
         if (contentUnitState.contentID == -1 && requestedContentID != -1) {
-            GetContentUnit(requestedContentID, requestedContentCategory).then((downloadedContentUnit: ContentUnit) => setContentUnitState(downloadedContentUnit));
+            GetContentUnit((parseInt(currentContentID as string)), requestedContentCategory).then((downloadedContentUnit: ContentUnit) => setContentUnitState(downloadedContentUnit));
         }
     }
 
     useEffect(() => loadContentIfEmpty());
 
-    if (contentUnitState.contentID == -1 && requestedContentID != -1) {
-        return (<Fragment/>);
+    if ((contentUnitState.contentID == -1 && requestedContentID != -1) || isLoading) {
+        return (<LoadingOverlay position={"inherit"}/>);
     }
 
     const editFormTitle = contentUnitState.contentID == -1 ? "Create new " + requestedContentCategory : "Edit " + contentUnitState.title;
@@ -122,7 +127,9 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
         };
 
         let serverConnection = new ServerConnection();
+        setLoadingStatus(true);
         await serverConnection.SendPostRequestPromise(contentUnitState.contentID == -1 ? "createContent" : "updateContent", requestProperties).then((response: AxiosResponse) => {
+            setLoadingStatus(false);
             //TODO: open for all categories
             const currentContentUnitID = contentUnitState.contentID == -1 ? response.data.body.itemID : contentUnitState.contentID;
             window.open("http://" + window.location.host + "/" + currentContentUnitID, "_self");

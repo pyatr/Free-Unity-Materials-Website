@@ -1,5 +1,5 @@
 import React, {Fragment, useState} from "react";
-import {Box, Grid, Typography} from "@mui/material";
+import {Box, Button, Grid, Typography} from "@mui/material";
 import PixelSummForCSS from "../../utils/PixelSummForCSS";
 import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
 import {StripHTMLFromString} from "../../utils/Strings/StripHTMLFromString";
@@ -9,10 +9,11 @@ import {Create} from "@mui/icons-material";
 import {Link} from "react-router-dom";
 import MessageBoxYesNo from "../../components/MessageBoxes/MessageBoxYesNo";
 import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
+import {sideButtonStyle} from "../../components/MainPage/MainContent";
+import {unmountComponentAtNode} from "react-dom";
 
 type AssetUnitPreviewProps = {
-    contentUnitPreview: ContentUnitPreview,
-    contentUnitPreviewStyle: React.CSSProperties
+    contentUnitPreview: ContentUnitPreview
 }
 
 const adminButtonsGrid = {
@@ -27,7 +28,8 @@ const adminButtonsGrid = {
 const textBoxLink = {
     width: 'inherit',
     height: 'inherit',
-    position: 'absolute'
+    position: 'absolute',
+    color: "rgba(255,255,255,0)"
 }
 
 const editBoxStyle = {
@@ -77,7 +79,9 @@ const gridStyle = {
 }
 
 const previewTitleStyle = {
-    textOverflow: "ellipsis", overflow: "hidden"
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+    whiteSpace: "nowrap"
 }
 
 const previewBodyStyle = {
@@ -89,14 +93,22 @@ const previewBodyStyle = {
     display: "-webkit-box"
 }
 
-export default function AssetUnitPreview({contentUnitPreview, contentUnitPreviewStyle}: AssetUnitPreviewProps) {
+const contentUnitPreviewStyle = {
+    width: "16rem",
+    height: "25.6rem",
+    border: "2px",
+    borderStyle: "solid",
+    borderColor: "black",
+    textDecoration: "none",
+    boxSizing: "content-box"
+}
+
+export default function AssetUnitPreview({contentUnitPreview}: AssetUnitPreviewProps) {
     const [showingAdminButtons, setAdminButtonStatus] = useState(false);
     const [deleteWindowOpen, setDeleteWindowStatus] = useState(false);
 
     if (contentUnitPreview.contentID < 0) {
-        //Dummy item in case there are not enough items in row
-        let newWidth = PixelSummForCSS(contentUnitPreviewStyle.width as string, "4");
-        return (<Box width={newWidth}/>);
+        return (<Fragment/>);
     }
     const canEdit: boolean = CanUserEditContent();
 
@@ -119,15 +131,15 @@ export default function AssetUnitPreview({contentUnitPreview, contentUnitPreview
         background: 'black'
     }
 
-    const startPictureWidth = 187;
-    let fontSizeMod = parseFloat(contentUnitPreviewStyle.width as string) / startPictureWidth;
+    const startPictureWidth = 16;
+    let fontSizeMod = parseFloat(contentUnitPreviewStyle.width as string) / startPictureWidth + 0.3;
 
     const titleFontSize = fontSizeMod + "rem";
     const subtitleFontSite = (fontSizeMod * 0.7) + "rem";
 
     let link = "/" + contentUnitPreview.contentID;
     return (
-        <Grid style={contentUnitPreviewStyle}
+        <Grid sx={contentUnitPreviewStyle}
               onMouseEnter={showAdminButtons}
               onMouseLeave={hideAdminButtons}>
             <Box component={Link} to={link} sx={textBoxLink}/>

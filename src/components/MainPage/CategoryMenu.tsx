@@ -48,7 +48,10 @@ export default function CategoryMenu({propValue}: GenericStringProp) {
     if (propValue == 'create' || propValue == 'edit' || !isNaN(parseInt(propValue.split("/")[1]))) {
         usedPath = '/';
     }
-    const buttons = links.map((link) => <Button variant="outlined" key={link[0]} component={Link} to={link[0]}
+    const buttons = links.map((link) => <Button variant="outlined"
+                                                key={link[0]}
+                                                component={Link}
+                                                to={link[0]}
                                                 sx={(link[0].length > 1 ?
                                                     usedPath.startsWith(link[0]) : usedPath === link[0]) ?
                                                     selectedButtonStyle : buttonStyle}>{link[1]}</Button>);

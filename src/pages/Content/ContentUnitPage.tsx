@@ -14,7 +14,8 @@ import {CommentSection} from "../../components/Comments/CommentSection";
 import ContentUnitEditorButtons from "./ContentUnitEditorButtons";
 import {GetContentUnit} from "../../utils/ContentInteraction/GetContentUnit";
 import MessageBoxYesNo from "../../components/MessageBoxes/MessageBoxYesNo";
-import {GalleryFullView} from "../../components/ImageGallery/GalleryFullView";
+import {useParams} from "react-router-dom";
+import {LoadingOverlay} from "../../components/LoadingOverlay";
 
 const itemContentDisplay = {
     width: '100%',
@@ -27,9 +28,11 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
     const [contentUnit, setContentUnit] = useState(GetDummyContentUnit());
     const [deleteWindowOpen, setDeleteWindowStatus] = useState(false);
 
+    let {currentContentID} = useParams();
+
     const loadContent = () => {
         if (contentUnit.contentID == -1) {
-            GetContentUnit(requestedContentID, requestedContentCategory).then((conItem: ContentUnit) => setContentUnit(conItem));
+            GetContentUnit(parseInt(currentContentID as string), requestedContentCategory).then((conItem: ContentUnit) => setContentUnit(conItem));
         }
     }
 
@@ -38,7 +41,7 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
     });
 
     if (contentUnit.contentID == -1) {
-        return (<Fragment/>);
+        return (<LoadingOverlay position={"inherit"}/>);
     }
 
     window.scrollTo(0, 0);
