@@ -3,6 +3,6 @@ import React from "react";
 
 export default function ArticlesPage() {
     return (
-        <Typography variant="h4">Articles</Typography>
+        <Typography id="articlesPreview" variant="h4">Articles</Typography>
     );
 }

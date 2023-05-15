@@ -42,18 +42,12 @@ export default function CategoryMenu({propValue}: GenericStringProp) {
         padding: '8px',
         width: 'auto'
     };
-    const links = [["/", "Assets"], ["/articles", "Articles"], ["/scripts", "Scripts"]];
-    let usedPath = '/' + propValue;
-    //TODO: rework this
-    if (propValue == 'create' || propValue == 'edit' || !isNaN(parseInt(propValue.split("/")[1]))) {
-        usedPath = '/';
-    }
+    const links = [["/", "Assets", "AssetsPage"], ["/articles", "Articles", "ArticlesPage"], ["/scripts", "Scripts", "ScriptsPage"]];
+
     const buttons = links.map((link) => <Button variant="outlined"
                                                 key={link[0]}
                                                 component={Link}
                                                 to={link[0]}
-                                                sx={(link[0].length > 1 ?
-                                                    usedPath.startsWith(link[0]) : usedPath === link[0]) ?
-                                                    selectedButtonStyle : buttonStyle}>{link[1]}</Button>);
+                                                sx={propValue == link[2] ? selectedButtonStyle : buttonStyle}>{link[1]}</Button>);
     return (<Grid sx={boxStyle} display="grid">{buttons}</Grid>);
 }

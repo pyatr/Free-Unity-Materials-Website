@@ -16,10 +16,11 @@ import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
 import {IsMobileResolution} from "../../utils/MobileUtilities";
 
 import CreateContentButton from "../Buttons/CreateContentButton";
-import {SitePagesParameters} from "../../utils/PageParameters/SitePagesParameters";
-import {PageParameters} from "../../utils/PageParameters/PageParameters";
+import {SitePagesProperties} from "../../utils/PageProperties/SitePagesProperties";
+import {PageProperties} from "../../utils/PageProperties/PageProperties";
 import GetPreviews from "../../utils/ContentInteraction/GetPreviews";
 import {GetLastURLPart} from "../../utils/GetLastURLPart";
+import {LoadingOverlay} from "../LoadingOverlay";
 
 const mainContentGrid = {
     width: '70%',
@@ -50,6 +51,7 @@ export default function MainContent() {
 
     const pages = new Map();
     pages.set("", "AssetsPage");
+    pages.set("view", "AssetsPage");
     pages.set("articles", "ArticlesPage");
     pages.set("scripts", "ScriptsPage");
 
@@ -69,38 +71,39 @@ export default function MainContent() {
     const canShowCreateButton = permittedCreationLinks.includes(currentCategory) && currentPathnameSplit.length <= 2;
     const elementTypeName = pages.get(currentCategory);
 
-    const isPreviewPage = permittedCreationLinks.includes(GetLastURLPart());
-
     const landW = "15%";
     const portW = "30%";
     const isPortrait = IsMobileResolution();
     const selectedWidth = isPortrait ? portW : landW;
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [previewContent, setPreviewContent] = useState(Array<ContentUnitPreview>);
+    const [previewContent, setPreviewContent] = useState<ContentUnitPreview[]>([]);
+    const [totalContentCount, setTotalContentCount] = useState(-1);
 
-    const currentPageData: PageParameters = SitePagesParameters.page[elementTypeName];
+    const currentPageProperties: PageProperties = SitePagesProperties.page[elementTypeName];
 
     let shouldUpdate = false;
-    if (currentPageData != undefined) {
-        shouldUpdate = currentPageData.currentPage != currentPage;
-        currentPageData.currentPage = currentPage;
+    if (currentPageProperties != undefined) {
+        shouldUpdate = currentPageProperties.currentPage != currentPage;
+        currentPageProperties.currentPage = currentPage;
     }
 
     const setPageNum = (newNum: number) => {
-        if (currentPageData.currentPage != newNum) {
+        if (currentPageProperties.currentPage != newNum) {
             setCurrentPage(newNum);
         }
     }
 
-    const clickBack = () => setPageNum(Math.max(1, currentPageData.currentPage - 1));
+    const clickBack = () => setPageNum(Math.max(1, currentPageProperties.currentPage - 1));
 
-    const clickForward = () => setPageNum(Math.min(currentPageData.getPagesCount(), currentPageData.currentPage + 1));
+    const clickForward = () => setPageNum(Math.min(currentPageProperties.getPagesCount(), currentPageProperties.currentPage + 1));
 
     const loadPreviews = () => {
-        if ((previewContent.length == 0 || shouldUpdate) && currentPageData !== undefined) {
-            GetPreviews(currentPageData).then((previews: ContentUnitPreview[]) => {
+        if ((previewContent.length == 0 || shouldUpdate) && totalContentCount != 0 && currentPageProperties !== undefined) {
+            setPreviewContent([]);
+            GetPreviews(currentPageProperties).then((previews: ContentUnitPreview[]) => {
                 window.scrollTo(0, 0);
+                setTotalContentCount(currentPageProperties.getPostsCount())
                 setPreviewContent(previews);
             });
         }
@@ -114,31 +117,34 @@ export default function MainContent() {
         <Grid display="flex" padding="8px" gap="8px" paddingTop="16px">
             {/*Menu on the left*/}
             <Grid display="grid" width={selectedWidth} height="fit-content" gap="8px">
-                <CategoryMenu propValue={currentCategory}/>
+                <CategoryMenu propValue={elementTypeName}/>
                 {canShowCreateButton ?
                     <CreateContentButton
                         propValue={(currentCategory === "" ? "" : "/") + currentCategory + "/create"}/> :
                     <Fragment/>}
             </Grid>
             {/*Content selection and display*/}
-
             <Grid sx={mainContentGrid}>
                 <Box sx={mainContentBox} id="mainElementBox">
                     <Routes>
-                        <Route index
-                               element={<AssetsPage pageData={currentPageData} previewContent={previewContent}/>}/>
-                        <Route path=":currentContentID"
+                        <Route path={"/"}
+                               element={<AssetsPage pageProperties={currentPageProperties}
+                                                    previewContent={previewContent}
+                                                    onClickBack={clickBack}
+                                                    onClickForward={clickForward}
+                                                    onClickNum={setPageNum}/>}/>
+                        <Route path={"/view/:currentContentID"}
                                element={<ContentUnitPage requestedContentCategory={"asset"}
                                                          requestedContentID={currentContentID}/>}/>
-                        <Route path={"edit/:currentContentID"}
+                        <Route path={"/edit/:currentContentID"}
                                element={<ContentUnitEditForm requestedContentID={currentContentID}
                                                              requestedContentCategory={"asset"}/>}/>
-                        <Route path={"create"}
+                        <Route path={"/create"}
                                element={<ContentUnitEditForm requestedContentCategory={"asset"}
                                                              requestedContentID={-1}/>}/>
 
                         <Route path={"/articles"} element={<ArticlesPage/>}/>
-                        <Route path={"/articles/:currentContentID"}
+                        <Route path={"/articles/view/:currentContentID"}
                                element={<ContentUnitPage requestedContentCategory={"article"}
                                                          requestedContentID={currentContentID}/>}/>
                         <Route path={"/articles/edit/:currentContentID"}
@@ -149,7 +155,7 @@ export default function MainContent() {
                                                              requestedContentID={-1}/>}/>
 
                         <Route path={"/scripts"} element={<ScriptsPage/>}/>
-                        <Route path={"/scripts/:currentContentID"}
+                        <Route path={"/scripts/view/:currentContentID"}
                                element={<ContentUnitPage requestedContentCategory={"script"}
                                                          requestedContentID={currentContentID}/>}/>
                         <Route path={"/scripts/edit/:currentContentID"}
@@ -160,12 +166,6 @@ export default function MainContent() {
                                                              requestedContentID={-1}/>}/>
                     </Routes>
                 </Box>
-
-                {previewContent.length > 0 && isPreviewPage ?
-                    <ContentPageSwitch pageName={elementTypeName} onClickBack={clickBack}
-                                       onClickForward={clickForward}
-                                       onClickNum={setPageNum}/> :
-                    <Fragment/>}
             </Grid>
             {/*Right page content placeholder*/}
             {isPortrait ? <Fragment/> : <Box width={selectedWidth}/>}

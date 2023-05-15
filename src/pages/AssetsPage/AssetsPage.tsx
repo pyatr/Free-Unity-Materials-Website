@@ -1,11 +1,19 @@
 import {Grid} from "@mui/material";
 import React from "react";
 import AssetUnitPreview from "./AssetUnitPreview";
-import {PageLoadProps} from "../../utils/PageParameters/PageProperties";
+import {PageLoadProps} from "../../utils/PageProperties/PageProperties";
 import {GetDummyPreview} from "../../utils/Types/Content/ContentUnitPreview";
 import {LoadingOverlay} from "../../components/LoadingOverlay";
+import ContentPageSwitch from "../../components/MainPage/ContentPageSwitch";
 
-export default function AssetsPage({pageProperties, previewContent}: PageLoadProps) {
+export default function AssetsPage({
+                                       pageProperties,
+                                       previewContent,
+                                       onClickBack,
+                                       onClickForward,
+                                       onClickNum
+                                   }: PageLoadProps) {
+    console.log(pageProperties);
     if (previewContent.length > 0 && pageProperties != undefined) {
         const gridStyle = {
             display: "flex",
@@ -21,7 +29,15 @@ export default function AssetsPage({pageProperties, previewContent}: PageLoadPro
         let preparedContent = previewContent.map((previewData) => {
             return (<AssetUnitPreview contentUnitPreview={previewData}/>);
         });
-        return (<Grid sx={gridStyle}>{preparedContent}</Grid>);
+        return (
+            <Grid id="assetsPreview" sx={gridStyle}>
+                {preparedContent}
+                <ContentPageSwitch pageProperties={pageProperties}
+                                   previewContent={previewContent}
+                                   onClickBack={onClickBack}
+                                   onClickForward={onClickForward}
+                                   onClickNum={onClickNum}/>
+            </Grid>);
     } else {
         return (<LoadingOverlay position={"inherit"}/>);
     }

@@ -137,7 +137,7 @@ export default function AssetUnitPreview({contentUnitPreview}: AssetUnitPreviewP
     const titleFontSize = fontSizeMod + "rem";
     const subtitleFontSite = (fontSizeMod * 0.7) + "rem";
 
-    let link = "/" + contentUnitPreview.contentID;
+    let link = "/view/" + contentUnitPreview.contentID;
     return (
         <Grid sx={contentUnitPreviewStyle}
               onMouseEnter={showAdminButtons}

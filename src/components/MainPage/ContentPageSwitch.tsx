@@ -1,20 +1,9 @@
 import {Box, Button, Grid, Typography} from "@mui/material";
 import React, {Fragment} from "react";
-import {SitePagesParameters} from "../../utils/PageParameters/SitePagesParameters";
+import {PageLoadProps} from "../../utils/PageProperties/PageProperties";
 
-export type PageSwitchProps = {
-    pageName: string,
-    onClickBack: Function,
-    onClickForward: Function,
-    onClickNum: Function
-}
-
-export default function ContentPageSwitch({pageName, onClickBack, onClickForward, onClickNum}: PageSwitchProps) {
-    let elementPageData = SitePagesParameters.page[pageName];
-    if (elementPageData === undefined) {
-        return (<Fragment/>);
-    }
-    if (elementPageData.getPostsCount() == 0) {
+export default function ContentPageSwitch({pageProperties, previewContent, onClickBack, onClickForward, onClickNum}: PageLoadProps) {
+    if (pageProperties.getPostsCount() == 0) {
         //Not initialized, display nothing
         return (<Fragment/>);
     }
@@ -25,17 +14,17 @@ export default function ContentPageSwitch({pageName, onClickBack, onClickForward
         color: "black"
     }
     const gridStyle = {
-        width: "auto",
+        width: "100%",
         display: "grid"
     }
-    let pageCount = elementPageData.getPagesCount()
+    let pageCount = pageProperties.getPagesCount()
     let pageNumbers: number[] = [];
     for (let i = 0; i < pageCount; i++) {
         pageNumbers.push(i + 1);
     }
     let pagesAsText = pageNumbers.map((num) => {
-        let isCurrentPage = elementPageData.currentPage == num;
-        return <Button key={pageName + "Page" + num} style={isCurrentPage ? {
+        let isCurrentPage = pageProperties.currentPage == num;
+        return <Button key={pageProperties + "Page" + num} style={isCurrentPage ? {
             fontSize: "1.5rem",
             color: "black",
             fontWeight: "bold"
@@ -45,7 +34,7 @@ export default function ContentPageSwitch({pageName, onClickBack, onClickForward
             fontWeight: "normal"
         }} onClick={e => onClickNum(num)}>{num}</Button>;
     });
-    const pageCountText = (elementPageData.getFirstItemNumber() + 1) + "-" + elementPageData.getLastItemNumber();
+    const pageCountText = (pageProperties.getFirstItemNumber() + 1) + "-" + pageProperties.getLastItemNumber();
     return (
         <Grid style={gridStyle}>
             <Box display="flex" width="fit-content" justifySelf="center">

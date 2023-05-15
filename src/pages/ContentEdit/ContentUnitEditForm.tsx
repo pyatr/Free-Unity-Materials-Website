@@ -132,7 +132,7 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
             setLoadingStatus(false);
             //TODO: open for all categories
             const currentContentUnitID = contentUnitState.contentID == -1 ? response.data.body.itemID : contentUnitState.contentID;
-            window.open("http://" + window.location.host + "/" + currentContentUnitID, "_self");
+            window.open("http://" + window.location.host + "/view/" + currentContentUnitID, "_self");
         });
     }
 
