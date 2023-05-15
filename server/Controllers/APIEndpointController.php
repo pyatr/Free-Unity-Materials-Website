@@ -12,7 +12,7 @@ class APIEndpointController
         $data = (array)json_decode(file_get_contents('php://input'));
 
         $request = $data['request'];
-        $attributes = (array)$data['params'];
+        $attributes = (array)$data['attributes'];
         if ($request != null) {
             $userControllerName = "Server\\UserController";
             $contentControllerName = "Server\\ContentController";
