@@ -10,6 +10,7 @@ type LoadingOverlayProps = {
 const overlayStyle = {
     width: "100%",
     height: "80%",
+    minHeight: "12em",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",

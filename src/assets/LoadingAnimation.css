@@ -1,7 +1,8 @@
 .rotate {
-    width: 80px;
-    height: 80px;
-    animation: rotation infinite 2s linear;
+    animation: rotation;
+    animation-duration: 2s;
+    animation-direction: reverse;
+    animation-iteration-count: infinite;
 }
 
 @keyframes rotation {
