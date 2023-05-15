@@ -1,5 +1,5 @@
 import ServerConnection from "../ServerConnection";
-import {PageProperties} from "../PageParameters/PageProperties";
+import {PageProperties} from "../PageProperties/PageProperties";
 import {ContentUnitPreview} from "../Types/Content/ContentUnitPreview";
 
 export default async function GetPreviews(pageProperties: PageProperties): Promise<ContentUnitPreview[]> {
