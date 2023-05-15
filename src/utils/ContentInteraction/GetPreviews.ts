@@ -1,13 +1,13 @@
 import ServerConnection from "../ServerConnection";
-import {PageParameters} from "../PageParameters/PageParameters";
+import {PageProperties} from "../PageParameters/PageProperties";
 import {ContentUnitPreview} from "../Types/Content/ContentUnitPreview";
 
-export default async function GetPreviews(pageParameters: PageParameters): Promise<ContentUnitPreview[]> {
+export default async function GetPreviews(pageProperties: PageProperties): Promise<ContentUnitPreview[]> {
     const serverConnection = new ServerConnection();
     const attributes = {
-        pageSize: pageParameters.pageSize,
-        page: pageParameters.currentPage,
-        category: pageParameters.getCategoryName()
+        pageSize: pageProperties.pageSize,
+        page: pageProperties.currentPage,
+        category: pageProperties.getCategoryName()
     };
 
     //Use response.data.code for SQL request code and response.data.requesterror for error details
@@ -24,7 +24,7 @@ export default async function GetPreviews(pageParameters: PageParameters): Promi
             }
         )
     );
-    pageParameters.setPostsCount(data.contentCount);
+    pageProperties.setPostsCount(data.contentCount);
 
     return previews;
 }
