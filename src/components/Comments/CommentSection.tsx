@@ -87,11 +87,14 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
             {comments.length == 0 ?
                 <Typography variant="h6" marginTop="16px" marginBottom="16px">Nobody commented yet</Typography> :
                 <Fragment>
-                    <Typography color="gray">{commentCount} comments</Typography>
-                    <Grid gap="8px" display="grid" padding="4px"
-                          marginBottom="16px">
-                        {preparedComments}
-                    </Grid>
+                    {commentCount > -1 ?
+                        <Fragment>
+                            <Typography color="gray">{commentCount} comments</Typography>
+                            <Grid gap="8px" display="grid" padding="4px" marginBottom="16px">
+                                {preparedComments}
+                            </Grid>
+                        </Fragment> :
+                        <Fragment/>}
                 </Fragment>}
             {isLoggedIn ?
                 <TextField onChange={onCommentInputChange}
