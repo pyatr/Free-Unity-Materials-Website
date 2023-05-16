@@ -1,6 +1,5 @@
 import React, {Fragment, useState} from "react";
-import {Box, Button, Grid, Typography} from "@mui/material";
-import PixelSummForCSS from "../../utils/PixelSummForCSS";
+import {Box, Grid, Typography} from "@mui/material";
 import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
 import {StripHTMLFromString} from "../../utils/Strings/StripHTMLFromString";
 import {CanUserEditContent} from "../../utils/Login";
@@ -9,8 +8,6 @@ import {Create} from "@mui/icons-material";
 import {Link} from "react-router-dom";
 import MessageBoxYesNo from "../../components/MessageBoxes/MessageBoxYesNo";
 import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
-import {sideButtonStyle} from "../../components/MainPage/MainContent";
-import {unmountComponentAtNode} from "react-dom";
 
 type AssetUnitPreviewProps = {
     contentUnitPreview: ContentUnitPreview

@@ -13,7 +13,6 @@ export default function AssetsPage({
                                        onClickForward,
                                        onClickNum
                                    }: PageLoadProps) {
-    console.log(pageProperties);
     if (previewContent.length > 0 && pageProperties != undefined) {
         const gridStyle = {
             display: "flex",

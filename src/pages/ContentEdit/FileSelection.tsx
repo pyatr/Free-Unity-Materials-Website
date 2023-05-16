@@ -10,8 +10,10 @@ export default function FileSelection({title, inputType, multiple, loadImageFunc
                 alignItems: "flex-end",
                 gap: "8px",
                 width: "fit-content",
-                height: "24px",
-                maxHeight: "24px"
+                height: "32px",
+                maxHeight: "32px",
+                paddingTop: "4px",
+                paddingBottom: "4px"
             }}>
                 <Typography variant="subtitle2">{title}</Typography>
                 {<input type={inputType} multiple={multiple} onChange={loadImageFunction}/>}

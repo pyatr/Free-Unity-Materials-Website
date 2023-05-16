@@ -32,13 +32,11 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
 
     const loadContent = () => {
         if (contentUnit.contentID == -1) {
-            GetContentUnit(parseInt(currentContentID as string), requestedContentCategory).then((conItem: ContentUnit) => setContentUnit(conItem));
+            GetContentUnit(parseInt(currentContentID as string), requestedContentCategory).then((loadedContentUnit: ContentUnit) => setContentUnit(loadedContentUnit));
         }
     }
 
-    useEffect(() => {
-        loadContent();
-    });
+    useEffect(() => loadContent());
 
     if (contentUnit.contentID == -1) {
         return (<LoadingOverlay position={"inherit"}/>);

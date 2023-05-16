@@ -42,17 +42,20 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
     const [isLoading, setLoadingStatus] = useState(false);
 
     let {currentContentID} = useParams();
+    const contentIDNumber = parseInt(currentContentID as string);
 
     const loadContentIfEmpty = () => {
         //Request content if it's not loaded and given contentNumber is a real post number
-        if (contentUnitState.contentID == -1 && requestedContentID != -1) {
-            GetContentUnit((parseInt(currentContentID as string)), requestedContentCategory).then((downloadedContentUnit: ContentUnit) => setContentUnitState(downloadedContentUnit));
+        if (contentUnitState.contentID == -1 && contentIDNumber != -1) {
+            GetContentUnit(contentIDNumber, requestedContentCategory).then((downloadedContentUnit: ContentUnit) => {
+                setContentUnitState(downloadedContentUnit);
+            });
         }
     }
 
     useEffect(() => loadContentIfEmpty());
 
-    if ((contentUnitState.contentID == -1 && requestedContentID != -1) || isLoading) {
+    if ((contentUnitState.contentID == -1 && contentIDNumber != -1) || isLoading) {
         return (<LoadingOverlay position={"inherit"}/>);
     }
 
