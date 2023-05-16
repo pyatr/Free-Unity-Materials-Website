@@ -32,7 +32,10 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
 
     const loadContent = () => {
         if (contentUnit.contentID == -1) {
-            GetContentUnit(parseInt(currentContentID as string), requestedContentCategory).then((loadedContentUnit: ContentUnit) => setContentUnit(loadedContentUnit));
+            GetContentUnit(parseInt(currentContentID as string), requestedContentCategory).then((loadedContentUnit: ContentUnit) => {
+                window.scrollTo(0, 0);
+                setContentUnit(loadedContentUnit);
+            });
         }
     }
 
@@ -41,8 +44,6 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
     if (contentUnit.contentID == -1) {
         return (<LoadingOverlay position={"inherit"}/>);
     }
-
-    window.scrollTo(0, 0);
 
     const openDeleteWindow = () => setDeleteWindowStatus(true);
 
