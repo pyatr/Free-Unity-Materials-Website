@@ -29,11 +29,11 @@ export default function App() {
         <BrowserRouter>
             <SiteAppBar/>
             <Routes>
-                <Route path="login" element={<LoginPage/>}/>
-                <Route path="register" element={<RegisterPage/>}/>
-                <Route path="articles/*" element={<MainContent key={"articles"}/>}/>
-                <Route path="scripts/*" element={<MainContent key={"scripts"}/>}/>
-                <Route path="/*" element={<MainContent key={"assets"}/>}/>
+                <Route path="/login" element={<LoginPage/>}/>
+                <Route path="/register" element={<RegisterPage/>}/>
+                <Route path="/articles/*" element={<MainContent key={"articles"} propValue={"ArticlesPage"}/>}/>
+                <Route path="/scripts/*" element={<MainContent key={"scripts"} propValue={"ScriptsPage"}/>}/>
+                <Route path="/*" element={<MainContent key={"assets"} propValue={"AssetsPage"}/>}/>
             </Routes>
         </BrowserRouter>
     );
