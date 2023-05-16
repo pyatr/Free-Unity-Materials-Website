@@ -1,8 +1,16 @@
 import {Box, Button, Grid, Typography} from "@mui/material";
 import React, {Fragment} from "react";
-import {PageLoadProps} from "../../utils/PageProperties/PageProperties";
+import {PageProperties} from "../../utils/PageProperties/PageProperties";
 
-export default function ContentPageSwitch({pageProperties, previewContent, onClickBack, onClickForward, onClickNum}: PageLoadProps) {
+type ContentPageSwitchProps = {
+    pageProperties: PageProperties,
+    onClickBack: Function,
+    onClickForward: Function,
+    onClickNum: Function
+}
+
+
+export default function ContentPageSwitch({pageProperties, onClickBack, onClickForward, onClickNum}: ContentPageSwitchProps) {
     if (pageProperties.getPostsCount() == 0) {
         //Not initialized, display nothing
         return (<Fragment/>);

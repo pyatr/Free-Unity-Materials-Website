@@ -7,7 +7,8 @@ import {CanUserEditContent} from "../../utils/Login";
 
 type ContentEditButtonsProps = {
     contentID: number
-    onDelete: Function
+    onDelete: Function,
+    requestedContentCategory: string
 }
 
 const mainGridStyle = {
@@ -18,13 +19,21 @@ const mainGridStyle = {
     justifyContent: "space-between"
 }
 
-export default function ContentUnitEditorButtons({contentID, onDelete}: ContentEditButtonsProps) {
+export default function ContentUnitEditorButtons({
+                                                     contentID,
+                                                     onDelete,
+                                                     requestedContentCategory
+                                                 }: ContentEditButtonsProps) {
     if (CanUserEditContent()) {
+        const linksForCategories = [["asset", ""], ["article", "/articles"], ["script", "/scripts"]];
+        const chosenLink = linksForCategories.filter(linkCategoryPair => linkCategoryPair[0] === requestedContentCategory)[0][1];
         return (
             <Grid style={mainGridStyle}>
                 {/*Left grid*/}
                 <Grid style={{display: "flex", gap: "16px"}}>
-                    <Button component={Link} to={"/edit/" + contentID} style={sideButtonStyle}>Edit</Button>
+                    <Button component={Link}
+                            to={chosenLink + "/edit/" + contentID}
+                            style={sideButtonStyle}>Edit</Button>
                 </Grid>
                 {/*Right grid*/}
                 <Grid style={{display: "flex", gap: "16px"}}>

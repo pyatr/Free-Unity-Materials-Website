@@ -74,7 +74,7 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
             <ImageGallery imageLinks={contentUnit.galleryImageLinks} imageMapper={mapImage}/>
             <DownloadLinksList links={contentUnit.fileLinks}/>
             <Typography sx={itemContentDisplay} variant="body1">{contentBody}</Typography>
-            <ContentUnitEditorButtons contentID={contentUnit.contentID} onDelete={openDeleteWindow}/>
+            <ContentUnitEditorButtons contentID={contentUnit.contentID} onDelete={openDeleteWindow} requestedContentCategory={requestedContentCategory}/>
             <CommentSection requestedContentID={contentUnit.contentID}
                             requestedContentCategory={requestedContentCategory}></CommentSection>
         </Grid>);

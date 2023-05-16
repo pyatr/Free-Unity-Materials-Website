@@ -5,8 +5,6 @@ import {Route, Routes, useNavigate} from "react-router-dom";
 import CategoryMenu from "./CategoryMenu";
 
 import AssetsPage from "../../pages/AssetsPage/AssetsPage";
-import ScriptsPage from "../../pages/Scripts/ScriptsPage";
-import ArticlesPage from "../../pages/Articles/ArticlesPage";
 
 import ContentUnitPage from "../../pages/Content/ContentUnitPage";
 import ContentUnitEditForm from "../../pages/ContentEdit/ContentUnitEditForm";
@@ -20,6 +18,8 @@ import {PageProperties} from "../../utils/PageProperties/PageProperties";
 import GetPreviews from "../../utils/ContentInteraction/GetPreviews";
 import {GetLastURLPart} from "../../utils/GetLastURLPart";
 import {GenericStringProp} from "../../utils/Types/GenericProps/GenericStringProp";
+import ContentPageSwitch from "./ContentPageSwitch";
+import TextContentPage from "../../pages/TextContent/TextContentPage";
 
 const mainContentGrid = {
     width: '70%',
@@ -107,12 +107,11 @@ export default function MainContent({propValue}: GenericStringProp) {
 
     const previewPages = [
         ["AssetsPage", <AssetsPage pageProperties={currentPageProperties}
-                                   previewContent={previewContent}
-                                   onClickBack={clickBack}
-                                   onClickForward={clickForward}
-                                   onClickNum={setPageNumber}/>, ""],
-        ["ArticlesPage", <ArticlesPage/>, "articles"],
-        ["ScriptsPage", <ScriptsPage/>, "scripts"]
+                                   previewContent={previewContent}/>, ""],
+        ["ArticlesPage", <TextContentPage pageProperties={currentPageProperties}
+                                       previewContent={previewContent}/>, "articles"],
+        ["ScriptsPage", <TextContentPage pageProperties={currentPageProperties}
+                                     previewContent={previewContent}/>, "scripts"]
     ]
 
     const currentPreviewPageData = previewPages.filter(page => page[0] === elementTypeName)[0];
@@ -148,7 +147,15 @@ export default function MainContent({propValue}: GenericStringProp) {
                                                              requestedContentID={-1}/>}/>
                     </Routes>
                 </Box>
+                {previewContent.length > 0 && window.location.pathname === "/" ?
+                    <ContentPageSwitch pageProperties={currentPageProperties}
+                                       onClickBack={clickBack}
+                                       onClickForward={clickForward}
+                                       onClickNum={setPageNumber}/> :
+                    <Fragment/>}
+
             </Grid>
+
             {/*Right page content placeholder*/}
             {isPortrait ? <Fragment/> : <Box width={selectedWidth}/>}
         </Grid>);

@@ -1,11 +1,10 @@
 import {Grid} from "@mui/material";
 import React from "react";
-import AssetUnitPreview from "./AssetUnitPreview";
 import {PageLoadProps} from "../../utils/PageProperties/PageProperties";
-import {GetDummyPreview} from "../../utils/Types/Content/ContentUnitPreview";
 import {LoadingOverlay} from "../../components/LoadingOverlay";
+import TextContentPreview from "./TextContentPreview";
 
-export default function AssetsPage({pageProperties, previewContent}: PageLoadProps) {
+export default function TextContentPage({pageProperties, previewContent}: PageLoadProps) {
     if (previewContent.length > 0 && pageProperties != undefined) {
         const gridStyle = {
             display: "flex",
@@ -15,14 +14,13 @@ export default function AssetsPage({pageProperties, previewContent}: PageLoadPro
             paddingLeft: "16px",
             paddingRight: "16px"
         }
-        for (let i = previewContent.length; i < pageProperties.pageSize; i++) {
-            previewContent.push(GetDummyPreview());
-        }
         let preparedContent = previewContent.map((previewData) => {
-            return (<AssetUnitPreview contentUnitPreview={previewData}/>);
+            return (<TextContentPreview
+                requestedContentCategory={pageProperties.getCategoryName()}
+                contentUnitPreview={previewData}/>);
         });
         return (
-            <Grid id="assetsPreview" sx={gridStyle}>
+            <Grid sx={gridStyle}>
                 {preparedContent}
             </Grid>);
     } else {

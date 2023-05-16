@@ -2,10 +2,7 @@ import {ContentUnitPreview} from "../Types/Content/ContentUnitPreview";
 
 export type PageLoadProps = {
     pageProperties: PageProperties,
-    previewContent: ContentUnitPreview[],
-    onClickBack: Function,
-    onClickForward: Function,
-    onClickNum: Function
+    previewContent: ContentUnitPreview[]
 }
 
 export class PageProperties {
