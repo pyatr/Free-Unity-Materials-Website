@@ -73,11 +73,8 @@ export default function MainContent({propValue}: GenericStringProp) {
     const lastURLPart = Number(GetLastURLPart());
 
     if (!isNaN(lastURLPart) && window.location.pathname != "/") {
-        console.log(window.location.pathname);
         currentContentID = lastURLPart;
     }
-    console.log(lastURLPart);
-    console.log(currentContentID);
 
     const setPageNumber = (newNumber: number) => {
         if (currentPageProperties.currentPage !== newNumber) {
