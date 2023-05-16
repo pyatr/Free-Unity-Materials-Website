@@ -18,7 +18,7 @@ export default function SiteAppBar() {
                 <Toolbar sx={{justifyContent: "space-between"}}>
                     <Avatar
                         variant="square"
-                        src="./assets/logo.png"
+                        src="/assets/logo.png"
                         alt="logo"
                         component={Link}
                         to="/"
