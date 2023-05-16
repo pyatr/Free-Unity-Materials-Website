@@ -40,14 +40,14 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
     const [contentUnitState, setContentUnitState] = useState<ContentUnit>(GetDummyContentUnit());
     const [deleteWindowOpen, setDeleteWindowStatus] = useState(false);
     const [isLoading, setLoadingStatus] = useState(false);
+    const {currentContentID} = useParams();
 
-    let {currentContentID} = useParams();
-    const contentIDNumber = parseInt(currentContentID as string);
+    const contentIDParamsNumber: number = parseInt(currentContentID as string);
 
     const loadContentIfEmpty = () => {
         //Request content if it's not loaded and given contentNumber is a real post number
-        if (contentUnitState.contentID == -1 && contentIDNumber != -1) {
-            GetContentUnit(contentIDNumber, requestedContentCategory).then((downloadedContentUnit: ContentUnit) => {
+        if (contentUnitState.contentID == -1) {
+            GetContentUnit(contentIDParamsNumber, requestedContentCategory).then((downloadedContentUnit: ContentUnit) => {
                 setContentUnitState(downloadedContentUnit);
             });
         }
@@ -55,7 +55,7 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
 
     useEffect(() => loadContentIfEmpty());
 
-    if ((contentUnitState.contentID == -1 && contentIDNumber != -1) || isLoading) {
+    if ((contentUnitState.contentID == -1 && requestedContentID != -1) || isLoading) {
         return (<LoadingOverlay position={"inherit"}/>);
     }
 
@@ -131,11 +131,11 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
 
         let serverConnection = new ServerConnection();
         setLoadingStatus(true);
-        await serverConnection.SendPostRequestPromise(contentUnitState.contentID == -1 ? "createContent" : "updateContent", requestProperties).then((response: AxiosResponse) => {
-            setLoadingStatus(false);
-            //TODO: open for all categories
-            const currentContentUnitID = contentUnitState.contentID == -1 ? response.data.body.itemID : contentUnitState.contentID;
-            window.open("http://" + window.location.host + "/view/" + currentContentUnitID, "_self");
+        await serverConnection.SendPostRequestPromise(contentUnitState.contentID === -1 ? "createContent" : "updateContent", requestProperties).then((response: AxiosResponse) => {
+            const linksForCategories = [["asset", ""], ["article", "/articles"], ["script", "/scripts"]];
+            const link = linksForCategories.filter(linkCategoryPair => linkCategoryPair[0] === requestedContentCategory)[0][1];
+            const currentContentUnitID = contentUnitState.contentID === -1 ? response.data.body.itemID : contentUnitState.contentID;
+            window.open("http://" + window.location.host + link + "/view/" + currentContentUnitID, "_self");
         });
     }
 

@@ -1,6 +1,6 @@
 import React, {Fragment, useEffect, useState} from "react";
 import {Box, Grid} from "@mui/material";
-import {Route, Routes} from "react-router-dom";
+import {Route, Routes, useNavigate} from "react-router-dom";
 
 import CategoryMenu from "./CategoryMenu";
 
@@ -50,6 +50,12 @@ export default function MainContent({propValue}: GenericStringProp) {
     const [previewContent, setPreviewContent] = useState<ContentUnitPreview[]>([]);
     const [totalContentCount, setTotalContentCount] = useState(-1);
 
+    const history = useNavigate()
+
+    useEffect(() => {
+        //This is an empty hook to ensure that page is update when link is changed
+    }, [history]);
+
     const elementTypeName: string = propValue;
 
     const landscapeWidth: string = "15%";
@@ -59,8 +65,6 @@ export default function MainContent({propValue}: GenericStringProp) {
 
     const currentPageProperties: PageProperties = SitePagesProperties.page[elementTypeName];
 
-    const canShowCreateButton: boolean = true;
-
     let currentCategory: string = "idk";
     let shouldUpdate: boolean = false;
     if (currentPageProperties !== undefined) {
@@ -69,8 +73,8 @@ export default function MainContent({propValue}: GenericStringProp) {
         currentPageProperties.currentPage = currentPage;
     }
 
-    let currentContentID = -1;
-    const lastURLPart = Number(GetLastURLPart());
+    let currentContentID: number = -1;
+    const lastURLPart: number = Number(GetLastURLPart());
 
     if (!isNaN(lastURLPart) && window.location.pathname != "/") {
         currentContentID = lastURLPart;
@@ -112,8 +116,10 @@ export default function MainContent({propValue}: GenericStringProp) {
     ]
 
     const currentPreviewPageData = previewPages.filter(page => page[0] === elementTypeName)[0];
-    const currentPreviewPage = currentPreviewPageData[1];
-    const currentPreviewPageLink = currentPreviewPageData[2];
+    const currentPreviewPage: JSX.Element = currentPreviewPageData[1] as JSX.Element;
+    const currentPreviewPageLink: string = currentPreviewPageData[2] as string;
+
+    const canShowCreateButton: boolean = GetLastURLPart() === currentPreviewPageLink;
 
     return (
         <Grid display="flex" padding="8px" gap="8px" paddingTop="16px">
