@@ -27,13 +27,16 @@ const itemContentDisplay = {
 export default function ContentUnitPage({requestedContentID, requestedContentCategory}: ContentUnitRequestData) {
     const [contentUnit, setContentUnit] = useState(GetDummyContentUnit());
     const [deleteWindowOpen, setDeleteWindowStatus] = useState(false);
+    const [isLoading, setLoadingStatus] = useState(false);
 
     let {currentContentID} = useParams();
 
     const loadContent = () => {
-        if (contentUnit.contentID == -1) {
+        if (contentUnit.contentID == -1 && !isLoading) {
+            setLoadingStatus(true);
             GetContentUnit(parseInt(currentContentID as string), requestedContentCategory).then((loadedContentUnit: ContentUnit) => {
                 window.scrollTo(0, 0);
+                setLoadingStatus(false);
                 setContentUnit(loadedContentUnit);
             });
         }
@@ -41,7 +44,7 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
 
     useEffect(() => loadContent());
 
-    if (contentUnit.contentID == -1) {
+    if (isLoading) {
         return (<LoadingOverlay position={"inherit"}/>);
     }
 
@@ -75,7 +78,8 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
             <ImageGallery imageLinks={contentUnit.galleryImageLinks} imageMapper={mapImage}/>
             <DownloadLinksList links={contentUnit.fileLinks}/>
             <Typography sx={itemContentDisplay} variant="body1">{contentBody}</Typography>
-            <ContentUnitEditorButtons contentID={contentUnit.contentID} onDelete={openDeleteWindow} requestedContentCategory={requestedContentCategory}/>
+            <ContentUnitEditorButtons contentID={contentUnit.contentID} onDelete={openDeleteWindow}
+                                      requestedContentCategory={requestedContentCategory}/>
             <CommentSection requestedContentID={contentUnit.contentID}
                             requestedContentCategory={requestedContentCategory}></CommentSection>
         </Grid>);

@@ -49,6 +49,7 @@ export default function MainContent({propValue}: GenericStringProp) {
     const [currentPage, setCurrentPage] = useState(1);
     const [previewContent, setPreviewContent] = useState<ContentUnitPreview[]>([]);
     const [totalContentCount, setTotalContentCount] = useState(-1);
+    const [isLoading, setLoadingStatus] = useState(false);
 
     const history = useNavigate()
 
@@ -91,9 +92,11 @@ export default function MainContent({propValue}: GenericStringProp) {
     const clickForward = () => setPageNumber(Math.min(currentPageProperties.getPagesCount(), currentPageProperties.currentPage + 1));
 
     const loadPreviews = () => {
-        if ((previewContent.length === 0 || shouldUpdate) && totalContentCount !== 0 && currentPageProperties !== undefined) {
+        if ((previewContent.length === 0 || shouldUpdate) && totalContentCount !== 0 && currentPageProperties !== undefined && !isLoading) {
+            setLoadingStatus(true);
             setPreviewContent([]);
             GetPreviews(currentPageProperties).then((previews: ContentUnitPreview[]) => {
+                setLoadingStatus(false);
                 window.scrollTo(0, 0);
                 setTotalContentCount(currentPageProperties.getPostsCount())
                 setPreviewContent(previews);
@@ -109,9 +112,9 @@ export default function MainContent({propValue}: GenericStringProp) {
         ["AssetsPage", <AssetsPage pageProperties={currentPageProperties}
                                    previewContent={previewContent}/>, ""],
         ["ArticlesPage", <TextContentPage pageProperties={currentPageProperties}
-                                       previewContent={previewContent}/>, "articles"],
+                                          previewContent={previewContent}/>, "articles"],
         ["ScriptsPage", <TextContentPage pageProperties={currentPageProperties}
-                                     previewContent={previewContent}/>, "scripts"]
+                                         previewContent={previewContent}/>, "scripts"]
     ]
 
     const currentPreviewPageData = previewPages.filter(page => page[0] === elementTypeName)[0];

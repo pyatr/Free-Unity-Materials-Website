@@ -15,6 +15,7 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
     const [userComment, setUserComment] = useState("");
     const [comments, setComments] = useState(Array<UserCommentProps>);
     const [commentCount, setCommentCount] = useState(-1);
+    const [isLoading, setLoadingStatus] = useState(false);
 
     const onCommentInputChange = (event: any) => {
         setUserComment(event.target.value);
@@ -53,9 +54,11 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
     }
 
     const loadComments = () => {
-        if (commentCount == -1) {
+        if (commentCount == -1 && !isLoading) {
+            setLoadingStatus(true);
             //TODO: Request limited amount of comments
             GetComments(requestedContentID, requestedContentCategory).then((comments: Array<UserCommentProps>) => {
+                    setLoadingStatus(false);
                     setComments(comments);
                 }
             );
