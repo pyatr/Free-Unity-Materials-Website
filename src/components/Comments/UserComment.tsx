@@ -48,6 +48,10 @@ export function UserComment({
         setUserComment(event.target.value);
     }
 
+    if (userName === "") {
+        userName = "Deleted user";
+    }
+
     return (
         <Fragment>
             <Grid border="1px solid" gap="8px" borderColor="gray" padding="6px" display="flex"

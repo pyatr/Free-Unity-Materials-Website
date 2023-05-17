@@ -91,8 +91,9 @@ export default function TextContentPreview({
                 <Typography variant="body1"
                             sx={{color: "black"}}>{StripHTMLFromString(contentUnitPreview.body)}</Typography>
                 {commentCount > -1 ?
-                    <Typography variant="subtitle2" color="grey">{commentCount + " comments"}</Typography> :
-                    <Fragment/>}
+                    <Typography variant="subtitle2"
+                                color="grey">{(commentCount == 0 ? "No" : commentCount) + " comments"}</Typography> :
+                    <Typography variant="subtitle2" color="white">{"Loading comments"}</Typography>}
             </Grid>
             <ContentUnitEditorButtons contentID={contentUnitPreview.contentID}
                                       onDelete={openDeleteWindow}
