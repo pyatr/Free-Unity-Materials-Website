@@ -1,23 +1,16 @@
 import React, {Fragment, useState} from "react";
 
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import {Link} from "react-router-dom";
-import {TryLogin} from "../../utils/Login";
+import {ActivateUser, TryLogin} from "../../utils/Login";
 import {GoToHomePage} from "../../utils/GoToHomePage";
+import Avatar from "@mui/material/Avatar";
+import {AppRegistration} from "@mui/icons-material";
 import {LoadingOverlay} from "../../components/LoadingOverlay";
-
-const textFieldStyle = {
-    marginTop: "16px",
-    width: "300px",
-    minWidth: "300px",
-    maxWidth: "300px"
-}
+import Cookies from "universal-cookie";
 
 const submitButton = {
     marginTop: "24px",
@@ -33,58 +26,58 @@ const containerBoxStyle = {
     marginTop: "5%"
 }
 
-export default function LoginPage() {
+export default function UserActivationPage() {
+    const userEmail = sessionStorage.getItem("userEmailActivation");
     const [isLoading, setLoadingStatus] = useState(false);
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleActivationCodeSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
+
         const email = data.get("email") as string;
-        const password = data.get("password") as string;
-        if (email != null && password != null) {
+        const verificationCode = data.get("verification-code") as string;
+        if (email != null && verificationCode != null) {
             setLoadingStatus(true);
-            const loginStatus: string = await TryLogin(email, password);
-            if (loginStatus === "inactive") {
-                sessionStorage.setItem("userEmailActivation", email);
-                window.open(window.location.protocol + "//" + window.location.hostname + "/activate", "_self");
-            } else {
+            const [verificationStatus, loginCookie]: string[] = await ActivateUser(email, verificationCode);
+            if (verificationStatus === "success") {
+                const cookies = new Cookies();
+                const date = Date.now();
+                const expirationDate = new Date(date + 1000 * 60 * 60 * 24);
+                cookies.set("userLogin", loginCookie, {expires: expirationDate});
                 GoToHomePage();
             }
         }
     };
+
     return (
         <Container component="main">
             <Box sx={containerBoxStyle}>
                 {isLoading ? <LoadingOverlay position={"fixed"}/> : <Fragment/>}
                 <Avatar sx={{margin: "16px", background: 'secondary.main'}}>
-                    <LockOutlinedIcon/>
+                    <AppRegistration/>
                 </Avatar>
-                <Typography component="h1" variant="h5">
-                    Sign in
-                </Typography>
+                <Typography component="h1"
+                            variant="h5">Please input the account activation code we sent to your email</Typography>
                 <Box component="form"
-                     onSubmit={handleSubmit}
-                     display='grid'
+                     onSubmit={handleActivationCodeSubmit}
                      sx={{marginTop: "8px", display: "grid"}}>
                     <TextField id="email-field"
                                name="email"
                                label="Email"
                                variant="standard"
+                               value={userEmail}
                                required
-                               sx={textFieldStyle}/>
-                    <TextField id="password-field"
-                               name="password"
-                               label="Password"
+                               sx={{marginTop: "16px", minWidth: "300px"}}/>
+                    <TextField id="verification-code-field"
+                               name="verification-code"
+                               label="Verification code"
                                variant="standard"
-                               type="password"
                                required
-                               sx={textFieldStyle}/>
-                    <Link to="/register" style={{marginTop: "16px", color: "black"}}>Register</Link>
-                    <Link to="/register" style={{marginTop: "16px", color: "black"}}>Forgot password?</Link>
+                               sx={{marginTop: "16px", minWidth: "300px"}}></TextField>
                     <Button variant="contained"
                             sx={submitButton}
                             type="submit">
-                        Submit
+                        Activate
                     </Button>
                 </Box>
             </Box>

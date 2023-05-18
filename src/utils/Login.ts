@@ -26,7 +26,24 @@ export async function TryCookieLogin() {
     }
 }
 
-export async function TryLogin(email: string, password: string) {
+export async function ActivateUser(email: string, verificationCode: string): Promise<string[]> {
+    let serverConnection: ServerConnection = new ServerConnection();
+
+    const attributes = {
+        email: email,
+        verificationCode: verificationCode
+    };
+    const {data} = await serverConnection.SendPostRequestPromise("activateUser", attributes);
+    try {
+        console.log("Activation data: " + data);
+        return [data.activationResult, data.loginCookie];
+    } catch (e) {
+        console.log("Error when parsing login response: " + e);
+    }
+    return ["failed", "no cookie"];
+}
+
+export async function TryLogin(email: string, password: string): Promise<string> {
     let serverConnection: ServerConnection = new ServerConnection();
 
     const attributes = {
@@ -35,17 +52,17 @@ export async function TryLogin(email: string, password: string) {
     };
     const {data} = await serverConnection.SendPostRequestPromise("login", attributes);
     try {
-        if (data.loginStatus !== "success") {
-            return;
+        if (data.loginStatus === "success") {
+            const cookies = new Cookies();
+            const date = Date.now();
+            const expirationDate = new Date(date + 1000 * 60 * 60 * 24);
+            cookies.set("userLogin", data.loginCookie, {expires: expirationDate});
         }
-        const cookies = new Cookies();
-        const date = Date.now();
-        const expirationDate = new Date(date + 1000 * 60 * 60 * 24);
-        cookies.set("userLogin", data.loginCookie, {expires: expirationDate});
-        GoToHomePage();
+        return data.loginStatus;
     } catch (e) {
         console.log("Error when parsing login response: " + e);
     }
+    return "error";
 }
 
 export function IsLoggedIn(): boolean {
