@@ -38,7 +38,7 @@ export {imageBoxStyle}
 export default function ImageGallery({imageLinks, imageMapper}: ImageGalleryProps) {
     const [fullViewImageLink, setFullImageView] = useState("");
 
-    useEffect(() => {
+    const addWindowKeysEvent = () => {
         window.onkeyup = (event: any) => {
             //Right
             if (event.keyCode == 39 && fullViewImageLink != "") {
@@ -49,7 +49,9 @@ export default function ImageGallery({imageLinks, imageMapper}: ImageGalleryProp
                 showPreviousImage();
             }
         }
-    });
+    }
+
+    useEffect(() => addWindowKeysEvent());
 
     if (imageLinks.length == 0) {
         return <Fragment/>;
