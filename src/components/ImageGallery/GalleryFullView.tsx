@@ -1,11 +1,13 @@
 import Box from "@mui/material/Box";
 import {useState} from "react";
-import {Button, Grid} from "@mui/material";
+import {Button, Grid, Typography} from "@mui/material";
 import {ArrowLeft, ArrowRight} from "@mui/icons-material";
 import {GetDocumentDimensions} from "../../utils/GetDocumentDimensions";
 
 type FullImageViewProps = {
     imageLink: string,
+    imageNumber: number,
+    gallerySize: number,
     onBackgroundClick: Function,
     onNextClick: Function,
     onPreviousClick: Function
@@ -27,13 +29,28 @@ const sideButtonStyle = {
     },
     color: "white",
     zIndex: 21,
-    width: "10%",
+    width: "15%",
     height: "100%",
     position: "fixed"
 }
 
+const arrowStyle = {
+    width: "6em",
+    height: "6em"
+}
+
+const bottomTextStyle = {
+    color: "white",
+    position: "fixed",
+    left: "50%",
+    top: "90%",
+    transform: "translate(-50%, 0)"
+}
+
 export function GalleryFullView({
                                     imageLink,
+                                    imageNumber,
+                                    gallerySize,
                                     onBackgroundClick,
                                     onNextClick,
                                     onPreviousClick
@@ -51,7 +68,7 @@ export function GalleryFullView({
                     onMouseEnter={() => setClosingEnabled(false)}
                     onMouseLeave={() => setClosingEnabled(true)}
                     onClick={() => onPreviousClick()}>
-                <ArrowLeft style={{width: "6em", height: "6em"}}/>
+                <ArrowLeft style={arrowStyle}/>
             </Button>
 
             {<img style={{
@@ -61,17 +78,21 @@ export function GalleryFullView({
                 transform: "translate(-50%, -50%)",
                 zIndex: 22,
                 maxHeight: "80%",
-                maxWidth: "80%",
+                maxWidth: "70%",
+                cursor: "pointer"
             }}
                   onMouseEnter={() => setClosingEnabled(false)}
                   onMouseLeave={() => setClosingEnabled(true)}
+                  onClick={() => onNextClick()}
                   src={imageLink}/>}
 
             <Button sx={[sideButtonStyle, {right: "0"}]}
                     onMouseEnter={() => setClosingEnabled(false)}
                     onMouseLeave={() => setClosingEnabled(true)}
                     onClick={() => onNextClick()}>
-                <ArrowRight style={{width: "6em", height: "6em"}}/>
+                <ArrowRight style={arrowStyle}/>
             </Button>
+            <Typography
+                sx={bottomTextStyle} variant="h3">{(imageNumber + 1) + "/" + gallerySize}</Typography>
         </Grid>);
 }
