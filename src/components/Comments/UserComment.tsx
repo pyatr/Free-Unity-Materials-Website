@@ -22,6 +22,25 @@ type UserCommentDisplayProps = {
     onDelete: Function
 }
 
+const editButtonsGrid = {
+    display: "grid",
+    gap: "6px",
+    justifyContent: "end",
+    height: "fit-content",
+    marginTop: "4px",
+    marginBottom: "4px"
+}
+
+const mainCommentGrid = {
+    border: "1px",
+    borderStyle: "solid",
+    borderColor: "gray",
+    gap: "8px",
+    padding: "6px",
+    display: "flex",
+    justifyContent: "space-between"
+}
+
 export function UserComment({
                                 userEmail,
                                 userName,
@@ -40,6 +59,18 @@ export function UserComment({
         setDeleteWindow(false);
         onDelete(commentID);
     }
+
+
+    const onCancelEditing = () => {
+        setUserComment(content);
+        setEditMode(false);
+    }
+
+    const onSaveComment = () => {
+        onEdit(commentID, userComment);
+        setEditMode(false);
+    }
+
     const cancelDelete = () => setDeleteWindow(false);
 
     const canEditOrDelete = (GetUserEmail() == userEmail || IsUserAdmin());
@@ -54,8 +85,7 @@ export function UserComment({
 
     return (
         <Fragment>
-            <Grid border="1px solid" gap="8px" borderColor="gray" padding="6px" display="flex"
-                  justifyContent="space-between">
+            <Grid sx={mainCommentGrid}>
                 <Grid display="grid" gap={inEditMode ? "12px" : "4px"} height="fit-content" width="100%">
                     <Typography fontWeight="bold">{userName}</Typography>
                     {inEditMode ?
@@ -67,7 +97,7 @@ export function UserComment({
                         <Typography>{content}</Typography>}
                 </Grid>
                 {canEditOrDelete && !inEditMode ?
-                    <Grid display="grid" gap="6px" height="fit-content" marginTop="4px" marginBottom="4px">
+                    <Grid sx={editButtonsGrid}>
                         {deleteWindowOpen ?
                             <MessageBoxYesNo message={"Delete comment?"}
                                              onConfirm={confirmDelete}
@@ -75,29 +105,24 @@ export function UserComment({
                                              parentWidth={"320px"}
                                              parentHeight={"256px"}/> :
                             <Fragment/>}
-                        <Button style={editButtonStyle}
-                                onClick={() => setDeleteWindow(true)}>delete</Button>
-                        <Button style={editButtonStyle}
-                                onClick={() => setEditMode(true)}>edit</Button>
+                        <Button style={editButtonStyle} onClick={() => setDeleteWindow(true)}>
+                            delete
+                        </Button>
+                        <Button style={editButtonStyle} onClick={() => setEditMode(true)}>
+                            edit
+                        </Button>
                     </Grid> :
                     <Fragment/>}
             </Grid>
-            {
-                inEditMode ?
-                    <Grid margin="8px" display="flex" justifyContent="space-between">
-                        <Button style={editButtonStyle}
-                                onClick={() => {
-                                    onEdit(commentID, userComment);
-                                    setEditMode(false);
-                                }}>Save</Button>
-                        <Button style={editButtonStyle} onClick={() => {
-                            setUserComment(content);
-                            setEditMode(false);
-                        }}>Cancel</Button>
-                    </Grid> :
-                    <Fragment/>
-            }
-        </Fragment>
-    )
-        ;
+            {inEditMode ?
+                <Grid margin="8px" display="flex" justifyContent="space-between">
+                    <Button style={editButtonStyle} onClick={onSaveComment}>
+                        Save
+                    </Button>
+                    <Button style={editButtonStyle} onClick={onCancelEditing}>
+                        Cancel
+                    </Button>
+                </Grid> :
+                <Fragment/>}
+        </Fragment>);
 }
