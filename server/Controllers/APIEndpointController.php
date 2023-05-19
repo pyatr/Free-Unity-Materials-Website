@@ -20,6 +20,8 @@ class APIEndpointController
 
             $controllers = [
                 'createNewUser' => $userControllerName,
+                'activateUser' => $userControllerName,
+                'sendActivationCode' => $userControllerName,
                 'login' => $userControllerName,
                 'loginCookie' => $userControllerName,
 
@@ -41,6 +43,12 @@ class APIEndpointController
             switch ($request) {
                 case 'createNewUser':
                     $this->respond($controller->createNewUser($attributes));
+                    break;
+                case 'activateUser':
+                    $this->respond($controller->activateUser($attributes));
+                    break;
+                case 'sendActivationCode':
+                    $this->respond($controller->sendActivationCode($attributes));
                     break;
                 case 'login':
                     $this->respond($controller->tryLogin($attributes));

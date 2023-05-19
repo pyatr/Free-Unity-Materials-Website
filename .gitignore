@@ -27,3 +27,4 @@ yarn-error.log*
 /server/Images/
 /server/FileStorage/
 /server/Logs/
+/server/smtpdata

@@ -26,57 +26,49 @@ class UserController extends BaseController
             $response['loginStatus'] = 'no email or password';
             return $response;
         }
+
+        if (!$this->userModel->isUserActivated($email)) {
+            $response['loginStatus'] = 'inactive';
+            return $response;
+        }
+
         $loginStatus = $this->userModel->tryLogin($email, $password);
         if (!$loginStatus) {
             $response['loginStatus'] = 'could not login';
             return $response;
         }
-
+        $hashedUserPassword = $this->userModel->getUserPassword($email);
         //Should hash with User IP
-        $hashedData = openssl_encrypt(
+        $encryptedCookie = $this->encryptLoginPassword($email, $hashedUserPassword);
+        $response['loginStatus'] = 'success';
+        $response['loginCookie'] = $encryptedCookie;
+
+        return $response;
+    }
+
+    private function encryptLoginPassword(string $email, string $password): string
+    {
+        return openssl_encrypt(
             json_encode([$email, $password]),
             self::CIPHERING_METHOD,
             $this->cipherCode,
             OPENSSL_ZERO_PADDING,
             $this->initializationVector
         );
-        $response['loginStatus'] = 'success';
-        $response['loginCookie'] = $hashedData;
-
-        return $response;
     }
 
     public function tryLoginWithCookie(): array
     {
         $response = ['loginStatus' => 'failed'];
-        $cookies = explode('; ', $_SERVER['HTTP_COOKIE']);
-        $cookie = null;
-        foreach ($cookies as $kvp) {
-            $result = explode('=', $kvp);
-            if (count($result) <= 1) {
-                continue;
-            }
-            $cookieName = 'userLogin';
-            $stringEquality = strcmp($result[0], $cookieName);
-            if ($stringEquality == 0) {
-                //Decode to add special symbols back
-                $cookie = urldecode($result[1]);
-            }
-        }
+        $cookie = CookieManager::getCookie('userLogin');
         if ($cookie == null) {
+            $response['loginStatus'] = 'no cookie';
             return $response;
         }
-        $dehashed = openssl_decrypt(
-            $cookie,
-            self::CIPHERING_METHOD,
-            $this->cipherCode,
-            OPENSSL_ZERO_PADDING,
-            $this->initializationVector
-        );
-        $decoded = json_decode($dehashed);
-        $email = $decoded[0];
-        $password = $decoded[1];
-        $loginStatus = $this->userModel->tryLogin($email, $password);
+        $decrypted = $this->decryptLoginCookie($cookie);
+        $email = $decrypted[0];
+        $password = $decrypted[1];
+        $loginStatus = $this->userModel->tryLogin($email, $password, false);
         if ($loginStatus) {
             $response['loginStatus'] = 'success';
             $response['userName'] = $this->userModel->getUserName($email);
@@ -87,6 +79,48 @@ class UserController extends BaseController
         return $response;
     }
 
+    private function decryptLoginCookie(string $cookie): array
+    {
+        return json_decode(
+            openssl_decrypt(
+                $cookie,
+                self::CIPHERING_METHOD,
+                $this->cipherCode,
+                OPENSSL_ZERO_PADDING,
+                $this->initializationVector
+            )
+        );
+    }
+
+    public function activateUser($attributes): array
+    {
+        $email = $this->tryGetValue($attributes, 'email');
+        $verificationCode = $this->tryGetValue($attributes, 'verificationCode');
+        $result = $this->userModel->activateUser($email, $verificationCode);
+        if ($result['activationResult'] == 'success') {
+            $subject = "Your address has been verified";
+            $userName = $this->userModel->getUserName($email);
+            $body = "Dear $userName! Thank you for registering on Free Unity Materials.";
+            ServerMailer::sendEmail($email, $subject, $body);
+            $password = $this->userModel->getUserPassword($email);
+            $result['loginCookie'] = $this->encryptLoginPassword($email, $password);
+        }
+        return $result;
+    }
+
+    public function sendActivationCode($attributes)
+    {
+        $email = $this->tryGetValue($attributes, 'email');
+        $verificationCode = $this->generateRandomVerificationCode();
+
+        $this->userModel->addUserVerificationCode($email, $verificationCode);
+        $subject = 'Verify your email address';
+        $body = "This email address was recently used to create an account on our website.<br/>
+            To activate your new account and verify your address enter verification code $verificationCode.<br/>
+            If you didn't use this address it means someone else entered it by mistake. In that case you don't have to take any action. Do not tell anyone this code.";
+        ServerMailer::sendEmail($email, $subject, $body);
+    }
+
     public function createNewUser($attributes)
     {
         $username = $this->tryGetValue($attributes, 'username');
@@ -94,11 +128,22 @@ class UserController extends BaseController
         $email = $this->tryGetValue($attributes, 'email');
 
         if ($this->userModel->doesUserExist($email)) {
-            return "userExists";
+            return ["registrationResult" => "userExists"];
         }
 
         if ($this->userModel->createNewUser($username, $password, $email)) {
-            return $this->tryLogin($attributes);
+            $this->sendActivationCode($attributes);
+            return ["registrationResult" => "userCreated"];
         }
+    }
+
+    private function generateRandomVerificationCode(): string
+    {
+        $code = "";
+        $codeLength = 6;
+        for ($i = 0; $i < $codeLength; $i++) {
+            $code .= rand(0, 9);
+        }
+        return $code;
     }
 }

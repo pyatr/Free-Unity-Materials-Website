@@ -174,6 +174,22 @@ class FileManager
         }
     }
 
+    public static function getTextFileContents(string $file): array
+    {
+        $contents = [];
+        if (file_exists($file) && is_file($file)) {
+            $fileContentsRaw = file_get_contents($file);
+            if ($fileContentsRaw != null) {
+                $contents = explode("\n", $fileContentsRaw);
+            } else {
+                ServerLogger::Log("$file found but could not be opened");
+            }
+        } else {
+            ServerLogger::Log("$file does not exist or it's not a file");
+        }
+        return $contents;
+    }
+
     private static function tryGetValue(array $array, $key)
     {
         return (array_key_exists($key, $array)) ? $array[$key] : null;
