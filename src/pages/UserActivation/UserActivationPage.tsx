@@ -5,12 +5,12 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import {ActivateUser, TryLogin} from "../../utils/Login";
 import {GoToHomePage} from "../../utils/GoToHomePage";
 import Avatar from "@mui/material/Avatar";
 import {AppRegistration} from "@mui/icons-material";
 import {LoadingOverlay} from "../../components/LoadingOverlay";
 import Cookies from "universal-cookie";
+import {ActivateUser, RequestVerificationCode} from "../../utils/UserActivation";
 
 const submitButton = {
     marginTop: "24px",
@@ -78,6 +78,11 @@ export default function UserActivationPage() {
                             sx={submitButton}
                             type="submit">
                         Activate
+                    </Button>
+                    <Button variant="contained"
+                            sx={submitButton}
+                            onClick={() => RequestVerificationCode(userEmail as string)}>
+                        Send again
                     </Button>
                 </Box>
             </Box>

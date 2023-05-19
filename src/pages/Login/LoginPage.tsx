@@ -79,8 +79,12 @@ export default function LoginPage() {
                                type="password"
                                required
                                sx={textFieldStyle}/>
-                    <Link to="/register" style={{marginTop: "16px", color: "black"}}>Register</Link>
-                    <Link to="/register" style={{marginTop: "16px", color: "black"}}>Forgot password?</Link>
+                    <Link to="/register" style={{marginTop: "16px", color: "black", width: "fit-content"}}>
+                        Register
+                    </Link>
+                    <Link to="/register" style={{marginTop: "16px", color: "black", width: "fit-content"}}>
+                        Forgot password?
+                    </Link>
                     <Button variant="contained"
                             sx={submitButton}
                             type="submit">
