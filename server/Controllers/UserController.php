@@ -92,6 +92,16 @@ class UserController extends BaseController
         );
     }
 
+    public function getPublicUserInfo($attributes): array
+    {
+        $email = $this->tryGetValue($attributes, 'email');
+        $userName = $this->userModel->getUserName($email);
+        $userRole = $this->userModel->getUserRole($email);
+        $userRegistrationDate = $this->userModel->getUserRegistrationDate($email);
+        $isUserActive = $this->userModel->isUserActivated($email);
+        return ["userName" => $userName, "role" => $userRole, "registrationDate" => $userRegistrationDate, "isActive" => $isUserActive];
+    }
+
     public function activateUser($attributes): array
     {
         $email = $this->tryGetValue($attributes, 'email');

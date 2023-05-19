@@ -22,6 +22,7 @@ class APIEndpointController
                 'createNewUser' => $userControllerName,
                 'activateUser' => $userControllerName,
                 'sendActivationCode' => $userControllerName,
+                'getPublicUserInfo' => $userControllerName,
                 'login' => $userControllerName,
                 'loginCookie' => $userControllerName,
 
@@ -49,6 +50,9 @@ class APIEndpointController
                     break;
                 case 'sendActivationCode':
                     $this->respond($controller->sendActivationCode($attributes));
+                    break;
+                case 'getPublicUserInfo':
+                    $this->respond($controller->getPublicUserInfo($attributes));
                     break;
                 case 'login':
                     $this->respond($controller->tryLogin($attributes));

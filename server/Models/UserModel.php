@@ -19,6 +19,8 @@ class UserModel extends BaseModel
     private const ENTRY_EMAIL = 'EMAIL';
     private const ENTRY_STATUS = 'STATUS';
     private const ENTRY_ACTIVATED = 'ACTIVATED';
+
+    private const ENTRY_REGISTRATION_DATE = 'REGISTRATION_DATE';
     private const ENTRY_VERIFICATION_CODE = 'VERIFICATION_CODE';
 
     public function isUserActivated(string $email): bool
@@ -131,6 +133,11 @@ class UserModel extends BaseModel
     public function getUserPassword(string $email): string
     {
         return $this->getUserAttribute($email, $this::ENTRY_PASSWORD);
+    }
+
+    public function getUserRegistrationDate(string $email): string
+    {
+        return $this->getUserAttribute($email, $this::ENTRY_REGISTRATION_DATE);
     }
 
     public function createNewUser(string $newName, string $password, string $email): bool
