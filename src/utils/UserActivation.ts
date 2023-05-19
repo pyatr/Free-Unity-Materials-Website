@@ -10,7 +10,6 @@ export async function ActivateUser(email: string, verificationCode: string): Pro
     };
     const {data} = await serverConnection.SendPostRequestPromise("activateUser", attributes);
     try {
-        console.log("Activation data: " + data);
         return [data.activationResult, data.loginCookie];
     } catch (e) {
         console.log("Error when parsing login response: " + e);
