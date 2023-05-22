@@ -1,5 +1,5 @@
 import {IsMobileResolution} from "../../utils/MobileUtilities";
-import {GetUserName, IsLoading, IsLoggedIn, LogOut} from "../../utils/Login";
+import {GetUserName, IsLoading, IsLoggedIn, LogOut} from "../../utils/User/Login";
 import {Box, Grid, Typography} from "@mui/material";
 import React, {Fragment} from "react";
 import {Link} from "react-router-dom";
@@ -23,7 +23,7 @@ const textGridStyle = {
 
 export default function UserBarDisplay() {
     let isMobile = IsMobileResolution();
-    let fontsize = isMobile ? 12 : 20;
+    let fontsize = isMobile ? 16 : 20;
     let fontStyle = {fontSize: fontsize, color: "#000000", width: "fit-content"};
 
     const isLoggedIn = IsLoggedIn();

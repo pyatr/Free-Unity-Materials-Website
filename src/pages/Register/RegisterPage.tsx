@@ -9,7 +9,7 @@ import {IsStringNullOrEmpty} from "../../utils/Strings/IsStringNullOrEmpty";
 import {StringContainsOneOfSymbols} from "../../utils/Strings/StringContainsOneOfSymbols";
 import {LoadingOverlay} from "../../components/LoadingOverlay";
 import {Grid} from "@mui/material";
-import {Register} from "../../utils/Register";
+import {Register} from "../../utils/User/Register";
 import Avatar from "@mui/material/Avatar";
 import {AppRegistration} from "@mui/icons-material";
 import Container from "@mui/material/Container";
@@ -33,6 +33,8 @@ const containerBoxStyle = {
     alignItems: "center",
     marginTop: "5%"
 }
+
+export {containerBoxStyle, submitButton, textFieldStyle}
 
 function CheckInput(email: string, username: string, password: string, passwordConfirmation: string): string {
     const badSymbols = ["'", '"', "[", "]"];

@@ -8,30 +8,10 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import {Link} from "react-router-dom";
-import {TryLogin} from "../../utils/Login";
+import {TryLogin} from "../../utils/User/Login";
 import {GoToHomePage} from "../../utils/GoToHomePage";
 import {LoadingOverlay} from "../../components/LoadingOverlay";
-
-const textFieldStyle = {
-    marginTop: "16px",
-    width: "300px",
-    minWidth: "300px",
-    maxWidth: "300px"
-}
-
-const submitButton = {
-    marginTop: "24px",
-    marginBottom: "16px",
-    width: "100%",
-    justifySelf: "center",
-}
-
-const containerBoxStyle = {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    marginTop: "5%"
-}
+import {containerBoxStyle, submitButton, textFieldStyle} from "../Register/RegisterPage";
 
 export default function LoginPage() {
     const [isLoading, setLoadingStatus] = useState(false);

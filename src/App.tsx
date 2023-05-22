@@ -4,11 +4,12 @@ import "./assets/HomePage.css";
 import SiteAppBar from "./components/MainPage/SiteAppBar";
 import LoginPage from "./pages/Login/LoginPage";
 import MainContent from "./components/MainPage/MainContent";
-import {IsLoggedIn, TryCookieLogin} from "./utils/Login";
+import {IsLoggedIn, TryCookieLogin} from "./utils/User/Login";
 import {useEffect, useState} from "react";
 import {RegisterPage} from "./pages/Register/RegisterPage";
 import UserActivationPage from "./pages/UserActivation/UserActivationPage";
 import {ProfilePage} from "./pages/Profile/ProfilePage";
+import EmailChangePage from "./pages/EmailChange/EmailChangePage";
 
 export default function App() {
     const [[width, height], setWidthHeight] = useState([window.innerWidth, window.innerHeight]);
@@ -35,6 +36,7 @@ export default function App() {
                 <Route path="/register" element={<RegisterPage/>}/>
                 <Route path="/activate" element={<UserActivationPage/>}/>
                 <Route path="/profile" element={<ProfilePage/>}/>
+                <Route path="/change-email" element={<EmailChangePage/>}/>
                 <Route path="/articles/*" element={<MainContent key={"articles"} propValue={"ArticlesPage"}/>}/>
                 <Route path="/scripts/*" element={<MainContent key={"scripts"} propValue={"ScriptsPage"}/>}/>
                 <Route path="/*" element={<MainContent key={"assets"} propValue={"AssetsPage"}/>}/>

@@ -10,21 +10,8 @@ import Avatar from "@mui/material/Avatar";
 import {AppRegistration} from "@mui/icons-material";
 import {LoadingOverlay} from "../../components/LoadingOverlay";
 import Cookies from "universal-cookie";
-import {ActivateUser, RequestVerificationCode} from "../../utils/UserActivation";
-
-const submitButton = {
-    marginTop: "24px",
-    marginBottom: "16px",
-    width: "100%",
-    justifySelf: "center",
-}
-
-const containerBoxStyle = {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    marginTop: "5%"
-}
+import {ActivateUser, RequestVerificationCode} from "../../utils/User/UserActivation";
+import {containerBoxStyle, submitButton} from "../Register/RegisterPage";
 
 export default function UserActivationPage() {
     const userEmail = sessionStorage.getItem("userEmailActivation");
@@ -56,8 +43,9 @@ export default function UserActivationPage() {
                 <Avatar sx={{margin: "16px", background: 'secondary.main'}}>
                     <AppRegistration/>
                 </Avatar>
-                <Typography component="h1"
-                            variant="h5">Please input the account activation code we sent to your email</Typography>
+                <Typography component="h1" variant="h5">
+                    Please input the account activation code we sent to your email
+                </Typography>
                 <Box component="form"
                      onSubmit={handleActivationCodeSubmit}
                      sx={{marginTop: "8px", display: "grid"}}>
@@ -73,7 +61,7 @@ export default function UserActivationPage() {
                                label="Verification code"
                                variant="standard"
                                required
-                               sx={{marginTop: "16px", minWidth: "300px"}}></TextField>
+                               sx={{marginTop: "16px", minWidth: "300px"}}/>
                     <Button variant="contained"
                             sx={submitButton}
                             type="submit">

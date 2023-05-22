@@ -1,9 +1,13 @@
 import React, {useEffect, useState} from 'react'
-import {Grid, Link, Typography} from "@mui/material";
+import {Grid, Typography} from "@mui/material";
 import {LoadingOverlay} from "../../components/LoadingOverlay";
 import {AccountBox} from "@mui/icons-material";
-import {GetUserEmail, LogOut} from "../../utils/Login";
-import {GetEmptyUserInfo, GetPublicUserInfo, PublicUserInfo} from "../../utils/GetPublicUserInfo";
+import {GetUserEmail, IsLoggedIn, LogOut} from "../../utils/User/Login";
+import {GetEmptyUserInfo, GetPublicUserInfo, PublicUserInfo} from "../../utils/User/GetPublicUserInfo";
+import {Link} from "react-router-dom";
+import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
+import {containerBoxStyle} from "../Register/RegisterPage";
 
 const mainGridStyle = {
     display: "grid",
@@ -33,7 +37,9 @@ const bottomLinksStyle = {
     cursor: "pointer",
     color: "black",
     fontSize: "18px",
-    marginTop: "0.5em"
+    marginTop: "0.5em",
+    textDecoration: "none",
+    width: "fit-content"
 }
 
 export function ProfilePage() {
@@ -54,6 +60,17 @@ export function ProfilePage() {
 
     useEffect(() => loadUserInfo());
 
+    if (!IsLoggedIn()) {
+        return (
+            <Container component="main">
+                <Box sx={containerBoxStyle}>
+                    <Typography component="h1" variant="h5">
+                        You must be logged in to view your profile.
+                    </Typography>
+                </Box>
+            </Container>);
+    }
+
     if (isLoading || currentUserInfo.email === "") {
         return (<LoadingOverlay position={"inherit"}/>);
     }
@@ -72,10 +89,10 @@ export function ProfilePage() {
                 </Grid>
             </Grid>
             <Grid sx={userInfoGridStyle} paddingLeft="2em">
-                <Typography style={bottomLinksStyle}>Change email (coming soon)</Typography>
+                <Link to="/change-email" style={bottomLinksStyle}>Change email</Link>
                 <Typography style={bottomLinksStyle}>Change password (coming soon)</Typography>
                 <Typography style={bottomLinksStyle}>Delete profile (coming soon)</Typography>
-                <Link style={bottomLinksStyle} onClick={LogOut}>Log out</Link>
+                <Typography style={bottomLinksStyle} onClick={LogOut}>Log out</Typography>
             </Grid>
         </Grid>)
 }
