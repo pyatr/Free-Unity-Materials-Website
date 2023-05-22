@@ -1,4 +1,4 @@
-import ServerConnection from "./ServerConnection";
+import ServerConnection from "../ServerConnection";
 
 export type PublicUserInfo = {
     email: string,

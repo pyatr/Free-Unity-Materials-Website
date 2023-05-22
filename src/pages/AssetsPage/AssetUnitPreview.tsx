@@ -2,7 +2,7 @@ import React, {Fragment, useState} from "react";
 import {Box, Grid, Typography} from "@mui/material";
 import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
 import {StripHTMLFromString} from "../../utils/Strings/StripHTMLFromString";
-import {CanUserEditContent} from "../../utils/Login";
+import {CanUserEditContent} from "../../utils/User/Login";
 import {Delete} from "@mui/icons-material";
 import {Create} from "@mui/icons-material";
 import {Link} from "react-router-dom";

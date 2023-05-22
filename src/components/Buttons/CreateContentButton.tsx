@@ -4,7 +4,7 @@ import React, {Fragment} from "react";
 
 import {sideButtonStyle} from "../MainPage/MainContent";
 
-import {CanUserEditContent} from "../../utils/Login";
+import {CanUserEditContent} from "../../utils/User/Login";
 import {GenericStringProp} from "../../utils/Types/GenericProps/GenericStringProp";
 
 export default function CreateContentButton({propValue}: GenericStringProp) {

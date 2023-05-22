@@ -1,6 +1,6 @@
 import React, {Fragment, useState} from "react";
 import {Box, Button, Grid, TextField, Typography} from "@mui/material";
-import {IsUserAdmin, GetUserEmail} from "../../utils/Login";
+import {IsUserAdmin, GetUserEmail} from "../../utils/User/Login";
 import {AccountBox, Cancel, CheckCircle} from "@mui/icons-material";
 import MessageBoxYesNo from "../MessageBoxes/MessageBoxYesNo";
 

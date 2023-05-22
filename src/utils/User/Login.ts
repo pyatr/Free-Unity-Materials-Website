@@ -1,6 +1,6 @@
 import Cookies from "universal-cookie";
-import ServerConnection from "./ServerConnection";
-import {GoToHomePage} from "./GoToHomePage";
+import ServerConnection from "../ServerConnection";
+import {GoToHomePage} from "../GoToHomePage";
 
 export async function TryCookieLogin() {
     const cookie = new Cookies();

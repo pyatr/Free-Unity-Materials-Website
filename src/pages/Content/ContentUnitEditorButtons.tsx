@@ -3,7 +3,7 @@ import React, {Fragment} from "react";
 import {Link} from "react-router-dom";
 
 import {sideButtonStyle} from "../../components/MainPage/MainContent";
-import {CanUserEditContent} from "../../utils/Login";
+import {CanUserEditContent} from "../../utils/User/Login";
 
 type ContentEditButtonsProps = {
     contentID: number

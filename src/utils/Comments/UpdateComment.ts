@@ -1,4 +1,4 @@
-import {GetUserEmail} from "../Login";
+import {GetUserEmail} from "../User/Login";
 import ServerConnection from "../ServerConnection";
 import {UserCommentProps} from "../Types/UserCommentProps";
 

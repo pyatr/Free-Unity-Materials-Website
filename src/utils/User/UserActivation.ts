@@ -1,4 +1,4 @@
-import ServerConnection from "./ServerConnection";
+import ServerConnection from "../ServerConnection";
 
 
 export async function ActivateUser(email: string, verificationCode: string): Promise<string[]> {

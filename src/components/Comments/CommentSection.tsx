@@ -1,6 +1,6 @@
 import React, {Fragment, useEffect, useState} from "react";
 import {Button, Grid, TextField, Typography} from "@mui/material";
-import {IsLoggedIn} from "../../utils/Login";
+import {IsLoggedIn} from "../../utils/User/Login";
 import {UserComment} from "./UserComment";
 import {GetComments} from "../../utils/Comments/GetComments";
 import {ContentUnitRequestData} from "../../utils/Types/Content/ContentUnitRequestData";
