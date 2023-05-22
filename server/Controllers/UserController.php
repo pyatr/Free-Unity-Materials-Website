@@ -99,7 +99,38 @@ class UserController extends BaseController
         $userRole = $this->userModel->getUserRole($email);
         $userRegistrationDate = $this->userModel->getUserRegistrationDate($email);
         $isUserActive = $this->userModel->isUserActivated($email);
-        return ["userName" => $userName, "role" => $userRole, "registrationDate" => $userRegistrationDate, "isActive" => $isUserActive];
+        return ['userName' => $userName, 'role' => $userRole, 'registrationDate' => $userRegistrationDate, 'isActive' => $isUserActive];
+    }
+
+    public function addCodeForUserEmailChange($attributes): array
+    {
+        $result = ['codeAdditionResult' => 'success'];
+        $email = $this->tryGetValue($attributes, 'email');
+        $newEmail = $this->tryGetValue($attributes, 'newEmail');
+        $verificationCode = $this->generateRandomVerificationCode();
+        $this->userModel->addUserEmailChangeCode($email, $newEmail, $verificationCode);
+        $userName = $this->userModel->getUserName($email);
+        $mailBody = "Dear $userName!<br/>
+Please verify your new email address by entering this verification code $verificationCode.<br/>
+If you didn't use this address it means someone else entered it by mistake. In that case you don't have to take any action. Do not tell anyone this code.";
+        $mailingResult = ServerMailer::sendEmail($newEmail, 'Verify your new email', $mailBody);
+        if (!$mailingResult) {
+            $this->userModel->clearEmailChangeCodes(urlencode($email));
+            $result['codeAdditionResult'] = 'failed';
+        }
+        return $result;
+    }
+
+    public function changeUserEmail($attributes)
+    {
+        $email = $this->tryGetValue($attributes, 'email');
+        $verificationCode = $this->tryGetValue($attributes, 'verificationCode');
+        $result = $this->userModel->changeUserEmail($email, $verificationCode);
+        $email = $result['newEmail'];
+        $password = $this->userModel->getUserPassword($email);
+        $result = $result['queryResult'];
+        $result['loginCookie'] = $this->encryptLoginPassword($email, $password);
+        return $result;
     }
 
     public function activateUser($attributes): array

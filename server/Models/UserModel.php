@@ -7,8 +7,8 @@ use PDO;
 class UserModel extends BaseModel
 {
     private const TABLE_USERS = 'USERS';
-
     private const TABLE_VERIFICATION_CODES = 'USER_VERIFICATION_CODES';
+    private const TABLE_EMAIL_CHANGE_CODES = 'EMAIL_CHANGE_CODES';
 
     private const ROLE_EDITOR = 'EDITOR';
     private const ROLE_ADMIN = 'ADMIN';
@@ -17,6 +17,7 @@ class UserModel extends BaseModel
     private const ENTRY_USERNAME = 'USERNAME';
     private const ENTRY_PASSWORD = 'PASSWORD';
     private const ENTRY_EMAIL = 'EMAIL';
+    private const ENTRY_NEW_EMAIL = 'NEW_EMAIL';
     private const ENTRY_STATUS = 'STATUS';
     private const ENTRY_ACTIVATED = 'ACTIVATED';
 
@@ -42,39 +43,107 @@ class UserModel extends BaseModel
         $request->execute();
     }
 
-    public function activateUser(string $email, string $code): array
+    private function verificationCodeExists(string $code, string $tableName): bool
     {
-        $email = urlencode($email);
-        $result = ['activationResult' => 'failed'];
         //Check if user code is valid
         $selectQueryObject = new SelectQueryBuilder();
         $selectQueryObject->
         select(["*"])->
-        from($this::TABLE_VERIFICATION_CODES)->
+        from($tableName)->
         where([$this::ENTRY_VERIFICATION_CODE, '=', "'$code'"]);
         $request = $this->DBConn->prepare($selectQueryObject->getQuery());
         $request->execute();
-        $isCodeValid = $request->fetchAll(PDO::FETCH_NUM)[0][0] > 0;
+        return $request->fetchAll(PDO::FETCH_NUM)[0][0] > 0;
+    }
+
+    private function deleteVerificationCode(string $URLencodedEmail, string $tableName)
+    {
+        $deleteQueryObject = new DeleteQueryBuilder();
+        $deleteQueryObject->
+        delete($tableName)->
+        where([$this::ENTRY_EMAIL, '=', "'$URLencodedEmail'"]);
+        $request = $this->DBConn->prepare($deleteQueryObject->getQuery());
+        $request->execute();
+    }
+
+    public function clearEmailChangeCodes(string $URLencodedEmail)
+    {
+        $this->deleteVerificationCode($URLencodedEmail, $this::TABLE_EMAIL_CHANGE_CODES);
+    }
+
+    public function addUserEmailChangeCode(string $email, string $newEmail, string $code)
+    {
+        $email = urlencode($email);
+        $newEmail = urlencode($newEmail);
+        $insertQueryObject = new InsertQueryBuilder();
+        $insertQueryObject->
+        insert(
+            $this::TABLE_EMAIL_CHANGE_CODES,
+            [$this::ENTRY_EMAIL, $this::ENTRY_NEW_EMAIL, $this::ENTRY_VERIFICATION_CODE],
+            [$email, $newEmail, $code]
+        );
+        $request = $this->DBConn->prepare($insertQueryObject->getQuery());
+        $request->execute();
+    }
+
+    public function changeUserEmail(string $oldEmail, string $code): array
+    {
+        $result = ['emailChangeResult' => 'failed'];
+        $isCodeValid = $this->verificationCodeExists($code, $this::TABLE_EMAIL_CHANGE_CODES);
         if (!$isCodeValid) {
             return $result;
         }
-        //Activate user
-        $userUpdateQueryObject = new UpdateQueryBuilder();
-        $userUpdateQueryObject->
-        update($this::TABLE_USERS, [$this::ENTRY_ACTIVATED], ['1'])->
-        where([$this::ENTRY_EMAIL, '=', "'$email'"]);
-        $request = $this->DBConn->prepare($userUpdateQueryObject->getQuery());
+        $oldEmail = urlencode($oldEmail);
+
+        //Get new email saved from first request
+        $selectQueryObject = new SelectQueryBuilder();
+        $selectQueryObject->
+        select([$this::ENTRY_NEW_EMAIL])->
+        from($this::TABLE_EMAIL_CHANGE_CODES)->
+        where([$this::ENTRY_EMAIL, '=', "'$oldEmail'"]);
+        $request = $this->DBConn->prepare($selectQueryObject->getQuery());
         $request->execute();
+        $emailSelectResult = $request->fetchAll(PDO::FETCH_NAMED);
+        if (count($emailSelectResult) == 0) {
+            return $result;
+        }
+        $matchingEmailCount = count($emailSelectResult);
+        $newEmail = $emailSelectResult[$matchingEmailCount - 1]['NEW_EMAIL'];
+        //Update user email
+        $this->updateUserField($this::ENTRY_EMAIL, $newEmail, [$this::ENTRY_EMAIL, '=', "'$oldEmail'"]);
 
         //Remove verification code
-        $deleteQueryObject = new DeleteQueryBuilder();
-        $deleteQueryObject->
-        delete($this::TABLE_VERIFICATION_CODES)->
-        where([$this::ENTRY_EMAIL, '=', "'$email'"]);
-        $request = $this->DBConn->prepare($deleteQueryObject->getQuery());
-        $request->execute();
+        $this->deleteVerificationCode($oldEmail, $this::TABLE_EMAIL_CHANGE_CODES);
+        $result['emailChangeResult'] = 'success';
+        return ['newEmail' => urldecode($newEmail), 'queryResult' => $result];
+    }
+
+    public function activateUser(string $email, string $code): array
+    {
+        $result = ['activationResult' => 'failed'];
+        $isCodeValid = $this->verificationCodeExists($code, $this::TABLE_VERIFICATION_CODES);
+        if (!$isCodeValid) {
+            return $result;
+        }
+        $email = urlencode($email);
+
+        //Activate user
+        $this->updateUserField($this::ENTRY_ACTIVATED, '1', [$this::ENTRY_EMAIL, '=', "'$email'"]);
+
+        //Remove verification code
+        $this->deleteVerificationCode($email, $this::TABLE_VERIFICATION_CODES);
         $result['activationResult'] = 'success';
         return $result;
+    }
+
+    private function updateUserField(string $field, string $value, array $whereCondition)
+    {
+        $userUpdateQueryObject = new UpdateQueryBuilder();
+        $userUpdateQueryObject->
+        update($this::TABLE_USERS, [$field], [$value])->
+        where($whereCondition);
+        $request = $this->DBConn->prepare($userUpdateQueryObject->getQuery());
+        $request->execute();
     }
 
     public function doesUserExist(string $email): bool
@@ -104,8 +173,6 @@ class UserModel extends BaseModel
         }
         return false;
     }
-
-    //How to change username: UPDATE USERS SET USERNAME = 'newname' WHERE USERNAME = 'oldname';
 
     public function getUserAttribute(string $email, string $attribute): string
     {

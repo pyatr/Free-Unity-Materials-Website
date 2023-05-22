@@ -8,11 +8,11 @@ use PHPMailer\PHPMailer\SMTP;
 
 class ServerMailer
 {
-    public static function sendEmail(string $address, string $subject, string $body, string $nonhtmlbody = '')
+    public static function sendEmail(string $address, string $subject, string $body, string $nonhtmlbody = ''): bool
     {
         $smtpdata = FileManager::getTextFileContents($_SERVER['DOCUMENT_ROOT'] . '/smtpdata');
         if (count($smtpdata) < 3) {
-            return;
+            return false;
         }
         $SMTPhost = $smtpdata[0];
         $SMTPusername = $smtpdata[1];
@@ -39,9 +39,12 @@ class ServerMailer
 
             $mail->send();
             ServerLogger::Log("Message has been sent to $address");
+            return true;
         } catch (Exception $e) {
             ServerLogger::Log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
             ServerLogger::Log("Exception {$e}");
+            return false;
         }
+        return false;
     }
 }
