@@ -1,13 +1,16 @@
-import React, {useEffect, useState} from 'react'
+import React, {Fragment, useEffect, useState} from 'react'
 import {Grid, Typography} from "@mui/material";
 import {LoadingOverlay} from "../../components/LoadingOverlay";
 import {AccountBox} from "@mui/icons-material";
-import {GetUserEmail, IsLoggedIn, LogOut} from "../../utils/User/Login";
+import {ClearUserData, GetUserEmail, IsLoggedIn, LogOut} from "../../utils/User/Login";
 import {GetEmptyUserInfo, GetPublicUserInfo, PublicUserInfo} from "../../utils/User/GetPublicUserInfo";
 import {Link} from "react-router-dom";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import {containerBoxStyle} from "../Register/RegisterPage";
+import MessageBoxYesNo from "../../components/MessageBoxes/MessageBoxYesNo";
+import {DeleteUser} from "../../utils/User/DeleteUser";
+import {GoToHomePage} from "../../utils/GoToHomePage";
 
 const mainGridStyle = {
     display: "grid",
@@ -44,8 +47,21 @@ const bottomLinksStyle = {
 
 export function ProfilePage() {
     const [isLoading, setLoadingStatus] = useState(false);
-
+    const [deleteWindowOpen, setDeleteWindow] = useState(false);
     const [currentUserInfo, setCurrentUserInfo] = useState<PublicUserInfo>(GetEmptyUserInfo());
+
+    const confirmDelete = async () => {
+        setDeleteWindow(false);
+        if (currentUserInfo != null) {
+            const deletionResult = await DeleteUser(currentUserInfo.email);
+            if (deletionResult === 'success') {
+                ClearUserData();
+                GoToHomePage();
+            }
+        }
+    }
+
+    const cancelDelete = () => setDeleteWindow(false);
 
     const loadUserInfo = () => {
         if (!isLoading && currentUserInfo.email === "") {
@@ -91,8 +107,19 @@ export function ProfilePage() {
             <Grid sx={userInfoGridStyle} paddingLeft="2em">
                 <Link to="/change-email" style={bottomLinksStyle}>Change email</Link>
                 <Link to="/change-password" style={bottomLinksStyle}>Change password</Link>
-                <Typography style={bottomLinksStyle}>Delete profile (coming soon)</Typography>
-                <Typography style={bottomLinksStyle} onClick={LogOut}>Log out</Typography>
+                {deleteWindowOpen ?
+                    <MessageBoxYesNo message={"Are you sure you want to delete your profile?"}
+                                     onConfirm={confirmDelete}
+                                     onCancel={cancelDelete}
+                                     parentWidth={"384px"}
+                                     parentHeight={"256px"}/> :
+                    <Fragment/>}
+                <Typography style={bottomLinksStyle} onClick={() => setDeleteWindow(!deleteWindowOpen)}>
+                    Delete profile
+                </Typography>
+                <Typography style={bottomLinksStyle} onClick={LogOut}>
+                    Log out
+                </Typography>
             </Grid>
         </Grid>)
 }
