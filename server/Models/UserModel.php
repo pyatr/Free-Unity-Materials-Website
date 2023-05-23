@@ -264,4 +264,17 @@ class UserModel extends BaseModel
         }
         return false;
     }
+
+    public function deleteUser($email): bool
+    {
+        if (!$this->doesUserExist($email)) {
+            return false;
+        }
+        $email = urlencode($email);
+        $this->delete($this::TABLE_USERS, [$this::ENTRY_EMAIL, '=', "'$email'"]);
+        $this->deleteVerificationCode($email, $this::TABLE_VERIFICATION_CODES);
+        $this->deleteVerificationCode($email, $this::TABLE_VERIFICATION_CODES);
+        $this->deleteVerificationCode($email, $this::TABLE_VERIFICATION_CODES);
+        return true;
+    }
 }

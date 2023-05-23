@@ -220,6 +220,17 @@ Please verify your new password by entering this verification code $verification
         }
     }
 
+    public function deleteUser($attributes): array
+    {
+        $email = $this->tryGetValue($attributes, 'email');
+        $result = [];
+        $result['deletionResult'] = 'failed';
+        if ($this->userModel->deleteUser($email)) {
+            $result['deletionResult'] = 'success';
+        }
+        return $result;
+    }
+
     private function generateRandomVerificationCode(): string
     {
         $code = "";

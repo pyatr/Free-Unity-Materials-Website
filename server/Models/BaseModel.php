@@ -46,7 +46,7 @@ abstract class BaseModel
 
     protected function executeRequest($query): array
     {
-        $response = array();
+        $response = [];
         $response['result'] = 'success';
         $request = $this->DBConn->prepare($query);
         try {
@@ -71,7 +71,7 @@ abstract class BaseModel
         return $result['body'];
     }
 
-    protected function update(string $tableName, array $columns, array $values, array $whereCondition)
+    protected function update(string $tableName, array $columns, array $values, array $whereCondition): void
     {
         $updateQueryObject = new UpdateQueryBuilder();
         $updateQueryObject->
@@ -80,7 +80,7 @@ abstract class BaseModel
         $this->executeRequest($updateQueryObject->getQuery());
     }
 
-    protected function delete(string $tableName, array $whereCondition)
+    protected function delete(string $tableName, array $whereCondition): void
     {
         $deleteQueryObject = new DeleteQueryBuilder();
         $deleteQueryObject->

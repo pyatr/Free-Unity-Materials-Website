@@ -27,6 +27,7 @@ class APIEndpointController
                 'changeUserEmail' => $userControllerName,
                 'addCodeForUserPasswordChange' => $userControllerName,
                 'changeUserPassword' => $userControllerName,
+                'deleteUser' => $userControllerName,
                 'login' => $userControllerName,
                 'loginCookie' => $userControllerName,
 
@@ -69,6 +70,9 @@ class APIEndpointController
                     break;
                 case 'changeUserPassword':
                     $this->respond($controller->changeUserPassword($attributes));
+                    break;
+                case 'deleteUser':
+                    $this->respond($controller->deleteUser($attributes));
                     break;
                 case 'login':
                     $this->respond($controller->tryLogin($attributes));
