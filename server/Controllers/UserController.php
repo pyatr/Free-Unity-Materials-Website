@@ -109,6 +109,15 @@ class UserController extends BaseController
         $email = $this->tryGetValue($attributes, 'email');
         $newEmail = $this->tryGetValue($attributes, 'newEmail');
         $verificationCode = $this->generateRandomVerificationCode();
+        if ($email == $newEmail) {
+            $result['codeAdditionResult'] = 'same-email';
+            return $result;
+        }
+
+        if ($this->userModel->doesUserExist($newEmail)) {
+            $result['codeAdditionResult'] = 'user-exists';
+            return $result;
+        }
         $this->userModel->addUserEmailChangeCode($email, $newEmail, $verificationCode);
         $userName = $this->userModel->getUserName($email);
         $mailBody = "Dear $userName!<br/>
