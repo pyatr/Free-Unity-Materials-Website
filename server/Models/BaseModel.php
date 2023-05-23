@@ -46,7 +46,8 @@ abstract class BaseModel
 
     protected function executeRequest($query): array
     {
-        $response = array('result' => 'success');
+        $response = array();
+        $response['result'] = 'success';
         $request = $this->DBConn->prepare($query);
         try {
             $request->execute();
@@ -57,5 +58,34 @@ abstract class BaseModel
         $response['body'] = $request->fetchAll(PDO::FETCH_NAMED);
         $response['code'] = $request->errorCode();
         return $response;
+    }
+
+    protected function select(array $columns, string $tableName, array $where): array
+    {
+        $selectQueryObject = new SelectQueryBuilder();
+        $selectQueryObject->
+        select($columns)->
+        from($tableName)->
+        where($where);
+        $result = $this->executeRequest($selectQueryObject->getQuery());
+        return $result['body'];
+    }
+
+    protected function update(string $tableName, array $columns, array $values, array $whereCondition)
+    {
+        $updateQueryObject = new UpdateQueryBuilder();
+        $updateQueryObject->
+        update($tableName, $columns, $values)->
+        where($whereCondition);
+        $this->executeRequest($updateQueryObject->getQuery());
+    }
+
+    protected function delete(string $tableName, array $whereCondition)
+    {
+        $deleteQueryObject = new DeleteQueryBuilder();
+        $deleteQueryObject->
+        delete($tableName)->
+        where($whereCondition);
+        $this->executeRequest($deleteQueryObject->getQuery());
     }
 }

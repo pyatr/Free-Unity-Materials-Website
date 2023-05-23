@@ -27,16 +27,17 @@ class UserController extends BaseController
             return $response;
         }
 
-        if (!$this->userModel->isUserActivated($email)) {
-            $response['loginStatus'] = 'inactive';
-            return $response;
-        }
-
         $loginStatus = $this->userModel->tryLogin($email, $password);
         if (!$loginStatus) {
             $response['loginStatus'] = 'could not login';
             return $response;
         }
+
+        if (!$this->userModel->isUserActivated($email)) {
+            $response['loginStatus'] = 'inactive';
+            return $response;
+        }
+
         $hashedUserPassword = $this->userModel->getUserPassword($email);
         //Should hash with User IP
         $encryptedCookie = $this->encryptLoginPassword($email, $hashedUserPassword);
@@ -129,6 +130,47 @@ If you didn't use this address it means someone else entered it by mistake. In t
         $email = $result['newEmail'];
         $password = $this->userModel->getUserPassword($email);
         $result = $result['queryResult'];
+        $result['loginCookie'] = $this->encryptLoginPassword($email, $password);
+        return $result;
+    }
+
+    public function addCodeForUserPasswordChange($attributes)
+    {
+        $result = ['codeAdditionResult' => 'success'];
+        $email = $this->tryGetValue($attributes, 'email');
+        $oldPassword = $this->tryGetValue($attributes, 'oldPassword');
+        if (!$this->userModel->comparePasswords($email, $oldPassword)) {
+            $result['codeAdditionResult'] = 'wrongpassword';
+            return $result;
+        }
+
+        $newPassword = $this->tryGetValue($attributes, 'newPassword');
+        if ($newPassword == $oldPassword) {
+            $result['codeAdditionResult'] = 'samepassword';
+            return $result;
+        }
+
+        $verificationCode = $this->generateRandomVerificationCode();
+        $this->userModel->addUserPasswordChangeCode($email, $newPassword, $verificationCode);
+        $userName = $this->userModel->getUserName($email);
+        $mailBody = "Dear $userName!<br/>
+Please verify your new password by entering this verification code $verificationCode.<br/>";
+        $mailingResult = ServerMailer::sendEmail($email, 'Verify your new password', $mailBody);
+        if (!$mailingResult) {
+            $this->userModel->clearPasswordChangeCodes(urlencode($email));
+            $result['codeAdditionResult'] = 'failed';
+        }
+        return $result;
+    }
+
+    public function changeUserPassword($attributes)
+    {
+        $email = $this->tryGetValue($attributes, 'email');
+        $verificationCode = $this->tryGetValue($attributes, 'verificationCode');
+
+        $result = $this->userModel->changeUserPassword($email, $verificationCode);
+        $password = urldecode($this->userModel->getUserPassword($email));
+
         $result['loginCookie'] = $this->encryptLoginPassword($email, $password);
         return $result;
     }

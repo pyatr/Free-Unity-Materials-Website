@@ -9,6 +9,7 @@ class UserModel extends BaseModel
     private const TABLE_USERS = 'USERS';
     private const TABLE_VERIFICATION_CODES = 'USER_VERIFICATION_CODES';
     private const TABLE_EMAIL_CHANGE_CODES = 'EMAIL_CHANGE_CODES';
+    private const TABLE_PASSWORD_CHANGE_CODES = 'PASSWORD_CHANGE_CODES';
 
     private const ROLE_EDITOR = 'EDITOR';
     private const ROLE_ADMIN = 'ADMIN';
@@ -18,6 +19,7 @@ class UserModel extends BaseModel
     private const ENTRY_PASSWORD = 'PASSWORD';
     private const ENTRY_EMAIL = 'EMAIL';
     private const ENTRY_NEW_EMAIL = 'NEW_EMAIL';
+    private const ENTRY_NEW_PASSWORD = 'NEW_PASSWORD';
     private const ENTRY_STATUS = 'STATUS';
     private const ENTRY_ACTIVATED = 'ACTIVATED';
 
@@ -58,12 +60,7 @@ class UserModel extends BaseModel
 
     private function deleteVerificationCode(string $URLencodedEmail, string $tableName)
     {
-        $deleteQueryObject = new DeleteQueryBuilder();
-        $deleteQueryObject->
-        delete($tableName)->
-        where([$this::ENTRY_EMAIL, '=', "'$URLencodedEmail'"]);
-        $request = $this->DBConn->prepare($deleteQueryObject->getQuery());
-        $request->execute();
+        $this->delete($tableName, [$this::ENTRY_EMAIL, '=', "'$URLencodedEmail'"]);
     }
 
     public function clearEmailChangeCodes(string $URLencodedEmail)
@@ -96,26 +93,72 @@ class UserModel extends BaseModel
         $oldEmail = urlencode($oldEmail);
 
         //Get new email saved from first request
-        $selectQueryObject = new SelectQueryBuilder();
-        $selectQueryObject->
-        select([$this::ENTRY_NEW_EMAIL])->
-        from($this::TABLE_EMAIL_CHANGE_CODES)->
-        where([$this::ENTRY_EMAIL, '=', "'$oldEmail'"]);
-        $request = $this->DBConn->prepare($selectQueryObject->getQuery());
-        $request->execute();
-        $emailSelectResult = $request->fetchAll(PDO::FETCH_NAMED);
+        $emailSelectResult = $this->select(
+            [$this::ENTRY_NEW_EMAIL],
+            $this::TABLE_EMAIL_CHANGE_CODES,
+            [$this::ENTRY_EMAIL, '=', "'$oldEmail'"]
+        );
         if (count($emailSelectResult) == 0) {
             return $result;
         }
         $matchingEmailCount = count($emailSelectResult);
         $newEmail = $emailSelectResult[$matchingEmailCount - 1]['NEW_EMAIL'];
         //Update user email
-        $this->updateUserField($this::ENTRY_EMAIL, $newEmail, [$this::ENTRY_EMAIL, '=', "'$oldEmail'"]);
+        $this->update($this::TABLE_USERS, [$this::ENTRY_EMAIL], [$newEmail], [$this::ENTRY_EMAIL, '=', "'$oldEmail'"]);
 
         //Remove verification code
         $this->deleteVerificationCode($oldEmail, $this::TABLE_EMAIL_CHANGE_CODES);
         $result['emailChangeResult'] = 'success';
         return ['newEmail' => urldecode($newEmail), 'queryResult' => $result];
+    }
+
+    public function clearPasswordChangeCodes(string $URLencodedEmail)
+    {
+        $this->deleteVerificationCode($URLencodedEmail, $this::TABLE_PASSWORD_CHANGE_CODES);
+    }
+
+    public function addUserPasswordChangeCode(string $email, string $newPassword, string $code)
+    {
+        $email = urlencode($email);
+        $newPassword = urlencode(hash($this::HASHING_ALGORITHM, $newPassword));
+        $insertQueryObject = new InsertQueryBuilder();
+        $insertQueryObject->
+        insert(
+            $this::TABLE_PASSWORD_CHANGE_CODES,
+            [$this::ENTRY_EMAIL, $this::ENTRY_NEW_PASSWORD, $this::ENTRY_VERIFICATION_CODE],
+            [$email, $newPassword, $code]
+        );
+        $request = $this->DBConn->prepare($insertQueryObject->getQuery());
+        $request->execute();
+    }
+
+    public function changeUserPassword(string $email, string $code): array
+    {
+        $result = ['passwordChangeResult' => 'failed'];
+        $isCodeValid = $this->verificationCodeExists($code, $this::TABLE_PASSWORD_CHANGE_CODES);
+        if (!$isCodeValid) {
+            return $result;
+        }
+        $email = urlencode($email);
+
+        //Get new password saved from first request
+        $passwordSelectResult = $this->select(
+            [$this::ENTRY_NEW_PASSWORD],
+            $this::TABLE_PASSWORD_CHANGE_CODES,
+            [$this::ENTRY_EMAIL, '=', "'$email'"]
+        );
+        if (count($passwordSelectResult) == 0) {
+            return $result;
+        }
+        $matchingPasswordCount = count($passwordSelectResult);
+        $newPassword = $passwordSelectResult[$matchingPasswordCount - 1]['NEW_PASSWORD'];
+        //Update user password
+        $this->update($this::TABLE_USERS, [$this::ENTRY_PASSWORD], [$newPassword], [$this::ENTRY_EMAIL, '=', "'$email'"]);
+
+        //Remove verification code
+        $this->deleteVerificationCode($email, $this::TABLE_PASSWORD_CHANGE_CODES);
+        $result['passwordChangeResult'] = 'success';
+        return $result;
     }
 
     public function activateUser(string $email, string $code): array
@@ -128,22 +171,12 @@ class UserModel extends BaseModel
         $email = urlencode($email);
 
         //Activate user
-        $this->updateUserField($this::ENTRY_ACTIVATED, '1', [$this::ENTRY_EMAIL, '=', "'$email'"]);
+        $this->update($this::TABLE_USERS, [$this::ENTRY_ACTIVATED], ['1'], [$this::ENTRY_EMAIL, '=', "'$email'"]);
 
         //Remove verification code
         $this->deleteVerificationCode($email, $this::TABLE_VERIFICATION_CODES);
         $result['activationResult'] = 'success';
         return $result;
-    }
-
-    private function updateUserField(string $field, string $value, array $whereCondition)
-    {
-        $userUpdateQueryObject = new UpdateQueryBuilder();
-        $userUpdateQueryObject->
-        update($this::TABLE_USERS, [$field], [$value])->
-        where($whereCondition);
-        $request = $this->DBConn->prepare($userUpdateQueryObject->getQuery());
-        $request->execute();
     }
 
     public function doesUserExist(string $email): bool
@@ -177,14 +210,8 @@ class UserModel extends BaseModel
     public function getUserAttribute(string $email, string $attribute): string
     {
         $email = urlencode($email);
-        $selectQueryObject = new SelectQueryBuilder();
-        $selectQueryObject->
-        select([$attribute])->
-        from($this::TABLE_USERS)->
-        where([$this::ENTRY_EMAIL, '=', "'$email'"]);
-        $request = $this->DBConn->prepare($selectQueryObject->getQuery());
-        $request->execute();
-        return urldecode($request->fetch(PDO::FETCH_NAMED)[$attribute]);
+        $result = $this->select([$attribute], $this::TABLE_USERS, [$this::ENTRY_EMAIL, '=', "'$email'"]);
+        return urldecode($result[0][$attribute]);
     }
 
     public function getUserName(string $email): string
@@ -205,6 +232,13 @@ class UserModel extends BaseModel
     public function getUserRegistrationDate(string $email): string
     {
         return $this->getUserAttribute($email, $this::ENTRY_REGISTRATION_DATE);
+    }
+
+    public function comparePasswords(string $email, string $givenPassword): bool
+    {
+        $userPassword = $this->getUserPassword($email);
+        $givenPassword = urlencode(hash($this::HASHING_ALGORITHM, $givenPassword));
+        return $userPassword == $givenPassword;
     }
 
     public function createNewUser(string $newName, string $password, string $email): bool
