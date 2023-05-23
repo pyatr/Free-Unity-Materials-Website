@@ -22,6 +22,7 @@ export default function EmailChangePage() {
     const [isLoading, setLoadingStatus] = useState(false);
 
     const sendCodeToNewEmail = async (event: React.FormEvent<HTMLFormElement>) => {
+        setErrorMessage("");
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         let errorMessage = "";
@@ -41,9 +42,18 @@ export default function EmailChangePage() {
             setLoadingStatus(true);
             const codeAdditionResult = await SendUserEmailChangeCode(userEmail, newEmail);
             setLoadingStatus(false);
-            if (codeAdditionResult != "success") {
-                setErrorMessage("Something went wrong when sending verification code");
+            if (codeAdditionResult === "success") {
+                return;
             }
+            if (codeAdditionResult === "same-email") {
+                setErrorMessage("You can't use same email");
+                return;
+            }
+            if (codeAdditionResult === "user-exists") {
+                setErrorMessage("That email is already in use");
+                return;
+            }
+            setErrorMessage("Something went wrong when sending verification code");
         }
     };
 
