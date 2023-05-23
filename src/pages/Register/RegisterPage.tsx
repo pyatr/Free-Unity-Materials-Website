@@ -121,6 +121,7 @@ export function RegisterPage() {
         <Container component="main">
             <Grid sx={containerBoxStyle}>
                 {isLoading ? <LoadingOverlay position={"fixed"}/> : <Fragment/>}
+                <ErrorNotification message={errorMessage} onDismiss={() => setErrorMessage("")}/>
                 <Avatar sx={{margin: "16px", background: 'secondary.main'}}>
                     <AppRegistration/>
                 </Avatar>
@@ -130,7 +131,6 @@ export function RegisterPage() {
                 <Box component="form"
                      onSubmit={handleSubmit}
                      sx={{marginTop: "8px", display: "grid"}}>
-                    <ErrorNotification message={errorMessage} onDismiss={() => setErrorMessage("")}/>
                     <TextField id="email-field"
                                name="email"
                                label="Email"

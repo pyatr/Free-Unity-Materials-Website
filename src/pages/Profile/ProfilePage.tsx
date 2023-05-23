@@ -90,7 +90,7 @@ export function ProfilePage() {
             </Grid>
             <Grid sx={userInfoGridStyle} paddingLeft="2em">
                 <Link to="/change-email" style={bottomLinksStyle}>Change email</Link>
-                <Typography style={bottomLinksStyle}>Change password (coming soon)</Typography>
+                <Link to="/change-password" style={bottomLinksStyle}>Change password</Link>
                 <Typography style={bottomLinksStyle}>Delete profile (coming soon)</Typography>
                 <Typography style={bottomLinksStyle} onClick={LogOut}>Log out</Typography>
             </Grid>

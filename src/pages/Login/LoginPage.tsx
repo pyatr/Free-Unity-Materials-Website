@@ -12,8 +12,10 @@ import {TryLogin} from "../../utils/User/Login";
 import {GoToHomePage} from "../../utils/GoToHomePage";
 import {LoadingOverlay} from "../../components/LoadingOverlay";
 import {containerBoxStyle, submitButton, textFieldStyle} from "../Register/RegisterPage";
+import ErrorNotification from "../../components/ErrorNotification";
 
 export default function LoginPage() {
+    const [errorMessage, setErrorMessage] = useState("");
     const [isLoading, setLoadingStatus] = useState(false);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -24,18 +26,24 @@ export default function LoginPage() {
         if (email != null && password != null) {
             setLoadingStatus(true);
             const loginStatus: string = await TryLogin(email, password);
+            setLoadingStatus(false);
             if (loginStatus === "inactive") {
                 sessionStorage.setItem("userEmailActivation", email);
                 window.open(window.location.protocol + "//" + window.location.hostname + "/activate", "_self");
-            } else {
-                GoToHomePage();
+                return;
             }
+            if (loginStatus === "could not login") {
+                setErrorMessage("Wrong password or login");
+                return;
+            }
+            GoToHomePage();
         }
     };
     return (
         <Container component="main">
             <Box sx={containerBoxStyle}>
                 {isLoading ? <LoadingOverlay position={"fixed"}/> : <Fragment/>}
+                <ErrorNotification message={errorMessage} onDismiss={() => setErrorMessage("")}/>
                 <Avatar sx={{margin: "16px", background: 'secondary.main'}}>
                     <LockOutlinedIcon/>
                 </Avatar>

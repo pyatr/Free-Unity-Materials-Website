@@ -10,6 +10,7 @@ import {RegisterPage} from "./pages/Register/RegisterPage";
 import UserActivationPage from "./pages/UserActivation/UserActivationPage";
 import {ProfilePage} from "./pages/Profile/ProfilePage";
 import EmailChangePage from "./pages/EmailChange/EmailChangePage";
+import PasswordChangePage from "./pages/PasswordChange/PasswordChangePage";
 
 export default function App() {
     const [[width, height], setWidthHeight] = useState([window.innerWidth, window.innerHeight]);
@@ -37,10 +38,10 @@ export default function App() {
                 <Route path="/activate" element={<UserActivationPage/>}/>
                 <Route path="/profile" element={<ProfilePage/>}/>
                 <Route path="/change-email" element={<EmailChangePage/>}/>
+                <Route path="/change-password" element={<PasswordChangePage/>}/>
                 <Route path="/articles/*" element={<MainContent key={"articles"} propValue={"ArticlesPage"}/>}/>
                 <Route path="/scripts/*" element={<MainContent key={"scripts"} propValue={"ScriptsPage"}/>}/>
                 <Route path="/*" element={<MainContent key={"assets"} propValue={"AssetsPage"}/>}/>
             </Routes>
-        </BrowserRouter>
-    );
+        </BrowserRouter>);
 }
