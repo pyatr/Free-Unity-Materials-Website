@@ -26,10 +26,10 @@ export default function ContentUnitEditFiles({
     const maxFileCount = 50;
     //TODO: add max filesize. file.size / 1000 is size in kilobytes
 
-    const uploadFiles = async (e: any) => {
-        let files: FileList = e.target.files as FileList;
+    const uploadFiles = async (event: any) => {
+        let files: FileList = event.target.files as FileList;
         if (contentUnitState.fileLinks.length + files.length > maxFileCount) {
-            e.target.value = null;
+            event.target.value = null;
             setErrorMessage("Too many files! Max: " + maxFileCount);
             return;
         }
@@ -41,7 +41,7 @@ export default function ContentUnitEditFiles({
                 blobLink: URL.createObjectURL(files[i])
             });
         }
-        e.target.value = null;
+        event.target.value = null;
         setNewFileLinks(newFileLinks.concat(blobs));
     }
 

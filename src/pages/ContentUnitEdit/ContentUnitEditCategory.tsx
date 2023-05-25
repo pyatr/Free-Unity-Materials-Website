@@ -1,7 +1,7 @@
 import {Grid, Typography} from "@mui/material";
 import React, {Fragment, useState} from "react";
 import {AddCircle, AddCircleOutline} from "@mui/icons-material";
-import ContentCategorySelectionMenu from "../../pages/ContentEdit/ContentCategorySelectionMenu";
+import ContentCategorySelectionMenu from ".//ContentCategorySelectionMenu";
 import {ContentUnitEditCommonProps} from "./ContentUnitEditForm";
 
 const categoryButtonStyle = {

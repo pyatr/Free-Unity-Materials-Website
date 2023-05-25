@@ -1,7 +1,7 @@
 import {Button, Grid} from "@mui/material";
 import React, {Fragment} from "react";
 
-import {sideButtonStyle} from "../../components/MainPage/MainContent";
+import {sideButtonStyle} from "../../components/Layouts/MainContentLayout";
 
 type ContentFormInteractionProps = {
     onSave: Function,

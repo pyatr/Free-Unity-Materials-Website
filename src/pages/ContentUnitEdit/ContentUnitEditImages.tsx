@@ -12,10 +12,10 @@ export function ContentUnitEditImages({
                                }: ContentUnitEditCommonProps) {
     const maxImageCount = 20;
 
-    const uploadImages = async (e: any) => {
-        let files: FileList = e.target.files as FileList;
+    const uploadImages = async (event: any) => {
+        let files: FileList = event.target.files as FileList;
         if (contentUnitState.galleryImageLinks.length + files.length > maxImageCount) {
-            e.target.value = null;
+            event.target.value = null;
             setErrorMessage("Too many images! Max: " + maxImageCount);
             return;
         }
@@ -25,7 +25,7 @@ export function ContentUnitEditImages({
             blobs.push(URL.createObjectURL(files[i]));
         }
         //On some browsers it can delete uploaded files even if they were stored somewhere else
-        e.target.value = null;
+        event.target.value = null;
         setGalleryImageLinks(contentUnitState.galleryImageLinks.concat(blobs));
     }
 

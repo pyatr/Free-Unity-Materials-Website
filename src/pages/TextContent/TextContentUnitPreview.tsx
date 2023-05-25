@@ -6,7 +6,7 @@ import "../../assets/HomePage.css";
 import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
 import {GoToHomePage} from "../../utils/GoToHomePage";
 import MessageBoxYesNo from "../../components/MessageBoxes/MessageBoxYesNo";
-import ContentUnitEditorButtons from "../Content/ContentUnitEditorButtons";
+import ContentUnitEditorButtons from "../ContentUnit/ContentUnitEditorButtons";
 import {StripHTMLFromString} from "../../utils/Strings/StripHTMLFromString";
 import {GetCommentCount} from "../../utils/Comments/GetCommentCount";
 import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
@@ -43,7 +43,7 @@ type TextContentPreviewProps = {
     contentUnitPreview: ContentUnitPreview
 }
 
-export default function TextContentPreview({
+export default function TextContentUnitPreview({
                                                requestedContentCategory,
                                                contentUnitPreview
                                            }: TextContentPreviewProps) {

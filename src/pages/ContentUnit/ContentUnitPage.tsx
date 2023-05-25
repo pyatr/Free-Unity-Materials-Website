@@ -10,7 +10,7 @@ import ImageGallery, {imageBoxStyle} from "../../components/ImageGallery/ImageGa
 import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
 import {GoToHomePage} from "../../utils/GoToHomePage";
 import DownloadLinksList from "../../components/DownloadLinks/DownloadLinksList";
-import {CommentSection} from "../../components/Comments/CommentSection";
+import {CommentSection} from "../../components/CommentsDisplay/CommentSection";
 import ContentUnitEditorButtons from "./ContentUnitEditorButtons";
 import {GetContentUnit} from "../../utils/ContentInteraction/GetContentUnit";
 import MessageBoxYesNo from "../../components/MessageBoxes/MessageBoxYesNo";

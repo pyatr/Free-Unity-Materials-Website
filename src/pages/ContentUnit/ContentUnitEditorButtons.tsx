@@ -2,7 +2,7 @@ import {Button, Grid} from "@mui/material";
 import React, {Fragment} from "react";
 import {Link} from "react-router-dom";
 
-import {sideButtonStyle} from "../../components/MainPage/MainContent";
+import {sideButtonStyle} from "../../components/Layouts/MainContentLayout";
 import {CanUserEditContent} from "../../utils/User/Login";
 
 type ContentEditButtonsProps = {

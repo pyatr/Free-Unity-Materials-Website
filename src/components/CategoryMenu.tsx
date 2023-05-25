@@ -1,7 +1,7 @@
 import {Button, Grid} from "@mui/material";
 import {Link} from "react-router-dom";
-import {IsMobileResolution} from "../../utils/MobileUtilities";
-import {GenericStringProp} from "../../utils/Types/GenericProps/GenericStringProp";
+import {IsMobileResolution} from "../utils/MobileUtilities";
+import {GenericStringProp} from "../utils/Types/GenericProps/GenericStringProp";
 
 export default function CategoryMenu({propValue}: GenericStringProp) {
     const landFontS = 14;

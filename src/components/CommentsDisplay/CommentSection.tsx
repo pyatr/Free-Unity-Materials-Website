@@ -5,7 +5,7 @@ import {UserComment} from "./UserComment";
 import {GetComments} from "../../utils/Comments/GetComments";
 import {ContentUnitRequestData} from "../../utils/Types/Content/ContentUnitRequestData";
 import {UserCommentProps} from "../../utils/Types/UserCommentProps";
-import {sideButtonStyle} from "../MainPage/MainContent";
+import {sideButtonStyle} from "../Layouts/MainContentLayout";
 import {SendComment} from "../../utils/Comments/SendComment";
 import {GetCommentCount} from "../../utils/Comments/GetCommentCount";
 import {DeleteComment} from "../../utils/Comments/DeleteComment";
