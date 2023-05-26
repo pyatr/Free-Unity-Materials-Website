@@ -2,12 +2,13 @@ import ServerConnection from "../ServerConnection";
 import {PageProperties} from "../PageProperties/PageProperties";
 import {ContentUnitPreview} from "../Types/Content/ContentUnitPreview";
 
-export default async function GetPreviews(pageProperties: PageProperties): Promise<ContentUnitPreview[]> {
+export default async function GetPreviews(pageProperties: PageProperties, filter: string = "none"): Promise<ContentUnitPreview[]> {
     const serverConnection = new ServerConnection();
     const attributes = {
         pageSize: pageProperties.pageSize,
         page: pageProperties.currentPage,
-        category: pageProperties.getCategoryName()
+        category: pageProperties.getCategoryName(),
+        filter: filter
     };
 
     //Use response.data.code for SQL request code and response.data.requesterror for error details

@@ -1,9 +1,9 @@
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 
 import "./assets/HomePage.css";
-import SiteAppBar from "./components/MainPage/SiteAppBar";
+import SiteAppBar from "./components/AppBar/SiteAppBar";
 import LoginPage from "./pages/Login/LoginPage";
-import MainContent from "./components/MainPage/MainContent";
+import MainContentLayout from "./components/Layouts/MainContentLayout";
 import {IsLoggedIn, TryCookieLogin} from "./utils/User/Login";
 import {useEffect, useState} from "react";
 import {RegisterPage} from "./pages/Register/RegisterPage";
@@ -39,9 +39,9 @@ export default function App() {
                 <Route path="/profile" element={<ProfilePage/>}/>
                 <Route path="/change-email" element={<EmailChangePage/>}/>
                 <Route path="/change-password" element={<PasswordChangePage/>}/>
-                <Route path="/articles/*" element={<MainContent key={"articles"} propValue={"ArticlesPage"}/>}/>
-                <Route path="/scripts/*" element={<MainContent key={"scripts"} propValue={"ScriptsPage"}/>}/>
-                <Route path="/*" element={<MainContent key={"assets"} propValue={"AssetsPage"}/>}/>
+                <Route path="/articles/*" element={<MainContentLayout key={"articles"} elementTypeName={"ArticlesPage"}/>}/>
+                <Route path="/scripts/*" element={<MainContentLayout key={"scripts"} elementTypeName={"ScriptsPage"}/>}/>
+                <Route path="/*" element={<MainContentLayout key={"assets"} elementTypeName={"AssetsPage"}/>}/>
             </Routes>
         </BrowserRouter>);
 }

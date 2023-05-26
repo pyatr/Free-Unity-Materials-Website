@@ -2,7 +2,7 @@ import {Button} from "@mui/material";
 import {Link} from "react-router-dom";
 import React, {Fragment} from "react";
 
-import {sideButtonStyle} from "../MainPage/MainContent";
+import {sideButtonStyle} from "../Layouts/MainContentLayout";
 
 import {CanUserEditContent} from "../../utils/User/Login";
 import {GenericStringProp} from "../../utils/Types/GenericProps/GenericStringProp";
