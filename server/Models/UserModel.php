@@ -196,7 +196,7 @@ class UserModel extends BaseModel
     {
         $password = urlencode($password);
         //TODO: Still no multiple 'where' support
-        if (!$this->doesUserExist($email) || !$this->isUserActivated($email)) {
+        if (!$this->doesUserExist($email)) {
             return false;
         }
         $givenHashedPassword = $hashPassword ? hash(BaseModel::HASHING_ALGORITHM, $password) : $password;

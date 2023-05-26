@@ -69,6 +69,12 @@ class UserController extends BaseController
         $decrypted = $this->decryptLoginCookie($cookie);
         $email = $decrypted[0];
         $password = $decrypted[1];
+
+        if (!$this->userModel->isUserActivated($email)) {
+            $response['loginStatus'] = 'inactive';
+            return $response;
+        }
+
         $loginStatus = $this->userModel->tryLogin($email, $password, false);
         if ($loginStatus) {
             $response['loginStatus'] = 'success';
@@ -200,17 +206,22 @@ Please verify your new password by entering this verification code $verification
         return $result;
     }
 
-    public function sendActivationCode($attributes)
+    public function sendActivationLink($attributes): bool
     {
         $email = $this->tryGetValue($attributes, 'email');
-        $verificationCode = $this->generateRandomVerificationCode();
+        $pathname = $this->tryGetValue($attributes, 'pathname');
+        $verificationCode = GUIDCreator::GUIDv4();
 
         $this->userModel->addUserVerificationCode($email, $verificationCode);
         $subject = 'Verify your email address';
+        $serviceData = FileManager::getTextFileContents($_SERVER['DOCUMENT_ROOT'] . '/hostdata');
+        $serviceHost = $serviceData[0];
+        $servicePort = $serviceData[1];
+        $verificationLink = "http://$serviceHost:$servicePort/$pathname/$verificationCode";
         $body = "This email address was recently used to create an account on our website.<br/>
-            To activate your new account and verify your address enter verification code $verificationCode.<br/>
-            If you didn't use this address it means someone else entered it by mistake. In that case you don't have to take any action. Do not tell anyone this code.";
-        ServerMailer::sendEmail($email, $subject, $body);
+            To activate your new account and verify your address click this link <href>$verificationLink</href>.<br/>
+            If you didn't use this address it means someone else entered it by mistake. In that case you don't have to take any action.";
+        return ServerMailer::sendEmail($email, $subject, $body);
     }
 
     public function createNewUser($attributes)
@@ -224,8 +235,12 @@ Please verify your new password by entering this verification code $verification
         }
 
         if ($this->userModel->createNewUser($username, $password, $email)) {
-            $this->sendActivationCode($attributes);
-            return ["registrationResult" => "userCreated"];
+            $attributes['pathname'] = 'activate';
+            if ($this->sendActivationLink($attributes)) {
+                return ["registrationResult" => "userCreated"];
+            } else {
+                return ["registrationResult" => "failedToSendEmail"];
+            }
         }
     }
 
