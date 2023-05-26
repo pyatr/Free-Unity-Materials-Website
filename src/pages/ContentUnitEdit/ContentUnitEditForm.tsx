@@ -17,7 +17,7 @@ import ServerConnection from "../../utils/ServerConnection";
 import {GoToHomePage} from "../../utils/GoToHomePage";
 import DeleteContent from "../../utils/ContentInteraction/DeleteContent";
 
-import ErrorNotification from "../../components/ErrorNotification";
+import Notification from "../../components/Notification";
 import {ContentUnitEditCategory} from "./ContentUnitEditCategory";
 import MessageBoxYesNo from "../../components/MessageBoxes/MessageBoxYesNo";
 import {ContentUnitEditImages} from "./ContentUnitEditImages";
@@ -152,7 +152,7 @@ export default function ContentUnitEditForm({requestedContentID, requestedConten
                         parentHeight={"512px"}/> :
                     <Fragment/>}
                 <Typography variant="h6">{editFormTitle}</Typography>
-                <ErrorNotification message={errorMessage} onDismiss={() => setErrorMessage("")}/>
+                <Notification message={errorMessage} color={"red"} onDismiss={() => setErrorMessage("")}/>
                 <ContentUnitEditImages setContentUnitProperty={setContentUnitProperty}
                                        setErrorMessage={setErrorMessage}
                                        contentUnitState={contentUnitState}/>

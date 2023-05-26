@@ -13,7 +13,7 @@ import Cookies from "universal-cookie";
 import {ClearUserData, GetUserEmail, IsLoggedIn} from "../../utils/User/Login";
 import {containerBoxStyle, submitButton} from "../Register/RegisterPage";
 import {IsStringNullOrEmpty} from "../../utils/Strings/IsStringNullOrEmpty";
-import ErrorNotification from "../../components/ErrorNotification";
+import Notification from "../../components/Notification";
 import {ChangeUserEmail, SendUserEmailChangeCode} from "../../utils/User/ChangeUserEmail";
 
 export default function EmailChangePage() {
@@ -94,7 +94,7 @@ export default function EmailChangePage() {
         <Container component="main">
             <Box sx={containerBoxStyle}>
                 {isLoading ? <LoadingOverlay position={"fixed"}/> : <Fragment/>}
-                <ErrorNotification message={errorMessage} onDismiss={() => setErrorMessage("")}/>
+                <Notification message={errorMessage} color={"red"} onDismiss={() => setErrorMessage("")}/>
                 <Avatar sx={{margin: "16px", background: 'secondary.main'}}>
                     <AppRegistration/>
                 </Avatar>

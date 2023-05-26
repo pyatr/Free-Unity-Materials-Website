@@ -12,7 +12,7 @@ import {TryLogin} from "../../utils/User/Login";
 import {GoToHomePage} from "../../utils/GoToHomePage";
 import {LoadingOverlay} from "../../components/LoadingOverlay";
 import {containerBoxStyle, submitButton, textFieldStyle} from "../Register/RegisterPage";
-import ErrorNotification from "../../components/ErrorNotification";
+import Notification from "../../components/Notification";
 
 export default function LoginPage() {
     const [errorMessage, setErrorMessage] = useState("");
@@ -43,7 +43,7 @@ export default function LoginPage() {
         <Container component="main">
             <Box sx={containerBoxStyle}>
                 {isLoading ? <LoadingOverlay position={"fixed"}/> : <Fragment/>}
-                <ErrorNotification message={errorMessage} onDismiss={() => setErrorMessage("")}/>
+                <Notification message={errorMessage} color={"red"} onDismiss={() => setErrorMessage("")}/>
                 <Avatar sx={{margin: "16px", background: 'secondary.main'}}>
                     <LockOutlinedIcon/>
                 </Avatar>
@@ -69,9 +69,6 @@ export default function LoginPage() {
                                sx={textFieldStyle}/>
                     <Link to="/register" style={{marginTop: "16px", color: "black", width: "fit-content"}}>
                         Register
-                    </Link>
-                    <Link to="/register" style={{marginTop: "16px", color: "black", width: "fit-content"}}>
-                        Forgot password?
                     </Link>
                     <Button variant="contained"
                             sx={submitButton}

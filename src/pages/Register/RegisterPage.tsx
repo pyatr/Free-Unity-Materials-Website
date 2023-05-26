@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import ErrorNotification from "../../components/ErrorNotification";
+import Notification from "../../components/Notification";
 import {IsStringNullOrEmpty} from "../../utils/Strings/IsStringNullOrEmpty";
 import {StringContainsOneOfSymbols} from "../../utils/Strings/StringContainsOneOfSymbols";
 import {LoadingOverlay} from "../../components/LoadingOverlay";
@@ -13,6 +13,9 @@ import {Register} from "../../utils/User/Register";
 import Avatar from "@mui/material/Avatar";
 import {AppRegistration} from "@mui/icons-material";
 import Container from "@mui/material/Container";
+import {IsStringWhiteSpaces} from "../../utils/Strings/IsStringWhiteSpaces";
+import {DoesStringHaveNumbers} from "../../utils/Strings/DoesStringHaveNumbers";
+import {DoesStringHaveCharacters} from "../../utils/Strings/DoesStringHaveCharacters";
 
 const textFieldStyle = {
     marginTop: "16px",
@@ -37,7 +40,8 @@ const containerBoxStyle = {
 export {containerBoxStyle, submitButton, textFieldStyle}
 
 function CheckInput(email: string, username: string, password: string, passwordConfirmation: string): string {
-    const badSymbols = ["'", '"', "[", "]"];
+    const badSymbols = ["'", '"', ":", ";"];
+
     let errorMessage = "";
     if (IsStringNullOrEmpty(email))
         errorMessage += "Enter email\n";
@@ -47,8 +51,20 @@ function CheckInput(email: string, username: string, password: string, passwordC
     if (IsStringNullOrEmpty(username))
         errorMessage += "Enter username\n";
 
+    if (IsStringWhiteSpaces(username))
+        errorMessage += "Username can not be empty or contain one of those symbols ' \" : ; \n";
+
     if (StringContainsOneOfSymbols(username, badSymbols))
         errorMessage += "Username has one of forbidden symbols " + badSymbols.join(", ") + "\n";
+
+    if (!DoesStringHaveNumbers(password))
+        errorMessage += "Password has to contain at least one number";
+
+    if (!DoesStringHaveCharacters(password))
+        errorMessage += "Password has to contain at least one character";
+
+    if (IsStringWhiteSpaces(password))
+        errorMessage += "Password can not be empty\n";
 
     if (IsStringNullOrEmpty(password))
         errorMessage += "Enter password\n";
@@ -63,8 +79,12 @@ function CheckInput(email: string, username: string, password: string, passwordC
 
 export function RegisterPage() {
     const [errorMessage, setErrorMessage] = useState("");
+    const [notificationMessage, setNotificationMessage] = useState("");
     const [isLoading, setLoadingStatus] = useState(false);
     const [isUserCreated, setUserCreated] = useState(false);
+    const minUsernameLength = 2;
+    const maxUsernameLength = 64;
+    const minPasswordLength = 5;
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         setErrorMessage("");
@@ -75,27 +95,27 @@ export function RegisterPage() {
         let username = data.get("username") as string;
         let password = data.get("password") as string;
         let passwordConfirmation = data.get("password-confirm") as string;
-
+        email = email.trim();
         let errorMessage = CheckInput(email, username, password, passwordConfirmation);
         if (errorMessage === "") {
             setLoadingStatus(true);
             const registrationResult = await Register(email, username, password);
-            if (registrationResult === "userExists") {
-                setErrorMessage("That email is already used");
-                setLoadingStatus(false);
+            switch (registrationResult) {
+                case "userExists":
+                    setErrorMessage("That email is already used");
+                    break;
+                case "userCreated":
+                    localStorage.setItem("userEmailActivation", email);
+                    setUserCreated(true);
+                    break;
+                case "failedToSendEmail":
+                    setErrorMessage("Failed to send email to provided address. Please log in and click send code again.");
+                    break;
             }
-            if (registrationResult === "userCreated") {
-                sessionStorage.setItem("userEmailActivation", email);
-                setLoadingStatus(false);
-                setUserCreated(true);
-            }
+            setLoadingStatus(false);
         } else {
             setErrorMessage(errorMessage);
         }
-    }
-
-    const goToActivationPage = () => {
-        window.open(window.location.protocol + "//" + window.location.hostname + "/activate", "_self");
     }
 
     if (isUserCreated) {
@@ -106,13 +126,8 @@ export function RegisterPage() {
                         Thank you for registering!
                     </Typography>
                     <Typography component="h1" variant="h5">
-                        Please go to account activation page and enter code we sent to your email.
+                        Please check your inbox and click the provided link to activate your account.
                     </Typography>
-                    <Button variant="contained"
-                            sx={submitButton}
-                            onClick={goToActivationPage}>
-                        Go to activation page
-                    </Button>
                 </Grid>
             </Container>);
     }
@@ -121,7 +136,9 @@ export function RegisterPage() {
         <Container component="main">
             <Grid sx={containerBoxStyle}>
                 {isLoading ? <LoadingOverlay position={"fixed"}/> : <Fragment/>}
-                <ErrorNotification message={errorMessage} onDismiss={() => setErrorMessage("")}/>
+                <Notification message={errorMessage} color={"red"} onDismiss={() => setErrorMessage("")}/>
+                <Notification message={notificationMessage} color={"primary.main"}
+                              onDismiss={() => setNotificationMessage("")}/>
                 <Avatar sx={{margin: "16px", background: 'secondary.main'}}>
                     <AppRegistration/>
                 </Avatar>
@@ -139,15 +156,17 @@ export function RegisterPage() {
                                sx={textFieldStyle}/>
                     <TextField id="username-field"
                                name="username"
-                               label="Name"
+                               label={"User name (min: " + minUsernameLength + ", max: " + maxUsernameLength + ")"}
                                variant="standard"
+                               inputProps={{minLength: minUsernameLength, maxLength: maxUsernameLength}}
                                required
                                sx={textFieldStyle}/>
                     <TextField id="password-field"
                                name="password"
-                               label="Password"
+                               label={"Password (min: " + minPasswordLength + ")"}
                                variant="standard"
                                type="password"
+                               inputProps={{minLength: minPasswordLength}}
                                required
                                sx={textFieldStyle}/>
                     <TextField id="password-confirm-field"

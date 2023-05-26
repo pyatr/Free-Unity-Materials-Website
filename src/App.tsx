@@ -7,7 +7,7 @@ import MainContentLayout from "./components/Layouts/MainContentLayout";
 import {IsLoggedIn, TryCookieLogin} from "./utils/User/Login";
 import {useEffect, useState} from "react";
 import {RegisterPage} from "./pages/Register/RegisterPage";
-import UserActivationPage from "./pages/UserActivation/UserActivationPage";
+import UserActivationRouter from "./pages/UserActivation/UserActivationRouter";
 import {ProfilePage} from "./pages/Profile/ProfilePage";
 import EmailChangePage from "./pages/EmailChange/EmailChangePage";
 import PasswordChangePage from "./pages/PasswordChange/PasswordChangePage";
@@ -35,7 +35,7 @@ export default function App() {
             <Routes>
                 <Route path="/login" element={<LoginPage/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
-                <Route path="/activate" element={<UserActivationPage/>}/>
+                <Route path="/activate/*" element={<UserActivationRouter/>}/>
                 <Route path="/profile" element={<ProfilePage/>}/>
                 <Route path="/change-email" element={<EmailChangePage/>}/>
                 <Route path="/change-password" element={<PasswordChangePage/>}/>

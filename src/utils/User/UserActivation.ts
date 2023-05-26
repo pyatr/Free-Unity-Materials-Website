@@ -17,11 +17,12 @@ export async function ActivateUser(email: string, verificationCode: string): Pro
     return ["failed", "no cookie"];
 }
 
-export async function RequestVerificationCode(email: string) {
+export async function RequestVerificationLink(email: string, pathname: string) {
     let serverConnection: ServerConnection = new ServerConnection();
 
     const attributes = {
-        email: email
+        email: email,
+        pathname: pathname
     };
-    await serverConnection.SendPostRequestPromise("sendActivationCode", attributes);
+    await serverConnection.SendPostRequestPromise("sendActivationLink", attributes);
 }
