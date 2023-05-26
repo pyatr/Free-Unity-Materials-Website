@@ -28,3 +28,4 @@ yarn-error.log*
 /server/FileStorage/
 /server/Logs/
 /server/smtpdata
+/server/hostdata
