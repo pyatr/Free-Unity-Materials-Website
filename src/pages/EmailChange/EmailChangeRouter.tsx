@@ -121,14 +121,18 @@ function EmailChangeLinkVerificationPage() {
     };
 
     if (!IsLoggedIn()) {
-        return (
-            <Container component="main">
-                <Box sx={containerBoxStyle}>
-                    <Typography component="h1" variant="h5">
-                        You must be logged in to change password.
-                    </Typography>
-                </Box>
-            </Container>);
+        if (isLoading) {
+            return (<LoadingOverlay position={"fixed"}/>);
+        } else {
+            return (
+                <Container component="main">
+                    <Box sx={containerBoxStyle}>
+                        <Typography component="h1" variant="h5">
+                            You must be logged in to change password.
+                        </Typography>
+                    </Box>
+                </Container>);
+        }
     }
 
     if (!isCodeValid) {
@@ -164,16 +168,20 @@ function EmailChangeLinkVerificationPage() {
                                name="new-email"
                                label="Enter new email"
                                variant="standard"
+                               required
                                sx={{marginTop: "16px", minWidth: "300px"}}/>
                     <TextField id="confirm-new-email-field"
                                name="confirm-new-email"
                                label="Confirm new email"
                                variant="standard"
+                               required
                                sx={{marginTop: "16px", minWidth: "300px"}}/>
                     <TextField id="password-field"
                                name="password"
                                label="Enter password"
                                variant="standard"
+                               type="password"
+                               required
                                sx={{marginTop: "16px", minWidth: "300px"}}/>
                     <Button variant="contained"
                             sx={submitButton}

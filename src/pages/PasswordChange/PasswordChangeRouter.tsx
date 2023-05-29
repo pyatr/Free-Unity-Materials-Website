@@ -113,14 +113,18 @@ function PasswordChangeLinkVerificationPage() {
     };
 
     if (!IsLoggedIn()) {
-        return (
-            <Container component="main">
-                <Box sx={containerBoxStyle}>
-                    <Typography component="h1" variant="h5">
-                        You must be logged in to change password.
-                    </Typography>
-                </Box>
-            </Container>);
+        if (isLoading) {
+            return (<LoadingOverlay position={"fixed"}/>);
+        } else {
+            return (
+                <Container component="main">
+                    <Box sx={containerBoxStyle}>
+                        <Typography component="h1" variant="h5">
+                            You must be logged in to change password.
+                        </Typography>
+                    </Box>
+                </Container>);
+        }
     }
 
     if (!isCodeValid) {
