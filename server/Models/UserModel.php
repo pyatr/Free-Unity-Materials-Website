@@ -18,7 +18,6 @@ class UserModel extends BaseModel
     private const ENTRY_USERNAME = 'USERNAME';
     private const ENTRY_PASSWORD = 'PASSWORD';
     private const ENTRY_EMAIL = 'EMAIL';
-    private const ENTRY_NEW_EMAIL = 'NEW_EMAIL';
     private const ENTRY_NEW_PASSWORD = 'NEW_PASSWORD';
     private const ENTRY_STATUS = 'STATUS';
     private const ENTRY_ACTIVATED = 'ACTIVATED';
@@ -68,22 +67,21 @@ class UserModel extends BaseModel
         $this->deleteVerificationCode($URLencodedEmail, $this::TABLE_EMAIL_CHANGE_CODES);
     }
 
-    public function addUserEmailChangeCode(string $email, string $newEmail, string $code)
+    public function addUserEmailChangeCode(string $email, string $code)
     {
         $email = urlencode($email);
-        $newEmail = urlencode($newEmail);
         $insertQueryObject = new InsertQueryBuilder();
         $insertQueryObject->
         insert(
             $this::TABLE_EMAIL_CHANGE_CODES,
-            [$this::ENTRY_EMAIL, $this::ENTRY_NEW_EMAIL, $this::ENTRY_VERIFICATION_CODE],
-            [$email, $newEmail, $code]
+            [$this::ENTRY_EMAIL, $this::ENTRY_VERIFICATION_CODE],
+            [$email, $code]
         );
         $request = $this->DBConn->prepare($insertQueryObject->getQuery());
         $request->execute();
     }
 
-    public function changeUserEmail(string $oldEmail, string $code): array
+    public function changeUserEmail(string $oldEmail, string $newEmail, string $code): array
     {
         $result = ['emailChangeResult' => 'failed'];
         $isCodeValid = $this->verificationCodeExists($code, $this::TABLE_EMAIL_CHANGE_CODES);
@@ -91,25 +89,26 @@ class UserModel extends BaseModel
             return $result;
         }
         $oldEmail = urlencode($oldEmail);
-
-        //Get new email saved from first request
-        $emailSelectResult = $this->select(
-            [$this::ENTRY_NEW_EMAIL],
-            $this::TABLE_EMAIL_CHANGE_CODES,
-            [$this::ENTRY_EMAIL, '=', "'$oldEmail'"]
-        );
-        if (count($emailSelectResult) == 0) {
-            return $result;
-        }
-        $matchingEmailCount = count($emailSelectResult);
-        $newEmail = $emailSelectResult[$matchingEmailCount - 1]['NEW_EMAIL'];
+        $newEmail = urlencode($newEmail);
         //Update user email
         $this->update($this::TABLE_USERS, [$this::ENTRY_EMAIL], [$newEmail], [$this::ENTRY_EMAIL, '=', "'$oldEmail'"]);
 
         //Remove verification code
         $this->deleteVerificationCode($oldEmail, $this::TABLE_EMAIL_CHANGE_CODES);
         $result['emailChangeResult'] = 'success';
-        return ['newEmail' => urldecode($newEmail), 'queryResult' => $result];
+        return $result;
+    }
+
+    public function doesEmailChangeCodeExist(string $code): bool
+    {
+        $selectQueryObject = new SelectQueryBuilder();
+        $selectQueryObject->
+        select(["COUNT(1)"])->
+        from($this::TABLE_EMAIL_CHANGE_CODES)->
+        where([$this::ENTRY_VERIFICATION_CODE, '=', "'$code'"]);
+        $request = $this->DBConn->prepare($selectQueryObject->getQuery());
+        $request->execute();
+        return $request->fetchAll(PDO::FETCH_NUM)[0][0] > 0;
     }
 
     public function clearPasswordChangeCodes(string $URLencodedEmail)

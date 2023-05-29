@@ -47,10 +47,10 @@ class UserController extends BaseController
         return $response;
     }
 
-    private function encryptLoginPassword(string $email, string $password): string
+    private function encryptLoginPassword(string $email, string $hashedPassword): string
     {
         return openssl_encrypt(
-            json_encode([$email, $password]),
+            json_encode([$email, $hashedPassword]),
             self::CIPHERING_METHOD,
             $this->cipherCode,
             OPENSSL_ZERO_PADDING,
@@ -113,23 +113,16 @@ class UserController extends BaseController
     {
         $result = ['codeAdditionResult' => 'success'];
         $email = $this->tryGetValue($attributes, 'email');
-        $newEmail = $this->tryGetValue($attributes, 'newEmail');
-        $verificationCode = $this->generateRandomVerificationCode();
-        if ($email == $newEmail) {
-            $result['codeAdditionResult'] = 'same-email';
-            return $result;
-        }
-
-        if ($this->userModel->doesUserExist($newEmail)) {
-            $result['codeAdditionResult'] = 'user-exists';
-            return $result;
-        }
-        $this->userModel->addUserEmailChangeCode($email, $newEmail, $verificationCode);
+        $verificationCode = GUIDCreator::GUIDv4();
+        $this->userModel->addUserEmailChangeCode($email, $verificationCode);
         $userName = $this->userModel->getUserName($email);
+        $serviceData = FileManager::getTextFileContents($_SERVER['DOCUMENT_ROOT'] . '/hostdata');
+        $serviceHost = $serviceData[0];
+        $servicePort = $serviceData[1];
+        $verificationLink = "http://$serviceHost:$servicePort/change-email/$verificationCode";
         $mailBody = "Dear $userName!<br/>
-Please verify your new email address by entering this verification code $verificationCode.<br/>
-If you didn't use this address it means someone else entered it by mistake. In that case you don't have to take any action. Do not tell anyone this code.";
-        $mailingResult = ServerMailer::sendEmail($newEmail, 'Verify your new email', $mailBody);
+Please follow this link to change your email <href>$verificationLink</href><br/>";
+        $mailingResult = ServerMailer::sendEmail($email, 'Follow the link to change your email on our website', $mailBody);
         if (!$mailingResult) {
             $this->userModel->clearEmailChangeCodes(urlencode($email));
             $result['codeAdditionResult'] = 'failed';
@@ -140,13 +133,42 @@ If you didn't use this address it means someone else entered it by mistake. In t
     public function changeUserEmail($attributes)
     {
         $email = $this->tryGetValue($attributes, 'email');
-        $verificationCode = $this->tryGetValue($attributes, 'verificationCode');
-        $result = $this->userModel->changeUserEmail($email, $verificationCode);
-        $email = $result['newEmail'];
+        $newEmail = $this->tryGetValue($attributes, 'newEmail');
+        $givenPassword = $this->tryGetValue($attributes, 'password');
         $password = $this->userModel->getUserPassword($email);
-        $result = $result['queryResult'];
-        $result['loginCookie'] = $this->encryptLoginPassword($email, $password);
+
+        if ($email == $newEmail) {
+            $result['emailChangeResult'] = 'same-email';
+            return $result;
+        }
+
+        if ($this->userModel->doesUserExist($newEmail)) {
+            $result['emailChangeResult'] = 'user-exists';
+            return $result;
+        }
+
+        if ($givenPassword == null || $givenPassword == "") {
+            $result['emailChangeResult'] = 'no-password';
+            return $result;
+        }
+
+        $loginStatus = $this->userModel->tryLogin($email, $givenPassword);
+        if (!$loginStatus) {
+            $result['emailChangeResult'] = 'wrong-password';
+            return $result;
+        }
+
+        $verificationCode = $this->tryGetValue($attributes, 'verificationCode');
+        $result = $this->userModel->changeUserEmail($email, $newEmail, $verificationCode);
+
+        $result['loginCookie'] = $this->encryptLoginPassword($newEmail, $password);
         return $result;
+    }
+
+    public function checkEmailValidationCode($attributes)
+    {
+        $verificationCode = $this->tryGetValue($attributes, 'verificationCode');
+        return ['isCodeReal' => $this->userModel->doesEmailChangeCodeExist($verificationCode) ? "exists" : "does-not-exist"];
     }
 
     public function addCodeForUserPasswordChange($attributes)
