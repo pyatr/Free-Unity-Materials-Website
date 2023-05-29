@@ -17,8 +17,7 @@ import Notification from "../../components/Notification";
 import {ChangeUserEmail, CheckEmailValidationCode, SendUserEmailChangeLink} from "../../utils/User/ChangeUserEmail";
 import {Route, Routes, useParams} from "react-router-dom";
 
-export default function EmailChangeRouter() {
-
+export function EmailChangeRouter() {
     return (
         <Routes>
             <Route path="/" element={<EmailChangePage/>}/>
@@ -28,8 +27,8 @@ export default function EmailChangeRouter() {
 
 function EmailChangeLinkVerificationPage() {
     const [errorMessage, setErrorMessage] = useState("");
-    const [isLoading, setLoadingStatus] = useState(true);
-    const [isCodeValid, setCodeValidity] = useState(false);
+    const [isLoading, setLoadingStatus] = useState(false);
+    const [isCodeValid, setCodeValidity] = useState<boolean>();
 
     const userEmail = GetUserEmail();
 
@@ -43,10 +42,12 @@ function EmailChangeLinkVerificationPage() {
             setCodeValidity(false);
             return;
         }
-        setLoadingStatus(true);
-        let isCodeValidLocal: boolean = await CheckEmailValidationCode(activationCode as string);
-        setCodeValidity(isCodeValidLocal);
-        setLoadingStatus(false);
+        if (isCodeValid === undefined && !isLoading) {
+            setLoadingStatus(true);
+            let isCodeValidLocal: boolean = await CheckEmailValidationCode(activationCode as string);
+            setCodeValidity(isCodeValidLocal);
+            setLoadingStatus(false);
+        }
     }
 
     useEffect(() => {
@@ -119,8 +120,19 @@ function EmailChangeLinkVerificationPage() {
         }
     };
 
+    if (!IsLoggedIn()) {
+        return (
+            <Container component="main">
+                <Box sx={containerBoxStyle}>
+                    <Typography component="h1" variant="h5">
+                        You must be logged in to change password.
+                    </Typography>
+                </Box>
+            </Container>);
+    }
+
     if (!isCodeValid) {
-        if (isLoading) {
+        if (isLoading || isCodeValid === undefined) {
             return (<LoadingOverlay position={"fixed"}/>);
         } else {
             return (
@@ -179,7 +191,7 @@ function EmailChangePage() {
     const [notificationMessage, setNotification] = useState("");
     const [isLoading, setLoadingStatus] = useState(false);
 
-    const sendActivationLinkToEmail = async (event: React.FormEvent<HTMLFormElement>) => {
+    const sendEmailChangeLinkToEmail = async (event: React.FormEvent<HTMLFormElement>) => {
         setErrorMessage("");
         event.preventDefault();
 
@@ -220,10 +232,10 @@ function EmailChangePage() {
                     <AppRegistration/>
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Click send link to receive a link to your email change page.
+                    Click "Send link" to receive link to your email change page.
                 </Typography>
                 <Box component="form"
-                     onSubmit={sendActivationLinkToEmail}
+                     onSubmit={sendEmailChangeLinkToEmail}
                      sx={{marginTop: "8px", display: "grid"}}>
                     <TextField id="your-email-field"
                                name="your-email"

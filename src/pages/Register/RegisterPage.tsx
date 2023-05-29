@@ -44,12 +44,12 @@ function CheckInput(email: string, username: string, password: string, passwordC
 
     let errorMessage = "";
     if (IsStringNullOrEmpty(email))
-        errorMessage += "Enter email\n";
+        errorMessage += "Enter email.\n";
     else if (!email.includes("@"))
-        errorMessage += email + " is not a valid email address\n";
+        errorMessage += email + " is not a valid email address.\n";
 
     if (IsStringNullOrEmpty(username))
-        errorMessage += "Enter username\n";
+        errorMessage += "Enter username.\n";
 
     if (IsStringWhiteSpaces(username))
         errorMessage += "Username can not be empty or contain one of those symbols ' \" : ; \n";
@@ -58,22 +58,22 @@ function CheckInput(email: string, username: string, password: string, passwordC
         errorMessage += "Username has one of forbidden symbols " + badSymbols.join(", ") + "\n";
 
     if (!DoesStringHaveNumbers(password))
-        errorMessage += "Password has to contain at least one number";
+        errorMessage += "Password has to contain at least one number.\n";
 
     if (!DoesStringHaveCharacters(password))
-        errorMessage += "Password has to contain at least one character";
+        errorMessage += "Password has to contain at least one character.\n";
 
     if (IsStringWhiteSpaces(password))
-        errorMessage += "Password can not be empty\n";
+        errorMessage += "Password can not be empty.\n";
 
     if (IsStringNullOrEmpty(password))
-        errorMessage += "Enter password\n";
+        errorMessage += "Enter password.\n";
 
     if (IsStringNullOrEmpty(passwordConfirmation))
-        errorMessage += "Confirm password\n";
+        errorMessage += "Confirm password.\n";
 
     if (passwordConfirmation != password)
-        errorMessage += "Passwords do not match, please enter correct password\n";
+        errorMessage += "Passwords do not match, please enter correct password.\n";
     return errorMessage;
 }
 
