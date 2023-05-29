@@ -9,8 +9,8 @@ import {useEffect, useState} from "react";
 import {RegisterPage} from "./pages/Register/RegisterPage";
 import UserActivationRouter from "./pages/UserActivation/UserActivationRouter";
 import {ProfilePage} from "./pages/Profile/ProfilePage";
-import EmailChangeRouter from "./pages/EmailChange/EmailChangeRouter";
-import PasswordChangePage from "./pages/PasswordChange/PasswordChangePage";
+import {EmailChangeRouter} from "./pages/EmailChange/EmailChangeRouter";
+import {PasswordChangeRouter} from "./pages/PasswordChange/PasswordChangeRouter";
 
 export default function App() {
     const [[width, height], setWidthHeight] = useState([window.innerWidth, window.innerHeight]);
@@ -35,10 +35,10 @@ export default function App() {
             <Routes>
                 <Route path="/login" element={<LoginPage/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
-                <Route path="/activate/*" element={<UserActivationRouter/>}/>
                 <Route path="/profile" element={<ProfilePage/>}/>
+                <Route path="/activate/*" element={<UserActivationRouter/>}/>
                 <Route path="/change-email/*" element={<EmailChangeRouter/>}/>
-                <Route path="/change-password" element={<PasswordChangePage/>}/>
+                <Route path="/change-password/*" element={<PasswordChangeRouter/>}/>
                 <Route path="/articles/*" element={<MainContentLayout key={"articles"} elementTypeName={"ArticlesPage"}/>}/>
                 <Route path="/scripts/*" element={<MainContentLayout key={"scripts"} elementTypeName={"ScriptsPage"}/>}/>
                 <Route path="/*" element={<MainContentLayout key={"assets"} elementTypeName={"AssetsPage"}/>}/>
