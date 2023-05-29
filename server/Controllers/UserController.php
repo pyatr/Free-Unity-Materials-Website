@@ -171,28 +171,26 @@ Please follow this link to change your email <href>$verificationLink</href><br/>
         return ['isCodeReal' => $this->userModel->doesEmailChangeCodeExist($verificationCode) ? "exists" : "does-not-exist"];
     }
 
+    public function checkPasswordValidationCode($attributes)
+    {
+        $verificationCode = $this->tryGetValue($attributes, 'verificationCode');
+        return ['isCodeReal' => $this->userModel->doesPasswordChangeCodeExist($verificationCode) ? "exists" : "does-not-exist"];
+    }
+
     public function addCodeForUserPasswordChange($attributes)
     {
         $result = ['codeAdditionResult' => 'success'];
         $email = $this->tryGetValue($attributes, 'email');
-        $oldPassword = $this->tryGetValue($attributes, 'oldPassword');
-        if (!$this->userModel->comparePasswords($email, $oldPassword)) {
-            $result['codeAdditionResult'] = 'wrongpassword';
-            return $result;
-        }
-
-        $newPassword = $this->tryGetValue($attributes, 'newPassword');
-        if ($newPassword == $oldPassword) {
-            $result['codeAdditionResult'] = 'samepassword';
-            return $result;
-        }
-
-        $verificationCode = $this->generateRandomVerificationCode();
-        $this->userModel->addUserPasswordChangeCode($email, $newPassword, $verificationCode);
+        $verificationCode = GUIDCreator::GUIDv4();
+        $this->userModel->addUserPasswordChangeCode($email, $verificationCode);
         $userName = $this->userModel->getUserName($email);
+        $serviceData = FileManager::getTextFileContents($_SERVER['DOCUMENT_ROOT'] . '/hostdata');
+        $serviceHost = $serviceData[0];
+        $servicePort = $serviceData[1];
+        $verificationLink = "http://$serviceHost:$servicePort/change-password/$verificationCode";
         $mailBody = "Dear $userName!<br/>
-Please verify your new password by entering this verification code $verificationCode.<br/>";
-        $mailingResult = ServerMailer::sendEmail($email, 'Verify your new password', $mailBody);
+Please follow this link to change your password <html>$verificationLink</html>";
+        $mailingResult = ServerMailer::sendEmail($email, 'Follow the link to change your password on our website', $mailBody);
         if (!$mailingResult) {
             $this->userModel->clearPasswordChangeCodes(urlencode($email));
             $result['codeAdditionResult'] = 'failed';
@@ -202,10 +200,23 @@ Please verify your new password by entering this verification code $verification
 
     public function changeUserPassword($attributes)
     {
+        $result['passwordChangeResult'] = 'success';
         $email = $this->tryGetValue($attributes, 'email');
         $verificationCode = $this->tryGetValue($attributes, 'verificationCode');
 
-        $result = $this->userModel->changeUserPassword($email, $verificationCode);
+        $oldPassword = $this->tryGetValue($attributes, 'oldPassword');
+        if (!$this->userModel->comparePasswords($email, $oldPassword)) {
+            $result['passwordChangeResult'] = 'wrong-password';
+            return $result;
+        }
+
+        $newPassword = $this->tryGetValue($attributes, 'newPassword');
+        if ($newPassword == $oldPassword) {
+            $result['passwordChangeResult'] = 'same-password';
+            return $result;
+        }
+
+        $result = $this->userModel->changeUserPassword($email, $newPassword, $verificationCode);
         $password = urldecode($this->userModel->getUserPassword($email));
 
         $result['loginCookie'] = $this->encryptLoginPassword($email, $password);

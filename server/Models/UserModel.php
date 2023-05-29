@@ -111,27 +111,38 @@ class UserModel extends BaseModel
         return $request->fetchAll(PDO::FETCH_NUM)[0][0] > 0;
     }
 
+    public function doesPasswordChangeCodeExist(string $code): bool
+    {
+        $selectQueryObject = new SelectQueryBuilder();
+        $selectQueryObject->
+        select(["COUNT(1)"])->
+        from($this::TABLE_PASSWORD_CHANGE_CODES)->
+        where([$this::ENTRY_VERIFICATION_CODE, '=', "'$code'"]);
+        $request = $this->DBConn->prepare($selectQueryObject->getQuery());
+        $request->execute();
+        return $request->fetchAll(PDO::FETCH_NUM)[0][0] > 0;
+    }
+
     public function clearPasswordChangeCodes(string $URLencodedEmail)
     {
         $this->deleteVerificationCode($URLencodedEmail, $this::TABLE_PASSWORD_CHANGE_CODES);
     }
 
-    public function addUserPasswordChangeCode(string $email, string $newPassword, string $code)
+    public function addUserPasswordChangeCode(string $email, string $code)
     {
         $email = urlencode($email);
-        $newPassword = urlencode(hash($this::HASHING_ALGORITHM, $newPassword));
         $insertQueryObject = new InsertQueryBuilder();
         $insertQueryObject->
         insert(
             $this::TABLE_PASSWORD_CHANGE_CODES,
-            [$this::ENTRY_EMAIL, $this::ENTRY_NEW_PASSWORD, $this::ENTRY_VERIFICATION_CODE],
-            [$email, $newPassword, $code]
+            [$this::ENTRY_EMAIL, $this::ENTRY_VERIFICATION_CODE],
+            [$email, $code]
         );
         $request = $this->DBConn->prepare($insertQueryObject->getQuery());
         $request->execute();
     }
 
-    public function changeUserPassword(string $email, string $code): array
+    public function changeUserPassword(string $email, string $newPassword, string $code): array
     {
         $result = ['passwordChangeResult' => 'failed'];
         $isCodeValid = $this->verificationCodeExists($code, $this::TABLE_PASSWORD_CHANGE_CODES);
@@ -139,18 +150,8 @@ class UserModel extends BaseModel
             return $result;
         }
         $email = urlencode($email);
+        $newPassword = hash($this::HASHING_ALGORITHM, urlencode($newPassword));
 
-        //Get new password saved from first request
-        $passwordSelectResult = $this->select(
-            [$this::ENTRY_NEW_PASSWORD],
-            $this::TABLE_PASSWORD_CHANGE_CODES,
-            [$this::ENTRY_EMAIL, '=', "'$email'"]
-        );
-        if (count($passwordSelectResult) == 0) {
-            return $result;
-        }
-        $matchingPasswordCount = count($passwordSelectResult);
-        $newPassword = $passwordSelectResult[$matchingPasswordCount - 1]['NEW_PASSWORD'];
         //Update user password
         $this->update($this::TABLE_USERS, [$this::ENTRY_PASSWORD], [$newPassword], [$this::ENTRY_EMAIL, '=', "'$email'"]);
 

@@ -27,6 +27,7 @@ class APIEndpointController
                 'addCodeForUserEmailChange' => $userControllerName,
                 'changeUserEmail' => $userControllerName,
                 'checkEmailValidationCode' => $userControllerName,
+                'checkPasswordValidationCode' => $userControllerName,
                 'addCodeForUserPasswordChange' => $userControllerName,
                 'changeUserPassword' => $userControllerName,
                 'deleteUser' => $userControllerName,
@@ -69,6 +70,9 @@ class APIEndpointController
                     break;
                 case 'checkEmailValidationCode':
                     $this->respond($controller->checkEmailValidationCode($attributes));
+                    break;
+                case 'checkPasswordValidationCode':
+                    $this->respond($controller->checkPasswordValidationCode($attributes));
                     break;
                 case 'addCodeForUserPasswordChange':
                     $this->respond($controller->addCodeForUserPasswordChange($attributes));
