@@ -9,7 +9,7 @@ import {useEffect, useState} from "react";
 import {RegisterPage} from "./pages/Register/RegisterPage";
 import UserActivationRouter from "./pages/UserActivation/UserActivationRouter";
 import {ProfilePage} from "./pages/Profile/ProfilePage";
-import EmailChangePage from "./pages/EmailChange/EmailChangePage";
+import EmailChangeRouter from "./pages/EmailChange/EmailChangeRouter";
 import PasswordChangePage from "./pages/PasswordChange/PasswordChangePage";
 
 export default function App() {
@@ -37,7 +37,7 @@ export default function App() {
                 <Route path="/register" element={<RegisterPage/>}/>
                 <Route path="/activate/*" element={<UserActivationRouter/>}/>
                 <Route path="/profile" element={<ProfilePage/>}/>
-                <Route path="/change-email" element={<EmailChangePage/>}/>
+                <Route path="/change-email/*" element={<EmailChangeRouter/>}/>
                 <Route path="/change-password" element={<PasswordChangePage/>}/>
                 <Route path="/articles/*" element={<MainContentLayout key={"articles"} elementTypeName={"ArticlesPage"}/>}/>
                 <Route path="/scripts/*" element={<MainContentLayout key={"scripts"} elementTypeName={"ScriptsPage"}/>}/>

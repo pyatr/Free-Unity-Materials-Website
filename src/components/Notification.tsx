@@ -33,6 +33,6 @@ export default function Notification({message, color, onDismiss}: NotificationPr
                     <pre style={{textAlign: "left"}}>{message}</pre>
                 </Typography>
             </Grid>
-            <Button onClick={() => onDismiss()} style={{color: "red"}}>Dismiss</Button>
+            <Button onClick={() => onDismiss()} style={{color: color}}>Dismiss</Button>
         </Grid>);
 }
