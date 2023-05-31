@@ -39,6 +39,7 @@ class APIEndpointController
                 'updateContent' => $contentControllerName,
                 'getContent' => $contentControllerName,
                 'getPreviews' => $contentControllerName,
+                'getAllPreviews' => $contentControllerName,
 
                 'addComment' => $commentControllerName,
                 'deleteComment' => $commentControllerName,
@@ -103,6 +104,9 @@ class APIEndpointController
                     break;
                 case 'getPreviews':
                     $this->respond($controller->getContentPreviews($attributes));
+                    break;
+                case 'getAllPreviews':
+                    $this->respond($controller->getAllContentPreviews($attributes));
                     break;
                 case 'addComment':
                     $this->respond($controller->addComment($attributes));

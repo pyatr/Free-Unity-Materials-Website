@@ -137,7 +137,7 @@ class FileManager
             sort($fileFoldersInContentDirectory, SORT_NATURAL);
             foreach ($fileFoldersInContentDirectory as $fileFolder) {
                 $fileName = scandir("$fileFolder")[2];
-                $links[] = "$fileFolder/$fileName";
+                $links[] = str_replace($_SERVER['DOCUMENT_ROOT'], "", "$fileFolder/$fileName");
             }
         }
         if (count($links) == 0) {

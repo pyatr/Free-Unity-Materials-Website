@@ -69,7 +69,7 @@ class ContentModel extends BaseModel
         return $response;
     }
 
-    public function getContentPreviews(string $category, int $pageSize, int $page): array
+    public function getContentPreviews(string $category, string $nameFilter, int $pageSize, int $page): array
     {
         $tableName = self::$tablesForCategories[$category];
         $postsOffset = $pageSize * ($page - 1);
@@ -80,22 +80,52 @@ class ContentModel extends BaseModel
         orderBy('1', 'DESC')->
         limit($pageSize)->
         offset($postsOffset);
+        if ($nameFilter != '') {
+            $selectQueryObject->where([$this::ENTRY_TITLE, ' LIKE ', "'%$nameFilter%'"]);
+        }
         $result = $this->executeRequest($selectQueryObject->getQuery());
         foreach ($result['body'] as &$resultBody) {
             $resultBody['TITLE'] = urldecode($resultBody['TITLE']);
             $resultBody['CONTENT'] = mb_strimwidth(urldecode($resultBody['CONTENT']), 0, $this::SHORT_DESC_LENGTH, "...");
         }
-        $result['contentCount'] = $this->getContentCount($category);
+        $result['contentCount'] = $this->getContentCount($category, $nameFilter);
         return $result;
     }
 
-    public function getContentCount(string $category)
+    public function getAllContentPreviews(string $nameFilter): array
+    {
+        $allPreviews['body'] = [];
+        foreach (self::$tablesForCategories as $tableName) {
+            $category = array_search($tableName, self::$tablesForCategories);
+            $selectQueryObject = new SelectQueryBuilder();
+            $selectQueryObject->
+            select([$this::ENTRY_NUMBER, $this::ENTRY_TITLE, $this::ENTRY_CATEGORIES, $this::ENTRY_CONTENT])->
+            from($tableName)->
+            orderBy('1', 'DESC');
+            if ($nameFilter != '') {
+                $selectQueryObject->where([$this::ENTRY_TITLE, ' LIKE ', "'%$nameFilter%'"]);
+            }
+            $result = $this->executeRequest($selectQueryObject->getQuery());
+            foreach ($result['body'] as &$resultBody) {
+                $resultBody['TITLE'] = urldecode($resultBody['TITLE']);
+                $resultBody['CONTENT'] = mb_strimwidth(urldecode($resultBody['CONTENT']), 0, $this::SHORT_DESC_LENGTH, "...");
+                $resultBody['primaryCategory'] = $category;
+            }
+            $allPreviews['body'] = array_merge($allPreviews['body'], $result['body']);
+        }
+        return $allPreviews;
+    }
+
+    public function getContentCount(string $category, string $nameFilter = '')
     {
         $tableName = self::$tablesForCategories[$category];
         $selectQueryObject = new SelectQueryBuilder();
         $selectQueryObject->
         select(["COUNT(*)"])->
         from($tableName);
+        if ($nameFilter != '') {
+            $selectQueryObject->where([$this::ENTRY_TITLE, ' LIKE ', "'%$nameFilter%'"]);
+        }
         $request = $this->DBConn->prepare($selectQueryObject->getQuery());
         $request->execute();
         return $request->fetch(PDO::FETCH_NAMED)['COUNT(*)'];

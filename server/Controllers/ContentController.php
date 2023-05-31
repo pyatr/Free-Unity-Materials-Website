@@ -79,12 +79,23 @@ class ContentController extends BaseController
     public function getContentPreviews(array $attributes): array
     {
         $category = $this->tryGetValue($attributes, 'category');
-
         $pageSize = $this->tryGetValue($attributes, 'pageSize');
         $page = $this->tryGetValue($attributes, 'page');
-        $result = $this->contentModel->getContentPreviews($category, $pageSize, $page);
+        $nameFilter = $this->tryGetValue($attributes, 'nameFilter');
+        $result = $this->contentModel->getContentPreviews($category, $nameFilter, $pageSize, $page);
 
         FileManager::loadImagesForPreviews($result, $category);
+        return $result;
+    }
+
+    public function getAllContentPreviews(array $attributes): array
+    {
+        $pageSize = $this->tryGetValue($attributes, 'pageSize');
+        $page = $this->tryGetValue($attributes, 'page');
+        $nameFilter = $this->tryGetValue($attributes, 'nameFilter');
+        $result = $this->contentModel->getAllContentPreviews($nameFilter);
+        //Only assets will have previews
+        FileManager::loadImagesForPreviews($result, 'asset');
         return $result;
     }
 }
