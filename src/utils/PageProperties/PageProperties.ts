@@ -16,8 +16,9 @@ export class PageProperties {
     private pagesCount: number;
 
     private categoryName: string;
+    private linkForCategory: string;
 
-    constructor(landscapeRowCount: number, landscapeColumnCount: number, mobileRowCount: number, mobileColumnCount: number, categoryName: string) {
+    constructor(landscapeRowCount: number, landscapeColumnCount: number, mobileRowCount: number, mobileColumnCount: number, categoryName: string, linkForCategory: string) {
         this.landscapeRowColumnCount = [landscapeRowCount, landscapeColumnCount];
         this.mobileRowColumnCount = [mobileRowCount, mobileColumnCount];
         this.pageSize = Math.max(this.landscapeRowColumnCount[0] * this.landscapeRowColumnCount[1], this.mobileRowColumnCount[0] * this.mobileRowColumnCount[1]);
@@ -25,6 +26,7 @@ export class PageProperties {
         this.postsCount = 0;
         this.pagesCount = 0;
         this.categoryName = categoryName;
+        this.linkForCategory = linkForCategory;
     }
 
     setPostsCount(newNum: number) {
@@ -38,6 +40,10 @@ export class PageProperties {
 
     getCategoryName() {
         return this.categoryName;
+    }
+
+    getLinkForCategory() {
+        return this.linkForCategory;
     }
 
     getPagesCount() {

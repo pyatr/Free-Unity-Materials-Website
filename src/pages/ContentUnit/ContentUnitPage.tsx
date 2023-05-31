@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from "react";
-import {Grid, Typography} from "@mui/material";
+import {Button, Grid, Typography} from "@mui/material";
 import parse from 'html-react-parser';
 
 import "../../assets/HomePage.css";
@@ -14,8 +14,9 @@ import {CommentSection} from "../../components/CommentsDisplay/CommentSection";
 import ContentUnitEditorButtons from "./ContentUnitEditorButtons";
 import {GetContentUnit} from "../../utils/ContentInteraction/GetContentUnit";
 import MessageBoxYesNo from "../../components/MessageBoxes/MessageBoxYesNo";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import {LoadingOverlay} from "../../components/LoadingOverlay";
+import {sideButtonStyle} from "../../components/Layouts/MainContentLayout";
 
 const itemContentDisplay = {
     width: '100%',
@@ -28,6 +29,8 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
     const [contentUnit, setContentUnit] = useState(GetDummyContentUnit());
     const [deleteWindowOpen, setDeleteWindowStatus] = useState(false);
     const [isLoading, setLoadingStatus] = useState(false);
+
+    const navigate = useNavigate();
 
     let {currentContentID} = useParams();
 
@@ -63,6 +66,11 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
 
     return (
         <Grid sx={itemContentDisplay}>
+            <Button style={sideButtonStyle}
+                    sx={{marginBottom: "16px", width: "fit-content"}}
+                    onClick={() => navigate(-1)}>
+                Back
+            </Button>
             {deleteWindowOpen ?
                 <MessageBoxYesNo
                     message={"Delete " + contentUnit.title + "?"}

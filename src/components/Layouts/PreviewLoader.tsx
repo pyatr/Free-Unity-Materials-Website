@@ -1,15 +1,19 @@
 import React, {useEffect, useState} from "react";
 import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
-import {Route, Routes, useParams} from "react-router-dom";
+import {Route, Routes, useParams, useSearchParams} from "react-router-dom";
 import {PageProperties} from "../../utils/PageProperties/PageProperties";
 import {SitePagesProperties} from "../../utils/PageProperties/SitePagesProperties";
 import {GetLastURLPart} from "../../utils/GetLastURLPart";
-import GetPreviews from "../../utils/ContentInteraction/GetPreviews";
+import GetPreviews, {GetAllPreviews} from "../../utils/ContentInteraction/GetPreviews";
 import AssetsPreviewGridPage from "../../pages/Assets/AssetsPreviewGridPage";
 import {ArticlesPreviewListPage} from "../../pages/Articles/ArticlesPreviewListPage";
 import {ScriptsPreviewListPage} from "../../pages/Scripts/ScriptsPreviewListPage";
 import ContentUnitPage from "../../pages/ContentUnit/ContentUnitPage";
 import ContentUnitEditForm from "../../pages/ContentUnitEdit/ContentUnitEditForm";
+import {LoadingOverlay} from "../LoadingOverlay";
+import {Typography} from "@mui/material";
+import TextContentPreviewListPage from "../../pages/TextContent/TextContentPreviewListPage";
+import {AllContentPreviewListPage} from "../../pages/AllContent/AllContentPreviewListPage";
 
 type PreviewLoaderProps = {
     elementTypeName: string,
@@ -17,13 +21,20 @@ type PreviewLoaderProps = {
 }
 
 export function PreviewLoader({elementTypeName, onContentLoaded}: PreviewLoaderProps) {
-    const [previewContent, setPreviewContent] = useState<ContentUnitPreview[]>([]);
-    const [totalContentCount, setTotalContentCount] = useState(-1);
+    const [previewContent, setPreviewContent] = useState<ContentUnitPreview[] | undefined>();
+    const [searchName, setSearchName] = useState("");
     const [isLoading, setLoadingStatus] = useState(false);
 
-    const {searchname} = useParams();
-    if (searchname != null) {
+    const [searchParams, setSearchParams] = useSearchParams();
 
+    if (searchParams !== undefined) {
+        const searchKeyword = searchParams.get("keyword");
+        if (searchKeyword !== null) {
+            if (searchName !== searchKeyword) {
+                setSearchName(searchKeyword);
+                setPreviewContent(undefined);
+            }
+        }
     }
 
     const currentPageProperties: PageProperties = SitePagesProperties.page[elementTypeName];
@@ -40,17 +51,22 @@ export function PreviewLoader({elementTypeName, onContentLoaded}: PreviewLoaderP
         currentContentID = lastURLPart;
     }
 
-    const loadPreviews = () => {
-        if ((previewContent.length === 0) && totalContentCount !== 0 && currentPageProperties !== undefined && !isLoading) {
+    const loadPreviews = async () => {
+        if (previewContent === undefined && currentPageProperties !== undefined && !isLoading) {
             setLoadingStatus(true);
-            setPreviewContent([]);
-            GetPreviews(currentPageProperties).then((previews: ContentUnitPreview[]) => {
-                setLoadingStatus(false);
-                window.scrollTo(0, 0);
-                setTotalContentCount(currentPageProperties.getPostsCount())
-                setPreviewContent(previews);
-                onContentLoaded();
-            });
+            let loadedPreviews: ContentUnitPreview[];
+            let totalContentCount: number;
+            if (elementTypeName === "AllContentPage") {
+                loadedPreviews = await GetAllPreviews(searchName);
+                totalContentCount = loadedPreviews.length;
+            } else {
+                [loadedPreviews, totalContentCount] = await GetPreviews(currentPageProperties, searchName);
+            }
+            currentPageProperties.setPostsCount(totalContentCount);
+            setPreviewContent(loadedPreviews);
+            window.scrollTo(0, 0);
+            onContentLoaded();
+            setLoadingStatus(false);
         }
     }
 
@@ -60,15 +76,29 @@ export function PreviewLoader({elementTypeName, onContentLoaded}: PreviewLoaderP
 
     const previewPages = [
         ["AssetsPage", <AssetsPreviewGridPage pageProperties={currentPageProperties}
-                                              previewContent={previewContent}/>],
+                                              previewContent={previewContent as ContentUnitPreview[]}/>],
         ["ArticlesPage", <ArticlesPreviewListPage pageProperties={currentPageProperties}
-                                                  previewContent={previewContent}/>],
+                                                  previewContent={previewContent as ContentUnitPreview[]}/>],
         ["ScriptsPage", <ScriptsPreviewListPage pageProperties={currentPageProperties}
-                                                previewContent={previewContent}/>]
+                                                previewContent={previewContent as ContentUnitPreview[]}/>],
+        ["AllContentPage", <AllContentPreviewListPage pageProperties={currentPageProperties}
+                                                       previewContent={previewContent as ContentUnitPreview[]}/>]
     ]
 
     const currentPreviewPageData = previewPages.filter(page => page[0] === elementTypeName)[0];
     const currentPreviewPage: JSX.Element = currentPreviewPageData[1] as JSX.Element;
+
+    if (previewContent === undefined || isLoading) {
+        return (<LoadingOverlay position={"inherit"}/>);
+    }
+
+    if (previewContent.length === 0) {
+        if (searchName === "") {
+            return (<Typography>This category is empty.</Typography>);
+        } else {
+            return (<Typography>{"No results matching '" + searchName + "'"}</Typography>);
+        }
+    }
 
     return (
         <Routes>

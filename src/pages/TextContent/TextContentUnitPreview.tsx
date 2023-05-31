@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from "react";
-import {Box, Grid, Typography} from "@mui/material";
+import {Grid, Typography} from "@mui/material";
 
 import "../../assets/HomePage.css";
 
@@ -10,7 +10,7 @@ import ContentUnitEditorButtons from "../ContentUnit/ContentUnitEditorButtons";
 import {StripHTMLFromString} from "../../utils/Strings/StripHTMLFromString";
 import {GetCommentCount} from "../../utils/Comments/GetCommentCount";
 import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
-import {Link} from "react-router-dom";
+import {Link, useSearchParams} from "react-router-dom";
 
 const outerGrid = {
     width: '100%',
@@ -39,23 +39,20 @@ const textBoxLink = {
 }
 
 type TextContentPreviewProps = {
-    requestedContentCategory: string,
     contentUnitPreview: ContentUnitPreview
 }
 
 export default function TextContentUnitPreview({
-                                               requestedContentCategory,
-                                               contentUnitPreview
-                                           }: TextContentPreviewProps) {
+                                                   contentUnitPreview
+                                               }: TextContentPreviewProps) {
     const [deleteWindowOpen, setDeleteWindowStatus] = useState(false);
-
     const [commentCount, setCommentCount] = useState(-1);
 
     useEffect(() => getCommentCount());
 
     const getCommentCount = () => {
         if (commentCount == -1) {
-            GetCommentCount(contentUnitPreview.contentID, requestedContentCategory).then((commentCount: number) => setCommentCount(commentCount));
+            GetCommentCount(contentUnitPreview.contentID, contentUnitPreview.primaryCategory).then((commentCount: number) => setCommentCount(commentCount));
         }
     }
 
@@ -63,10 +60,10 @@ export default function TextContentUnitPreview({
 
     const closeDeleteWindow = () => setDeleteWindowStatus(false);
 
-    const confirmDelete = () => DeleteContent(contentUnitPreview.contentID, requestedContentCategory).then(() => GoToHomePage());
+    const confirmDelete = () => DeleteContent(contentUnitPreview.contentID, contentUnitPreview.primaryCategory).then(() => GoToHomePage());
 
     const linksForCategories = [["asset", ""], ["article", "/articles"], ["script", "/scripts"]];
-    const chosenLink = linksForCategories.filter(linkCategoryPair => linkCategoryPair[0] === requestedContentCategory)[0][1];
+    const chosenLink = linksForCategories.filter(linkCategoryPair => linkCategoryPair[0] === contentUnitPreview.primaryCategory)[0][1];
 
     const link = chosenLink + "/view/" + contentUnitPreview.contentID;
 
@@ -97,6 +94,6 @@ export default function TextContentUnitPreview({
             </Grid>
             <ContentUnitEditorButtons contentID={contentUnitPreview.contentID}
                                       onDelete={openDeleteWindow}
-                                      requestedContentCategory={requestedContentCategory}/>
+                                      requestedContentCategory={contentUnitPreview.primaryCategory}/>
         </Grid>);
 }

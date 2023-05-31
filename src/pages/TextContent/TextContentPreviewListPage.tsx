@@ -3,9 +3,10 @@ import React from "react";
 import {PageLoadProps} from "../../utils/PageProperties/PageProperties";
 import {LoadingOverlay} from "../../components/LoadingOverlay";
 import TextContentUnitPreview from "./TextContentUnitPreview";
+import {ContentUnitPreview} from "../../utils/Types/Content/ContentUnitPreview";
 
 export default function TextContentPreviewListPage({pageProperties, previewContent}: PageLoadProps) {
-    if (previewContent.length > 0 && pageProperties != undefined) {
+    if (previewContent.length > 0 && pageProperties !== undefined) {
         const gridStyle = {
             display: "flex",
             flexWrap: "wrap",
@@ -14,9 +15,8 @@ export default function TextContentPreviewListPage({pageProperties, previewConte
             paddingLeft: "16px",
             paddingRight: "16px"
         }
-        let preparedContent = previewContent.map((previewData) => {
+        let preparedContent = previewContent.map((previewData: ContentUnitPreview) => {
             return (<TextContentUnitPreview
-                requestedContentCategory={pageProperties.getCategoryName()}
                 contentUnitPreview={previewData}/>);
         });
         return (

@@ -39,9 +39,10 @@ export default function App() {
                 <Route path="/activate/*" element={<UserActivationRouter/>}/>
                 <Route path="/change-email/*" element={<EmailChangeRouter/>}/>
                 <Route path="/change-password/*" element={<PasswordChangeRouter/>}/>
-                <Route path="/articles/*" element={<MainContentLayout key={"articles"} elementTypeName={"ArticlesPage"}/>}/>
-                <Route path="/scripts/*" element={<MainContentLayout key={"scripts"} elementTypeName={"ScriptsPage"}/>}/>
-                <Route path="/*" element={<MainContentLayout key={"assets"} elementTypeName={"AssetsPage"}/>}/>
+                <Route path="/articles/*" element={<MainContentLayout key="articles" elementTypeName="ArticlesPage"/>}/>
+                <Route path="/scripts/*" element={<MainContentLayout key="scripts" elementTypeName="ScriptsPage"/>}/>
+                <Route path="/*" element={<MainContentLayout key="assets" elementTypeName="AssetsPage"/>}/>
+                <Route path="/search-all/*" element={<MainContentLayout key="search-all" elementTypeName="AllContentPage"/>}/>
             </Routes>
         </BrowserRouter>);
 }

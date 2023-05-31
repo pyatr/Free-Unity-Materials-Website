@@ -3,6 +3,7 @@ export type ContentUnitPreview = {
     title: string,
     categories: string,
     body: string,
+    primaryCategory: string,
     titlepicLink: string
 }
 
@@ -13,6 +14,7 @@ export function GetDummyPreview(): ContentUnitPreview {
             title: "",
             categories: "",
             body: "",
+            primaryCategory: "",
             titlepicLink: ""
         }
     )
