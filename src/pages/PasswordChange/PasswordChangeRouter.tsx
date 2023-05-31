@@ -33,7 +33,6 @@ export function PasswordChangeRouter() {
 }
 
 function PasswordChangeLinkVerificationPage() {
-    const userEmail = GetUserEmail();
     const [errorMessage, setErrorMessage] = useState("");
     const [isLoading, setLoadingStatus] = useState(false);
     const [isCodeValid, setCodeValidity] = useState<boolean>();
@@ -66,7 +65,6 @@ function PasswordChangeLinkVerificationPage() {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
 
-        const oldPassword = data.get("old-password") as string;
         const newPassword = data.get("new-password") as string;
         const confirmNewPassword = data.get("confirm-new-password") as string;
 
@@ -89,7 +87,7 @@ function PasswordChangeLinkVerificationPage() {
             setErrorMessage(errorMessage);
         } else if (activationCode !== undefined) {
             setLoadingStatus(true);
-            const [passwordChangeResult, loginCookie] = await ChangeUserPassword(userEmail, oldPassword, newPassword, activationCode);
+            const [passwordChangeResult, loginCookie] = await ChangeUserPassword(newPassword, activationCode);
             setLoadingStatus(false);
             if (passwordChangeResult === "success") {
                 ClearUserData();
@@ -111,21 +109,6 @@ function PasswordChangeLinkVerificationPage() {
             setErrorMessage("Unknown error.");
         }
     };
-
-    if (!IsLoggedIn()) {
-        if (isLoading) {
-            return (<LoadingOverlay position={"fixed"}/>);
-        } else {
-            return (
-                <Container component="main">
-                    <Box sx={containerBoxStyle}>
-                        <Typography component="h1" variant="h5">
-                            You must be logged in to change password.
-                        </Typography>
-                    </Box>
-                </Container>);
-        }
-    }
 
     if (!isCodeValid) {
         if (isLoading || isCodeValid === undefined) {
@@ -156,13 +139,6 @@ function PasswordChangeLinkVerificationPage() {
                 <Box component="form"
                      onSubmit={sendPasswordChangeLinkToEmail}
                      sx={{marginTop: "8px", display: "grid"}}>
-                    <TextField id="old-password-field"
-                               name="old-password"
-                               label="Enter old password"
-                               variant="standard"
-                               type="password"
-                               required
-                               sx={{marginTop: "16px", minWidth: "300px"}}/>
                     <TextField id="new-password-field"
                                name="new-password"
                                label={"Enter new password (min: " + minPasswordLength + ")"}
@@ -190,7 +166,7 @@ function PasswordChangeLinkVerificationPage() {
 }
 
 function PasswordChangePage() {
-    const userEmail = GetUserEmail();
+    const [userEmail, setUserEmail] = useState<string>(GetUserEmail());
     const [errorMessage, setErrorMessage] = useState("");
     const [notificationMessage, setNotification] = useState("");
     const [isLoading, setLoadingStatus] = useState(false);
@@ -215,17 +191,6 @@ function PasswordChangePage() {
         }
     };
 
-    if (!IsLoggedIn()) {
-        return (
-            <Container component="main">
-                <Box sx={containerBoxStyle}>
-                    <Typography component="h1" variant="h5">
-                        You must be logged in to change password.
-                    </Typography>
-                </Box>
-            </Container>);
-    }
-
     return (
         <Container component="main">
             <Box sx={containerBoxStyle}>
@@ -245,8 +210,9 @@ function PasswordChangePage() {
                                name="your-email"
                                label="Your email"
                                variant="standard"
-                               value={userEmail}
-                               disabled
+                               defaultValue={userEmail}
+                               disabled={IsLoggedIn()}
+                               onChange={(event) => setUserEmail(event.target.value)}
                                sx={{marginTop: "16px", minWidth: "300px"}}/>
                     <Button variant="contained"
                             sx={submitButton}

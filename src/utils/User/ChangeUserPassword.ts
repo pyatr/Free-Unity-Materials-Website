@@ -10,12 +10,10 @@ export async function SendUserPasswordChangeLink(email: string): Promise<string>
     return data.codeAdditionResult;
 }
 
-export async function ChangeUserPassword(email: string, oldPassword: string, newPassword: string, code: string): Promise<string[]> {
+export async function ChangeUserPassword(newPassword: string, code: string): Promise<string[]> {
     let serverConnection = new ServerConnection();
 
     const attributes = {
-        email: email,
-        oldPassword: oldPassword,
         newPassword: newPassword,
         verificationCode: code
     };

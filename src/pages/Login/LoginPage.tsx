@@ -70,6 +70,9 @@ export default function LoginPage() {
                     <Link to="/register" style={{marginTop: "16px", color: "black", width: "fit-content"}}>
                         Register
                     </Link>
+                    <Link to="/change-password" style={{marginTop: "16px", color: "black", width: "fit-content"}}>
+                        Forgot password?
+                    </Link>
                     <Button variant="contained"
                             sx={submitButton}
                             type="submit">
