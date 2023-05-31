@@ -201,17 +201,12 @@ Please follow this link to change your password <html>$verificationLink</html>";
     public function changeUserPassword($attributes)
     {
         $result['passwordChangeResult'] = 'success';
-        $email = $this->tryGetValue($attributes, 'email');
         $verificationCode = $this->tryGetValue($attributes, 'verificationCode');
-
-        $oldPassword = $this->tryGetValue($attributes, 'oldPassword');
-        if (!$this->userModel->comparePasswords($email, $oldPassword)) {
-            $result['passwordChangeResult'] = 'wrong-password';
-            return $result;
-        }
+        $email = $this->userModel->getEmailForPasswordChangeCode($verificationCode);
+        $email = urldecode($email);
 
         $newPassword = $this->tryGetValue($attributes, 'newPassword');
-        if ($newPassword == $oldPassword) {
+        if ($this->userModel->comparePasswords($email, $newPassword)) {
             $result['passwordChangeResult'] = 'same-password';
             return $result;
         }

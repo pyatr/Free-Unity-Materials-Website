@@ -142,6 +142,18 @@ class UserModel extends BaseModel
         $request->execute();
     }
 
+    public function getEmailForPasswordChangeCode(string $code)
+    {
+        $selectQueryObject = new SelectQueryBuilder();
+        $selectQueryObject->
+        select([$this::ENTRY_EMAIL])->
+        from($this::TABLE_PASSWORD_CHANGE_CODES)->
+        where([$this::ENTRY_VERIFICATION_CODE, '=', "'$code'"]);
+        $request = $this->DBConn->prepare($selectQueryObject->getQuery());
+        $request->execute();
+        return $request->fetchAll(PDO::FETCH_NAMED)[0]["EMAIL"];
+    }
+
     public function changeUserPassword(string $email, string $newPassword, string $code): array
     {
         $result = ['passwordChangeResult' => 'failed'];
