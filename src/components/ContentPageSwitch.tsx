@@ -42,8 +42,8 @@ export default function ContentPageSwitch({elementTypeName, onNumberChanged}: Co
 
     const setPageNumber = (newNumber: number) => {
         if (currentPageProperties.currentPage !== newNumber) {
-            onNumberChanged(newNumber);
             currentPageProperties.currentPage = newNumber;
+            onNumberChanged(newNumber);
         }
     }
 

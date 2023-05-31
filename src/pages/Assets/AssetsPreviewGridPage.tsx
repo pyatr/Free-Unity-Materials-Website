@@ -18,8 +18,10 @@ export default function AssetsPreviewGridPage({pageProperties, previewContent}: 
         for (let i = previewContent.length; i < pageProperties.pageSize; i++) {
             previewContent.push(GetDummyPreview());
         }
+        let uniqueKey = 0;
         let preparedContent = previewContent.map((previewData) => {
-            return (<AssetUnitPreview contentUnitPreview={previewData}/>);
+            uniqueKey++;
+            return (<AssetUnitPreview key={uniqueKey.toString()} contentUnitPreview={previewData}/>);
         });
         return (
             <Grid id="assetsPreview" sx={gridStyle}>

@@ -105,7 +105,7 @@ export default function AssetUnitPreview({contentUnitPreview}: AssetUnitPreviewP
     const [deleteWindowOpen, setDeleteWindowStatus] = useState(false);
 
     if (contentUnitPreview.contentID < 0) {
-        return (<Fragment/>);
+        return (<Box width={contentUnitPreviewStyle.width}/>);
     }
     const canEdit: boolean = CanUserEditContent();
 
