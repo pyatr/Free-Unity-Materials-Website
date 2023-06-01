@@ -1,6 +1,6 @@
 import React, {Fragment} from "react";
 import EditFileList from "../../components/DownloadLinks/EditFileList";
-import FileSelection from "./FileSelection";
+import FileSelection from "../../components/FileSelection";
 import {FileNameBlobPair} from "../../utils/Types/FileNameBlobPair";
 import {ContentUnit} from "../../utils/Types/Content/ContentUnit";
 

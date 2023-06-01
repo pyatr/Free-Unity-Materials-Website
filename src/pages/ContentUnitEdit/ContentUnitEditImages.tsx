@@ -1,7 +1,7 @@
 import {ImageInEditFormGallery} from "../../components/ImageGallery/ImageInEditFormGallery";
 import React, {Fragment} from "react";
 import ImageGallery from "../../components/ImageGallery/ImageGallery";
-import FileSelection from "./FileSelection";
+import FileSelection from "../../components/FileSelection";
 import {ContentUnitEditCommonProps} from "./ContentUnitEditForm";
 
 

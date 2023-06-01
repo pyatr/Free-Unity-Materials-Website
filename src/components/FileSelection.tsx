@@ -1,13 +1,13 @@
 import {Grid, Typography} from "@mui/material";
 import React, {Fragment} from "react";
-import {FileSelectionInfo} from "../../utils/Types/FileSelectionInfo";
+import {FileSelectionInfo} from "../utils/Types/FileSelectionInfo";
 
 export default function FileSelection({title, inputType, multiple, loadImageFunction}: FileSelectionInfo) {
     return (
         <Fragment>
             <Grid style={{
                 display: "flex",
-                alignItems: "flex-end",
+                alignItems: "baseline",
                 gap: "8px",
                 width: "fit-content",
                 height: "32px",
@@ -15,7 +15,7 @@ export default function FileSelection({title, inputType, multiple, loadImageFunc
                 paddingTop: "4px",
                 paddingBottom: "4px"
             }}>
-                <Typography variant="subtitle2">{title}</Typography>
+                <Typography whiteSpace={"nowrap"} variant="subtitle2">{title}</Typography>
                 {<input type={inputType} multiple={multiple} onChange={loadImageFunction}/>}
             </Grid>
         </Fragment>);
