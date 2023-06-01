@@ -145,6 +145,7 @@ function PasswordChangeLinkVerificationPage() {
                                variant="standard"
                                type="password"
                                inputProps={{minLength: minPasswordLength}}
+                               helperText="Password needs to have at least one character, one number and it has to be at least 5 characters long"
                                required
                                sx={{marginTop: "16px", minWidth: "300px"}}/>
                     <TextField id="confirm-new-password-field"

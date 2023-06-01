@@ -156,17 +156,19 @@ export function RegisterPage() {
                                sx={textFieldStyle}/>
                     <TextField id="username-field"
                                name="username"
-                               label={"User name (min: " + minUsernameLength + ", max: " + maxUsernameLength + ")"}
+                               label="User name"
                                variant="standard"
                                inputProps={{minLength: minUsernameLength, maxLength: maxUsernameLength}}
+                               helperText={"Minimum length: " + minUsernameLength + ", maximum length: " + maxUsernameLength + ")"}
                                required
                                sx={textFieldStyle}/>
                     <TextField id="password-field"
                                name="password"
-                               label={"Password (min: " + minPasswordLength + ")"}
+                               label="Password"
                                variant="standard"
                                type="password"
                                inputProps={{minLength: minPasswordLength}}
+                               helperText="Password needs to have at least one character, one number and it has to be at least 5 characters long"
                                required
                                sx={textFieldStyle}/>
                     <TextField id="password-confirm-field"
