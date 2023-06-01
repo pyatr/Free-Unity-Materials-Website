@@ -54,6 +54,63 @@ class FileManager
         return $links;
     }
 
+    public static function createUserFolder(string $userFolderName)
+    {
+        $folderPath = $_SERVER['DOCUMENT_ROOT'] . "/FileStorage/UsersFolder/$userFolderName";
+        if (is_dir($folderPath)) {
+            //Already exists
+            return;
+        }
+        mkdir($folderPath);
+    }
+
+    public static function deleteUserFolder(string $userFolderName)
+    {
+        $folderPath = $_SERVER['DOCUMENT_ROOT'] . "/FileStorage/UsersFolder/$userFolderName";
+        if (is_dir($folderPath)) {
+            self::deleteFolder($folderPath);
+        }
+    }
+
+    public static function saveUserAvatar(string $userFolderName, string $avatarImageBase64): void
+    {
+        $fileContents = file_get_contents($avatarImageBase64);
+        $pos = strpos($avatarImageBase64, ';');
+        $type = explode(':', substr($avatarImageBase64, 0, $pos))[1];
+        $extension = explode('/', $type)[1];
+        $filePath = $_SERVER['DOCUMENT_ROOT'] . "/FileStorage/UsersFolder/$userFolderName/avatar";
+        if (!is_dir($filePath)) {
+            mkdir($filePath);
+        }
+        $fileName = GUIDCreator::GUIDv4() . ".$extension";
+        $fullPath = "$filePath/$fileName";
+        $filesInDirectory = scandir($filePath);
+        if (count($filesInDirectory) > 2) {
+            foreach ($filesInDirectory as $avatarFile) {
+                if (is_file("$filePath/$avatarFile")) {
+                    unlink("$filePath/$avatarFile");
+                }
+            }
+        }
+        if (is_writeable($filePath)) {
+            file_put_contents($fullPath, $fileContents);
+        }
+    }
+
+    public static function getUserAvatarPath(string $userFolderName): string
+    {
+        $filePath = "FileStorage/UsersFolder/$userFolderName/avatar";
+        if (!is_dir($filePath)) {
+            return "";
+        }
+        $filesInDirectory = scandir($_SERVER['DOCUMENT_ROOT'] . "/$filePath");
+        if (count($filesInDirectory) > 2) {
+            $fileName = $filesInDirectory[2];
+            return "$filePath/$fileName";
+        }
+        return "";
+    }
+
     public static function loadImagesForPreviews(&$loadPreviewsResponse, $category): void
     {
         $folder = self::$foldersForCategories[$category];

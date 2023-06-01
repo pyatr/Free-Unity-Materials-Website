@@ -18,9 +18,9 @@ class UserModel extends BaseModel
     private const ENTRY_USERNAME = 'USERNAME';
     private const ENTRY_PASSWORD = 'PASSWORD';
     private const ENTRY_EMAIL = 'EMAIL';
-    private const ENTRY_NEW_PASSWORD = 'NEW_PASSWORD';
     private const ENTRY_STATUS = 'STATUS';
     private const ENTRY_ACTIVATED = 'ACTIVATED';
+    private const ENTRY_USER_FOLDER = 'USER_FOLDER';
 
     private const ENTRY_REGISTRATION_DATE = 'REGISTRATION_DATE';
     private const ENTRY_VERIFICATION_CODE = 'VERIFICATION_CODE';
@@ -246,6 +246,11 @@ class UserModel extends BaseModel
         return $this->getUserAttribute($email, $this::ENTRY_REGISTRATION_DATE);
     }
 
+    public function getUserFolder(string $email): string
+    {
+        return $this->getUserAttribute($email, $this::ENTRY_USER_FOLDER);
+    }
+
     public function comparePasswords(string $email, string $givenPassword): bool
     {
         $userPassword = $this->getUserPassword($email);
@@ -253,7 +258,7 @@ class UserModel extends BaseModel
         return $userPassword == $givenPassword;
     }
 
-    public function createNewUser(string $newName, string $password, string $email): bool
+    public function createNewUser(string $newName, string $password, string $email, string $userFolderName): bool
     {
         $email = urlencode($email);
 
@@ -266,8 +271,8 @@ class UserModel extends BaseModel
             $insertQueryObject->
             insert(
                 $this::TABLE_USERS,
-                [$this::ENTRY_USERNAME, $this::ENTRY_PASSWORD, $this::ENTRY_EMAIL, $this::ENTRY_STATUS],
-                [$newName, $hashedPassword, $email, $this::ROLE_USER]
+                [$this::ENTRY_USERNAME, $this::ENTRY_PASSWORD, $this::ENTRY_EMAIL, $this::ENTRY_STATUS, $this::ENTRY_USER_FOLDER],
+                [$newName, $hashedPassword, $email, $this::ROLE_USER, $userFolderName]
             );
             $request = $this->DBConn->prepare($insertQueryObject->getQuery());
             $request->execute();

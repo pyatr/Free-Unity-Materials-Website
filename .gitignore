@@ -29,3 +29,4 @@ yarn-error.log*
 /server/Logs/
 /server/smtpdata
 /server/hostdata
+/server/serverdata

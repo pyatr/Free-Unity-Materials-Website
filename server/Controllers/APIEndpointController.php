@@ -33,6 +33,7 @@ class APIEndpointController
                 'deleteUser' => $userControllerName,
                 'login' => $userControllerName,
                 'loginCookie' => $userControllerName,
+                'setUserAvatar' => $userControllerName,
 
                 'createContent' => $contentControllerName,
                 'deleteContent' => $contentControllerName,
@@ -89,6 +90,9 @@ class APIEndpointController
                     break;
                 case 'loginCookie':
                     $this->respond($controller->tryLoginWithCookie());
+                    break;
+                case 'setUserAvatar':
+                    $this->respond($controller->setUserAvatar($attributes));
                     break;
                 case 'createContent':
                     $this->respond($controller->createContent($attributes));

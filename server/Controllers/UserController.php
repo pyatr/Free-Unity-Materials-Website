@@ -99,6 +99,20 @@ class UserController extends BaseController
         );
     }
 
+    public function getUserAvatar($email): string
+    {
+        $userFolderName = $this->userModel->getUserFolder($email);
+        $userAvatarLink = '';
+        $userAvatarFilePath = FileManager::getUserAvatarPath($userFolderName);
+        if ($userAvatarFilePath != '') {
+            $serviceData = FileManager::getTextFileContents($_SERVER['DOCUMENT_ROOT'] . '/serverdata');
+            $serviceHost = $serviceData[0];
+            $servicePort = $serviceData[1];
+            $userAvatarLink = "http://$serviceHost:$servicePort/$userAvatarFilePath";
+        }
+        return $userAvatarLink;
+    }
+
     public function getPublicUserInfo($attributes): array
     {
         $email = $this->tryGetValue($attributes, 'email');
@@ -106,7 +120,14 @@ class UserController extends BaseController
         $userRole = $this->userModel->getUserRole($email);
         $userRegistrationDate = $this->userModel->getUserRegistrationDate($email);
         $isUserActive = $this->userModel->isUserActivated($email);
-        return ['userName' => $userName, 'role' => $userRole, 'registrationDate' => $userRegistrationDate, 'isActive' => $isUserActive];
+        $userAvatarLink = $this->getUserAvatar($email);
+        return [
+            'userName' => $userName,
+            'role' => $userRole,
+            'registrationDate' => $userRegistrationDate,
+            'isActive' => $isUserActive,
+            'avatarLink' => $userAvatarLink
+        ];
     }
 
     public function addCodeForUserEmailChange($attributes): array
@@ -218,6 +239,14 @@ Please follow this link to change your password <html>$verificationLink</html>";
         return $result;
     }
 
+    public function setUserAvatar($attributes)
+    {
+        $email = $this->tryGetValue($attributes, 'email');
+        $avatarImageBase64 = $this->tryGetValue($attributes, 'avatarImageBase64');
+        $userFolderName = $this->userModel->getUserFolder($email);
+        FileManager::saveUserAvatar($userFolderName, $avatarImageBase64);
+    }
+
     public function activateUser($attributes): array
     {
         $email = $this->tryGetValue($attributes, 'email');
@@ -261,9 +290,10 @@ Please follow this link to change your password <html>$verificationLink</html>";
         if ($this->userModel->doesUserExist($email)) {
             return ["registrationResult" => "userExists"];
         }
-
-        if ($this->userModel->createNewUser($username, $password, $email)) {
+        $userFolderName = GUIDCreator::GUIDv4();
+        if ($this->userModel->createNewUser($username, $password, $email, $userFolderName)) {
             $attributes['pathname'] = 'activate';
+            FileManager::createUserFolder($userFolderName);
             if ($this->sendActivationLink($attributes)) {
                 return ["registrationResult" => "userCreated"];
             } else {
@@ -275,10 +305,12 @@ Please follow this link to change your password <html>$verificationLink</html>";
     public function deleteUser($attributes): array
     {
         $email = $this->tryGetValue($attributes, 'email');
+        $userFolderName = $this->userModel->getUserFolder($email);
         $result = [];
         $result['deletionResult'] = 'failed';
         if ($this->userModel->deleteUser($email)) {
             $result['deletionResult'] = 'success';
+            FileManager::deleteUserFolder($userFolderName);
         }
         return $result;
     }
