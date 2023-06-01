@@ -78,6 +78,7 @@ export default function UserBarDisplay() {
                                 <Box style={{
                                     border: "2px",
                                     borderStyle: "solid",
+                                    color: "black",
                                     margin: "0.75em",
                                     width: "4.5em",
                                     height: "4.5em",
