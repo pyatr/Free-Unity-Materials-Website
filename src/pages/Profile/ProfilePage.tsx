@@ -11,6 +11,13 @@ import {containerBoxStyle} from "../Register/RegisterPage";
 import MessageBoxYesNo from "../../components/MessageBoxes/MessageBoxYesNo";
 import {DeleteUser} from "../../utils/User/DeleteUser";
 import {GoToHomePage} from "../../utils/GoToHomePage";
+import FileSelection from "../../components/FileSelection";
+import {DoesImageExist} from "../../utils/Files/DoesImageExist";
+import {SetUserAvatar} from "../../utils/User/SetUserAvatar";
+import FileToBase64 from "../../utils/Files/FileToBase64";
+import URLFileToBase64 from "../../utils/Files/URLFileToBase64";
+import {getImageSize} from "react-image-size";
+import Notification from "../../components/Notification";
 
 const mainGridStyle = {
     display: "grid",
@@ -47,8 +54,17 @@ const bottomLinksStyle = {
 
 export function ProfilePage() {
     const [isLoading, setLoadingStatus] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     const [deleteWindowOpen, setDeleteWindow] = useState(false);
     const [currentUserInfo, setCurrentUserInfo] = useState<PublicUserInfo>(GetEmptyUserInfo());
+    const [userHasAvatar, setUserHasAvatar] = useState<boolean | undefined>(undefined);
+
+    const [maxWidth, maxHeight] = [2048, 2048];
+    const maxFileSize = 8000000;//8 mb
+
+    if (userHasAvatar === undefined) {
+        DoesImageExist(currentUserInfo.avatarLink, setUserHasAvatar);
+    }
 
     const confirmDelete = async () => {
         setDeleteWindow(false);
@@ -63,18 +79,52 @@ export function ProfilePage() {
 
     const cancelDelete = () => setDeleteWindow(false);
 
-    const loadUserInfo = () => {
+    const loadUserInfo = async () => {
         if (!isLoading && currentUserInfo.email === "") {
             setLoadingStatus(true);
             const userEmail = GetUserEmail();
-            GetPublicUserInfo(userEmail).then((loadedUserInfo: PublicUserInfo) => {
-                setCurrentUserInfo(loadedUserInfo);
-                setLoadingStatus(false);
-            });
+            const loadedUserInfo: PublicUserInfo = await GetPublicUserInfo(userEmail);
+            setCurrentUserInfo(loadedUserInfo);
+            setUserHasAvatar(undefined);
+            setLoadingStatus(false);
         }
     }
 
-    useEffect(() => loadUserInfo());
+    const loadNewAvatar = async (event: any) => {
+        setLoadingStatus(true);
+        let file: File = event.target.files[0];
+        let errorMessage = "";
+        let blob: string = URL.createObjectURL(file);
+        let isImage: boolean = file.type.split("/")[0] === "image";
+        if (!isImage) {
+            errorMessage += "This is not an image.\n"
+        } else {
+            if (file.size > maxFileSize) {
+                errorMessage += "Image too heavy. Max size is " + maxFileSize / 1000000 + " MB.\n";
+            }
+            const dimensions = await getImageSize(blob);
+            if (dimensions.width > maxWidth) {
+                errorMessage += "Image too wide (" + dimensions.width + "px). Max width is " + maxWidth + " px.\n";
+            }
+            if (dimensions.height > maxHeight) {
+                errorMessage += "Image too tall (" + dimensions.height + "px). Max height is " + maxHeight + " px.\n";
+            }
+        }
+        if (errorMessage != "") {
+            setErrorMessage(errorMessage);
+            setLoadingStatus(false);
+            return;
+        }
+        let base64 = await FileToBase64(file);
+        event.target.value = null;
+        await SetUserAvatar(currentUserInfo.email, base64);
+        window.location.reload();
+    }
+
+    useEffect(() => {
+        const loadUserInfoBridge = async () => loadUserInfo();
+        loadUserInfoBridge();
+    });
 
     if (!IsLoggedIn()) {
         return (
@@ -93,8 +143,30 @@ export function ProfilePage() {
 
     return (
         <Grid sx={mainGridStyle}>
-            <Grid sx={{display: "flex"}}>
-                <AccountBox sx={{width: "10em", height: "10em"}}/>
+            <Notification message={errorMessage} color={"red"} onDismiss={() => setErrorMessage("")}/>
+            <Grid sx={{display: "flex", gap: "1em"}}>
+                <Grid sx={{width: "15em", height: "15em"}}>
+                    {userHasAvatar === true ?
+                        <Box style={{
+                            border: "2px",
+                            borderStyle: "solid",
+                            margin: "2em",
+                            width: "11em",
+                            height: "11em",
+                            display: "grid",
+                            overflow: "hidden",
+                            justifyContent: "center"
+                        }}>
+                            <img style={{height: "inherit", maxWidth: "none", maxHeight: "none"}}
+                                 src={currentUserInfo.avatarLink}/>
+                        </Box> :
+                        <AccountBox sx={{width: "9.6em", height: "9.6em"}}/>}
+                    <Box width="fit-content" height="fit-content" paddingLeft="2em">
+                        <FileSelection title={"Select avatar (Max size: ) " + maxFileSize / 1000000 + " MB"}
+                                       inputType={"file"} multiple={false}
+                                       loadImageFunction={loadNewAvatar}/>
+                    </Box>
+                </Grid>
                 <Grid sx={userInfoGridStyle}>
                     <Typography style={userInfoTextStyle}>User name</Typography>
                     <Typography style={userInfoTextStyle}>{currentUserInfo.userName}</Typography>

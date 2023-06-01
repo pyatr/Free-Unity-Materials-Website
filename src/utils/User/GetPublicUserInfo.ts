@@ -5,7 +5,8 @@ export type PublicUserInfo = {
     userName: string,
     role: string,
     registrationDate: string,
-    isActive: string
+    isActive: string,
+    avatarLink: string
 }
 
 export async function GetPublicUserInfo(email: string): Promise<PublicUserInfo> {
@@ -21,7 +22,8 @@ export async function GetPublicUserInfo(email: string): Promise<PublicUserInfo> 
             userName: data.userName,
             role: data.role,
             registrationDate: data.registrationDate,
-            isActive: data.isActive
+            isActive: data.isActive,
+            avatarLink: data.avatarLink
         }
 
         return userInfo;
@@ -38,6 +40,7 @@ export function GetEmptyUserInfo(): PublicUserInfo {
         userName: "",
         role: "",
         registrationDate: "",
-        isActive: ""
+        isActive: "",
+        avatarLink: ""
     });
 }

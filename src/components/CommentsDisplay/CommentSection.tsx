@@ -13,7 +13,7 @@ import {UpdateComment} from "../../utils/Comments/UpdateComment";
 
 export function CommentSection({requestedContentID, requestedContentCategory}: ContentUnitRequestData) {
     const [userComment, setUserComment] = useState("");
-    const [comments, setComments] = useState(Array<UserCommentProps>);
+    const [comments, setComments] = useState<UserCommentProps[]>([]);
     const [commentCount, setCommentCount] = useState(-1);
     const [isLoading, setLoadingStatus] = useState(false);
 
@@ -58,8 +58,8 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
             setLoadingStatus(true);
             //TODO: Request limited amount of comments
             GetComments(requestedContentID, requestedContentCategory).then((comments: Array<UserCommentProps>) => {
-                    setLoadingStatus(false);
                     setComments(comments);
+                    setLoadingStatus(false);
                 }
             );
         }
@@ -79,6 +79,7 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
 
     const preparedComments = comments.map(comment => <UserComment userEmail={comment.userEmail}
                                                                   userName={comment.userName}
+                                                                  userAvatarURL={comment.userAvatarURL}
                                                                   content={comment.content}
                                                                   creationDate={comment.creationDate}
                                                                   commentID={comment.commentID}

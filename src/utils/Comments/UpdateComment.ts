@@ -14,6 +14,7 @@ export async function UpdateComment(commentID: number, contentCategory: string, 
     const preparedComment: UserCommentProps = {
         userEmail: rawCommentData.EMAIL,
         userName: rawCommentData.USERNAME,
+        userAvatarURL: rawCommentData.USER_AVATAR_URL,
         content: rawCommentData.CONTENT,
         creationDate: rawCommentData.CREATION_DATE,
         commentID: rawCommentData.NUMBER

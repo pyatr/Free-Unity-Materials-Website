@@ -8,13 +8,14 @@ export async function GetComments(parentNumber: number, contentCategory: string)
         category: contentCategory
     };
     const {data} = await serverConnection.SendPostRequestPromise("getComments", attributes);
-    const preparedComments: Array<UserCommentProps> = (data.body as Array<any>).map(rawComment => {
+    const preparedComments: Array<UserCommentProps> = (data.body as Array<any>).map(rawCommentData => {
         return {
-            userEmail: rawComment.EMAIL,
-            userName: rawComment.USERNAME,
-            content: rawComment.CONTENT,
-            creationDate: rawComment.CREATION_DATE,
-            commentID: rawComment.NUMBER
+            userEmail: rawCommentData.EMAIL,
+            userName: rawCommentData.USERNAME,
+            userAvatarURL: rawCommentData.USER_AVATAR_URL,
+            content: rawCommentData.CONTENT,
+            creationDate: rawCommentData.CREATION_DATE,
+            commentID: rawCommentData.NUMBER
         }
     })
     return preparedComments;

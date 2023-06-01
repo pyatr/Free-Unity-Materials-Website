@@ -15,6 +15,7 @@ const editButtonStyle = {
 type UserCommentDisplayProps = {
     userEmail: string,
     userName: string,
+    userAvatarURL: string,
     content: string,
     creationDate: string,
     commentID: number,
@@ -44,6 +45,7 @@ const mainCommentGrid = {
 export function UserComment({
                                 userEmail,
                                 userName,
+                                userAvatarURL,
                                 content,
                                 creationDate,
                                 commentID,
@@ -59,7 +61,6 @@ export function UserComment({
         setDeleteWindow(false);
         onDelete(commentID);
     }
-
 
     const onCancelEditing = () => {
         setUserComment(content);
@@ -86,8 +87,23 @@ export function UserComment({
     return (
         <Fragment>
             <Grid sx={mainCommentGrid}>
+                {userAvatarURL !== "" ?
+                    <Box style={{
+                        border: "2px",
+                        borderStyle: "solid",
+                        margin: "0.5em",
+                        width: "3.2em",
+                        height: "3.2em",
+                        display: "grid",
+                        overflow: "hidden",
+                        justifyContent: "center"
+                    }}>
+                        <img style={{height: "inherit", maxWidth: "none", maxHeight: "none"}}
+                             src={userAvatarURL}/>
+                    </Box> :
+                    <AccountBox style={{width: "3.7rem", height: "3.7rem", color: "black"}}/>}
                 <Grid display="grid" gap={inEditMode ? "12px" : "4px"} height="fit-content" width="100%">
-                    <Typography fontWeight="bold">{userName}</Typography>
+                    <Typography fontWeight="bold" marginTop="0.3rem">{userName}</Typography>
                     {inEditMode ?
                         <TextField onChange={onCommentInputChange}
                                    label={"Edit comment"}
