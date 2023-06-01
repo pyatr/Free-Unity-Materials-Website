@@ -41,9 +41,11 @@ export default function UserBarDisplay() {
     const loadUserInfo = async () => {
         if (!isLoading && currentUserInfo.email === "") {
             const userEmail = GetUserEmail();
-            const loadedUserInfo: PublicUserInfo = await GetPublicUserInfo(userEmail);
-            setCurrentUserInfo(loadedUserInfo);
-            setUserHasAvatar(undefined);
+            if (userEmail != null) {
+                const loadedUserInfo: PublicUserInfo = await GetPublicUserInfo(userEmail);
+                setCurrentUserInfo(loadedUserInfo);
+                setUserHasAvatar(undefined);
+            }
         }
     }
 
