@@ -53,10 +53,9 @@ export default function UserBarDisplay() {
         const loadUserInfoBridge = async () => loadUserInfo();
         loadUserInfoBridge();
     });
-
     return (
         <Grid sx={parentGridStyle}>
-            {isLoading || currentUserInfo.email === "" || userHasAvatar === undefined ?
+            {isLoading || currentUserInfo.email === "" && IsLoggedIn() || userHasAvatar === undefined ?
                 <Typography style={fontStyle}>Loading...</Typography> :
                 isLoggedIn ?
                     <Grid display="flex" gap="1rem">
