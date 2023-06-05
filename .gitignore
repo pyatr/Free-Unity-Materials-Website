@@ -24,9 +24,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 /dist/
-/server/Images/
-/server/FileStorage/
-/server/Logs/
 /server/smtpdata
 /server/hostdata
 /server/serverdata
+/server/public/FileStorage/
+/server/public/Images/
+/server/vendor/
