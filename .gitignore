@@ -24,9 +24,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 /dist/
-/server/smtpdata
-/server/hostdata
-/server/serverdata
-/server/public/FileStorage/
-/server/public/Images/
+/server-laravel/smtpdata
+/server-laravel/hostdata
+/server-laravel/serverdata
+/server-laravel/public/FileStorage/
+/server-laravel/public/Images/
+/server-laravel/storage/server-logs/
 /server/vendor/

@@ -68,10 +68,11 @@ class ContentController extends BaseController
 
         $contentID = $this->tryGetValue($attributes, 'number');
         $response = $this->contentModel->getContent($category, $contentID);
+        $response['body']=$response['body'][0];
         //Creating empty gallery array
         if ($response['result'] == 'success') {
-            $response['body'][0]['GALLERY'] = FileManager::getImageLinks($category, $contentID);
-            $response['body'][0]['FILE_LINKS'] = FileManager::getFileLinks($category, $contentID);
+            $response['body']['GALLERY'] = FileManager::getImageLinks($category, $contentID);
+            $response['body']['FILE_LINKS'] = FileManager::getFileLinks($category, $contentID);
         }
         return $response;
     }
@@ -79,9 +80,9 @@ class ContentController extends BaseController
     public function getContentPreviews(array $attributes): array
     {
         $category = $this->tryGetValue($attributes, 'category');
-        $pageSize = $this->tryGetValue($attributes, 'pageSize');
+        $pageSize = $this->tryGetValue($attributes, 'page-size');
         $page = $this->tryGetValue($attributes, 'page');
-        $nameFilter = $this->tryGetValue($attributes, 'nameFilter');
+        $nameFilter = $this->tryGetValue($attributes, 'name-filter');
         $result = $this->contentModel->getContentPreviews($category, $nameFilter, $pageSize, $page);
 
         FileManager::loadImagesForPreviews($result, $category);

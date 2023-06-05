@@ -119,11 +119,11 @@ final class PHPMailerTest extends SendTestCase
         //This should select B-encoding automatically and should fold
         $bencode = str_repeat($letter, PHPMailer::STD_LINE_LENGTH + 1);
         //This should select Q-encoding automatically and should fold
-        $qencode = str_repeat('e', PHPMailer::STD_LINE_LENGTH) . $letter;
+        $qencode = PHPMailerTest . phpstr_repeat('e', PHPMailer::STD_LINE_LENGTH) . $letter;
         //This should select B-encoding automatically and should not fold
         $bencodenofold = str_repeat($letter, 10);
         //This should select Q-encoding automatically and should not fold
-        $qencodenofold = str_repeat('e', 9) . $letter;
+        $qencodenofold = PHPMailerTest . phpstr_repeat('e', 9) . $letter;
         //This should Q-encode as ASCII and fold (previously, this did not encode)
         $longheader = str_repeat('e', PHPMailer::STD_LINE_LENGTH + 10);
         //This should Q-encode as UTF-8 and fold

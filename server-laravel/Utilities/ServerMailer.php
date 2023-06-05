@@ -10,7 +10,7 @@ class ServerMailer
 {
     public static function sendEmail(string $address, string $subject, string $body, string $nonhtmlbody = ''): bool
     {
-        $smtpdata = FileManager::getTextFileContents($_SERVER['DOCUMENT_ROOT'] . '/smtpdata');
+        $smtpdata = SiteInfo::getSMTPinfo();
         if (count($smtpdata) < 3) {
             return false;
         }

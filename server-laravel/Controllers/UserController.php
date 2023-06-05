@@ -105,10 +105,10 @@ class UserController extends BaseController
         $userAvatarLink = '';
         $userAvatarFilePath = FileManager::getUserAvatarPath($userFolderName);
         if ($userAvatarFilePath != '') {
-            $serviceData = FileManager::getTextFileContents($_SERVER['DOCUMENT_ROOT'] . '/serverdata');
-            $serviceHost = $serviceData[0];
-            $servicePort = $serviceData[1];
-            $userAvatarLink = "http://$serviceHost:$servicePort/$userAvatarFilePath";
+            $serverData = SiteInfo::getServerInfo();
+            $serverHost = $serverData[0];
+            $serverPort = $serverData[1];
+            $userAvatarLink = "http://$serverHost:$serverPort/$userAvatarFilePath";
         }
         return $userAvatarLink;
     }
@@ -137,7 +137,7 @@ class UserController extends BaseController
         $verificationCode = GUIDCreator::GUIDv4();
         $this->userModel->addUserEmailChangeCode($email, $verificationCode);
         $userName = $this->userModel->getUserName($email);
-        $serviceData = FileManager::getTextFileContents($_SERVER['DOCUMENT_ROOT'] . '/hostdata');
+        $serviceData = SiteInfo::getHostInfo();
         $serviceHost = $serviceData[0];
         $servicePort = $serviceData[1];
         $verificationLink = "http://$serviceHost:$servicePort/change-email/$verificationCode";
@@ -205,7 +205,7 @@ Please follow this link to change your email <href>$verificationLink</href><br/>
         $verificationCode = GUIDCreator::GUIDv4();
         $this->userModel->addUserPasswordChangeCode($email, $verificationCode);
         $userName = $this->userModel->getUserName($email);
-        $serviceData = FileManager::getTextFileContents($_SERVER['DOCUMENT_ROOT'] . '/hostdata');
+        $serviceData = SiteInfo::getHostInfo();
         $serviceHost = $serviceData[0];
         $servicePort = $serviceData[1];
         $verificationLink = "http://$serviceHost:$servicePort/change-password/$verificationCode";
@@ -271,7 +271,7 @@ Please follow this link to change your password <html>$verificationLink</html>";
 
         $this->userModel->addUserVerificationCode($email, $verificationCode);
         $subject = 'Verify your email address';
-        $serviceData = FileManager::getTextFileContents($_SERVER['DOCUMENT_ROOT'] . '/hostdata');
+        $serviceData = SiteInfo::getHostInfo();
         $serviceHost = $serviceData[0];
         $servicePort = $serviceData[1];
         $verificationLink = "http://$serviceHost:$servicePort/$pathname/$verificationCode";

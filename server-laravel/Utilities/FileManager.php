@@ -38,6 +38,9 @@ class FileManager
     {
         $folder = self::$foldersForCategories[$category];
         $links = [];
+        $serverData = FileManager::getTextFileContents(dirname($_SERVER['DOCUMENT_ROOT'], 1) . '/serverdata');
+        $serverHost = $serverData[0];
+        $serverPort = $serverData[1];
         $galleryDirectory = "Images/$folder/$contentID/Gallery";
         if (is_dir($_SERVER['DOCUMENT_ROOT'] . "/$galleryDirectory/")) {
             $imagesInGallery = glob($_SERVER['DOCUMENT_ROOT'] . "/$galleryDirectory/*.png", GLOB_NOSORT);
@@ -45,7 +48,7 @@ class FileManager
             foreach ($imagesInGallery as $image) {
                 $fileNameSplit = explode('/', $image);
                 $fileName = $fileNameSplit[count($fileNameSplit) - 1];
-                $links[] = "$galleryDirectory/$fileName";
+                $links[] = "http://$serverHost:$serverPort/$galleryDirectory/$fileName";
             }
         }
         if (count($links) == 0) {
@@ -114,6 +117,9 @@ class FileManager
     public static function loadImagesForPreviews(&$loadPreviewsResponse, $category): void
     {
         $folder = self::$foldersForCategories[$category];
+        $serverData = FileManager::getTextFileContents(dirname($_SERVER['DOCUMENT_ROOT'], 1) . '/serverdata');
+        $serverHost = $serverData[0];
+        $serverPort = $serverData[1];
 
         foreach ($loadPreviewsResponse['body'] as &$preview) {
             $contentID = $preview['NUMBER'];
@@ -122,7 +128,7 @@ class FileManager
                 $filesInDirectory = scandir($_SERVER['DOCUMENT_ROOT'] . "/$galleryDirectory/");
                 if (count($filesInDirectory) > 2) {
                     $previewName = $filesInDirectory[2];
-                    $preview['titlepicLink'] = "$galleryDirectory/$previewName";
+                    $preview['titlepicLink'] = "http://$serverHost:$serverPort/$galleryDirectory/$previewName";
                 }
             } else {
                 $preview['titlepicLink'] = "noimages";
@@ -186,6 +192,9 @@ class FileManager
     {
         $folder = self::$foldersForCategories[$category];
         $links = [];
+        $serverData = FileManager::getTextFileContents(dirname($_SERVER['DOCUMENT_ROOT'], 1) . '/serverdata');
+        $serverHost = $serverData[0];
+        $serverPort = $serverData[1];
         $currentContentFileDirectory = "FileStorage/$folder/$contentID";
         $fullFilePath = $_SERVER['DOCUMENT_ROOT'] . "/$currentContentFileDirectory";
         if (is_dir($fullFilePath)) {
@@ -194,7 +203,7 @@ class FileManager
             sort($fileFoldersInContentDirectory, SORT_NATURAL);
             foreach ($fileFoldersInContentDirectory as $fileFolder) {
                 $fileName = scandir("$fileFolder")[2];
-                $links[] = str_replace($_SERVER['DOCUMENT_ROOT'], "", "$fileFolder/$fileName");
+                $links[] = "http://$serverHost:$serverPort/" . str_replace($_SERVER['DOCUMENT_ROOT'], "", "$fileFolder/$fileName");
             }
         }
         if (count($links) == 0) {

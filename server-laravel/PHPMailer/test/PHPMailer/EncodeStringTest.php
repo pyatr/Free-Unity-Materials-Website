@@ -53,7 +53,7 @@ final class EncodeStringTest extends TestCase
     {
         $input           = 'hello';
         $LE              = PHPMailer::getLE();
-        $base64_expected = base64_encode($input) . $LE;
+        $base64_expected = EncodeStringTest . phpbase64_encode($input) . $LE;
 
         return [
             'Simple string; no explicit encoding (using base64 default)' => [

@@ -44,8 +44,8 @@ class CommentController extends BaseController
     public function getComments(array $attributes): array
     {
         $category = $this->tryGetValue($attributes, 'category');
-        $parentNumber = $this->tryGetValue($attributes, 'parentNumber');
-        $comments = $this->commentModel->getComments($category, $parentNumber);
+        $parentID = $this->tryGetValue($attributes, 'parentID');
+        $comments = $this->commentModel->getComments($category, $parentID);
         foreach ($comments['body'] as &$comment) {
             $email = $comment['EMAIL'];
             $comment['USERNAME'] = $this->userModel->getUserName($email);
@@ -57,11 +57,11 @@ class CommentController extends BaseController
     public function getCommentCount(array $attributes): int
     {
         $category = $this->tryGetValue($attributes, 'category');
-        $parentNumber = $this->tryGetValue($attributes, 'parentNumber');
-        return $this->commentModel->getCommentCount($category, $parentNumber);
+        $parentID = $this->tryGetValue($attributes, 'parentID');
+        return $this->commentModel->getCommentCount($category, $parentID);
     }
 
-    public function deleteComment(array $attributes)
+    public function deleteComment(array $attributes): void
     {
         $category = $this->tryGetValue($attributes, 'category');
         $commentID = $this->tryGetValue($attributes, 'commentID');

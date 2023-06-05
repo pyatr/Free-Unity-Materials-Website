@@ -38,7 +38,7 @@ services:
     tty: true
     restart: always
     volumes:
-      - ./server:/var/www/html/server
+      - ./server-laravel:/var/www/html/server-laravel
     ports:
       - "8000:8000"
     networks:

@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-include_once '../../Autoload.php';
+include_once '../Autoload.php';
 
 /*
 |--------------------------------------------------------------------------
