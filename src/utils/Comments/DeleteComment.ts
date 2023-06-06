@@ -6,6 +6,6 @@ export async function DeleteComment(commentID: number, contentCategory: string):
         commentID: commentID,
         category: contentCategory
     };
-    const {data} = await serverConnection.SendPostRequestPromise("deleteComment", attributes);
+    const {data} = await serverConnection.SendPostRequestPromise("delete-comment", attributes);
     return data;
 }

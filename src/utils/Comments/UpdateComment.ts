@@ -1,4 +1,3 @@
-import {GetUserEmail} from "../User/Login";
 import ServerConnection from "../ServerConnection";
 import {UserCommentProps} from "../Types/UserCommentProps";
 
@@ -9,7 +8,7 @@ export async function UpdateComment(commentID: number, contentCategory: string, 
         category: contentCategory,
         content: comment
     };
-    const {data} = await serverConnection.SendPostRequestPromise("updateComment", attributes);
+    const {data} = await serverConnection.SendPostRequestPromise("update-comment", attributes);
     const rawCommentData = data.body[0];
     const preparedComment: UserCommentProps = {
         userEmail: rawCommentData.EMAIL,

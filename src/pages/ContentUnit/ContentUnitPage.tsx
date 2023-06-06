@@ -34,18 +34,19 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
 
     let {currentContentID} = useParams();
 
-    const loadContent = () => {
+    const loadContent = async () => {
         if (contentUnit.contentID == -1 && !isLoading) {
             setLoadingStatus(true);
-            GetContentUnit(parseInt(currentContentID as string), requestedContentCategory).then((loadedContentUnit: ContentUnit) => {
-                window.scrollTo(0, 0);
-                setLoadingStatus(false);
-                setContentUnit(loadedContentUnit);
-            });
+            const loadedContentUnit: ContentUnit = await GetContentUnit(parseInt(currentContentID as string), requestedContentCategory)
+            window.scrollTo(0, 0);
+            setLoadingStatus(false);
+            setContentUnit(loadedContentUnit);
         }
     }
 
-    useEffect(() => loadContent());
+    useEffect(() => {
+        loadContent();
+    });
 
     if (isLoading) {
         return (<LoadingOverlay position={"inherit"}/>);
@@ -86,9 +87,9 @@ export default function ContentUnitPage({requestedContentID, requestedContentCat
             <ImageGallery imageLinks={contentUnit.galleryImageLinks} imageMapper={mapImage}/>
             <DownloadLinksList links={contentUnit.fileLinks}/>
             <Typography sx={itemContentDisplay} variant="body1">{contentBody}</Typography>
-            <ContentUnitEditorButtons contentID={contentUnit.contentID} onDelete={openDeleteWindow}
+            <ContentUnitEditorButtons contentID={parseInt(currentContentID as string)} onDelete={openDeleteWindow}
                                       requestedContentCategory={requestedContentCategory}/>
-            <CommentSection requestedContentID={contentUnit.contentID}
+            <CommentSection requestedContentID={parseInt(currentContentID as string)}
                             requestedContentCategory={requestedContentCategory}></CommentSection>
         </Grid>);
 }

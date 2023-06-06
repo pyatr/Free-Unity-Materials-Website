@@ -16,4 +16,8 @@ export default class ServerConnection {
         });
         return response;
     }
+
+    public async SendGetRequestPromise(requestUrl: string): Promise<AxiosResponse> {
+        return await axios.get(this.serverConnection + "/" + requestUrl);
+    }
 }

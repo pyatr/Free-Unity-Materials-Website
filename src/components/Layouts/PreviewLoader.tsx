@@ -4,7 +4,7 @@ import {Route, Routes, useParams, useSearchParams} from "react-router-dom";
 import {PageProperties} from "../../utils/PageProperties/PageProperties";
 import {SitePagesProperties} from "../../utils/PageProperties/SitePagesProperties";
 import {GetLastURLPart} from "../../utils/GetLastURLPart";
-import GetPreviews, {GetAllPreviews} from "../../utils/ContentInteraction/GetPreviews";
+import GetPreviews from "../../utils/ContentInteraction/GetPreviews";
 import AssetsPreviewGridPage from "../../pages/Assets/AssetsPreviewGridPage";
 import {ArticlesPreviewListPage} from "../../pages/Articles/ArticlesPreviewListPage";
 import {ScriptsPreviewListPage} from "../../pages/Scripts/ScriptsPreviewListPage";
@@ -56,12 +56,7 @@ export function PreviewLoader({elementTypeName, onContentLoaded}: PreviewLoaderP
             setLoadingStatus(true);
             let loadedPreviews: ContentUnitPreview[];
             let totalContentCount: number;
-            if (elementTypeName === "AllContentPage") {
-                loadedPreviews = await GetAllPreviews(searchName);
-                totalContentCount = loadedPreviews.length;
-            } else {
-                [loadedPreviews, totalContentCount] = await GetPreviews(currentPageProperties, searchName);
-            }
+            [loadedPreviews, totalContentCount] = await GetPreviews(currentPageProperties, searchName);
             currentPageProperties.setPostsCount(totalContentCount);
             setPreviewContent(loadedPreviews);
             window.scrollTo(0, 0);
@@ -82,7 +77,7 @@ export function PreviewLoader({elementTypeName, onContentLoaded}: PreviewLoaderP
         ["ScriptsPage", <ScriptsPreviewListPage pageProperties={currentPageProperties}
                                                 previewContent={previewContent as ContentUnitPreview[]}/>],
         ["AllContentPage", <AllContentPreviewListPage pageProperties={currentPageProperties}
-                                                       previewContent={previewContent as ContentUnitPreview[]}/>]
+                                                      previewContent={previewContent as ContentUnitPreview[]}/>]
     ]
 
     const currentPreviewPageData = previewPages.filter(page => page[0] === elementTypeName)[0];

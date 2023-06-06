@@ -57,7 +57,7 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
         if (commentCount == -1 && !isLoading) {
             setLoadingStatus(true);
             //TODO: Request limited amount of comments
-            GetComments(requestedContentID, requestedContentCategory).then((comments: Array<UserCommentProps>) => {
+            GetComments(requestedContentID).then((comments: Array<UserCommentProps>) => {
                     setComments(comments);
                     setLoadingStatus(false);
                 }
@@ -67,7 +67,7 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
 
     const loadCommentCount = () => {
         if (commentCount == -1) {
-            GetCommentCount(requestedContentID, requestedContentCategory).then((commentCount: number) => setCommentCount(commentCount));
+            GetCommentCount(requestedContentID).then((commentCount: number) => setCommentCount(commentCount));
         }
     }
 
@@ -83,6 +83,7 @@ export function CommentSection({requestedContentID, requestedContentCategory}: C
                                                                   content={comment.content}
                                                                   creationDate={comment.creationDate}
                                                                   commentID={comment.commentID}
+                                                                  key={comment.commentID}
                                                                   onEdit={editComment}
                                                                   onDelete={deleteComment}/>);
 

@@ -1,56 +1,28 @@
 import ServerConnection from "../ServerConnection";
 import {PageProperties} from "../PageProperties/PageProperties";
 import {ContentUnitPreview} from "../Types/Content/ContentUnitPreview";
-import {SitePagesProperties} from "../PageProperties/SitePagesProperties";
 
 export default async function GetPreviews(pageProperties: PageProperties, nameFilter: string = ""): Promise<[ContentUnitPreview[], number]> {
     const serverConnection = new ServerConnection();
-    const attributes = {
-        pageSize: pageProperties.pageSize,
-        page: pageProperties.currentPage,
-        category: pageProperties.getCategoryName(),
-        nameFilter: nameFilter
-    };
 
-    //Use response.data.code for SQL request code and response.data.requesterror for error details
-    const {data} = await serverConnection.SendPostRequestPromise("getPreviews", attributes);
+    const requestURL = "content/get-previews";
+    let requestParameters = "?page=" + pageProperties.currentPage + "&page-size=" + pageProperties.pageSize + "&category=" + pageProperties.getCategoryName();
+    if (nameFilter != "")
+        requestParameters += "&name-filter=" + nameFilter;
+    const {data} = await serverConnection.SendGetRequestPromise(requestURL + requestParameters);
 
     const previews: ContentUnitPreview[] = [];
-    data.body.forEach((rawContentUnit: any) =>
-        previews.push({
-                contentID: rawContentUnit.NUMBER,
-                title: rawContentUnit.TITLE,
-                categories: rawContentUnit.CATEGORIES,
-                body: rawContentUnit.CONTENT,
-                primaryCategory: attributes.category,
-                titlepicLink: rawContentUnit.titlepicLink != "noimages" ? "http://" + window.location.host + ":8000/" + rawContentUnit.titlepicLink : ""
-            }
-        )
-    );
+
+    data.posts.forEach((rawContentUnit: any) => {
+        return previews.push({
+            contentID: rawContentUnit.ID,
+            title: rawContentUnit.TITLE,
+            categories: rawContentUnit.CATEGORIES,
+            body: rawContentUnit.CONTENT,
+            primaryCategory: rawContentUnit.MAIN_CATEGORY,
+            titlepicLink: rawContentUnit.titlepicLink
+        });
+    });
 
     return [previews, data.contentCount];
-}
-
-export async function GetAllPreviews(nameFilter: string = ""): Promise<ContentUnitPreview[]> {
-    const serverConnection = new ServerConnection();
-    const attributes = {
-        nameFilter: nameFilter
-    };
-
-    const {data} = await serverConnection.SendPostRequestPromise("getAllPreviews", attributes);
-
-    const previews: ContentUnitPreview[] = [];
-    data.body.forEach((rawContentUnit: any) =>
-        previews.push({
-                contentID: rawContentUnit.NUMBER,
-                title: rawContentUnit.TITLE,
-                categories: rawContentUnit.CATEGORIES,
-                body: rawContentUnit.CONTENT,
-                primaryCategory: rawContentUnit.primaryCategory,
-                titlepicLink: rawContentUnit.titlepicLink != "noimages" ? "http://" + window.location.host + ":8000/" + rawContentUnit.titlepicLink : ""
-            }
-        )
-    );
-
-    return previews;
 }

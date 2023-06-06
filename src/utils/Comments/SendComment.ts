@@ -11,7 +11,7 @@ export async function SendComment(contentNumber: number, contentCategory: string
         category: contentCategory,
         parentNumber: contentNumber
     };
-    const {data} = await serverConnection.SendPostRequestPromise("addComment", attributes);
+    const {data} = await serverConnection.SendPostRequestPromise("add-comment", attributes);
     const rawCommentData = data.body[0];
     const preparedComment: UserCommentProps = {
         userEmail: rawCommentData.EMAIL,

@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from "react";
-import {Grid, Typography} from "@mui/material";
+import {Box, Grid, Typography} from "@mui/material";
 
 import "../../assets/HomePage.css";
 
@@ -52,7 +52,7 @@ export default function TextContentUnitPreview({
 
     const getCommentCount = () => {
         if (commentCount == -1) {
-            GetCommentCount(contentUnitPreview.contentID, contentUnitPreview.primaryCategory).then((commentCount: number) => setCommentCount(commentCount));
+            GetCommentCount(contentUnitPreview.contentID).then((commentCount: number) => setCommentCount(commentCount));
         }
     }
 
@@ -80,17 +80,37 @@ export default function TextContentUnitPreview({
             <Grid sx={innerGrid}
                   component={Link}
                   to={link}>
-                <Typography variant="h5"
-                            sx={{marginBottom: "4px", color: "black"}}>{contentUnitPreview.title}</Typography>
+                <Typography variant="h5" sx={{marginBottom: "4px", color: "black"}}>
+                    {contentUnitPreview.title}
+                </Typography>
                 {contentUnitPreview.categories != "" ?
-                    <Typography variant="subtitle2" sx={{color: "grey"}}>{contentUnitPreview.categories}</Typography> :
+                    <Typography variant="subtitle2" sx={{color: "grey"}}>
+                        {contentUnitPreview.categories}
+                    </Typography> :
                     <Fragment/>}
-                <Typography variant="body1"
-                            sx={{color: "black"}}>{StripHTMLFromString(contentUnitPreview.body)}</Typography>
+                {contentUnitPreview.titlepicLink != "noimages" ?
+                    <Box sx={{
+                        width: "10em",
+                        height: "10em",
+                        color: "black",
+                        border: "2px",
+                        borderStyle: "solid",
+                        marginTop: "0.5em",
+                        marginBottom: "0.5em"
+                    }}>
+                        <img src={contentUnitPreview.titlepicLink}/>
+                    </Box> :
+                    <Fragment/>}
+                <Typography variant="body1" sx={{color: "black"}}>
+                    {StripHTMLFromString(contentUnitPreview.body)}
+                </Typography>
                 {commentCount > -1 ?
-                    <Typography variant="subtitle2"
-                                color="grey">{(commentCount == 0 ? "No" : commentCount) + " comments"}</Typography> :
-                    <Typography variant="subtitle2" color="white">{"Loading comments"}</Typography>}
+                    <Typography variant="subtitle2" color="grey">
+                        {(commentCount == 0 ? "No" : commentCount) + " comments"}
+                    </Typography> :
+                    <Typography variant="subtitle2" color="white">
+                        {"Loading comments"}
+                    </Typography>}
             </Grid>
             <ContentUnitEditorButtons contentID={contentUnitPreview.contentID}
                                       onDelete={openDeleteWindow}

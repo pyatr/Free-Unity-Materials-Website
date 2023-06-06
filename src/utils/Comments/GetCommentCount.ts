@@ -1,11 +1,9 @@
 import ServerConnection from "../ServerConnection";
 
-export async function GetCommentCount(parentNumber: number, contentCategory: string): Promise<number> {
+export async function GetCommentCount(parentID: number): Promise<number> {
     const serverConnection = new ServerConnection();
-    const attributes = {
-        parentNumber: parentNumber,
-        category: contentCategory
-    };
-    const {data} = await serverConnection.SendPostRequestPromise("getCommentCount", attributes);
+    const requestURL = "comments/get-comments-count";
+    const requestParameters = "?parentID=" + parentID;
+    const {data} = await serverConnection.SendGetRequestPromise(requestURL + requestParameters);
     return data as number;
 }
