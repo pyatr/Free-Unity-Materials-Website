@@ -2,6 +2,8 @@
 
 namespace Server;
 
+use App\Models\Comment;
+
 class CommentController extends BaseController
 {
     private UserController $userController;
@@ -43,10 +45,9 @@ class CommentController extends BaseController
 
     public function getComments(array $attributes): array
     {
-        $category = $this->tryGetValue($attributes, 'category');
         $parentID = $this->tryGetValue($attributes, 'parentID');
-        $comments = $this->commentModel->getComments($category, $parentID);
-        foreach ($comments['body'] as &$comment) {
+        $comments = Comment::getComments($parentID);
+        foreach ($comments as &$comment) {
             $email = $comment['EMAIL'];
             $comment['USERNAME'] = $this->userModel->getUserName($email);
             $comment['USER_AVATAR_URL'] = $this->userController->getUserAvatar($email);
@@ -56,9 +57,8 @@ class CommentController extends BaseController
 
     public function getCommentCount(array $attributes): int
     {
-        $category = $this->tryGetValue($attributes, 'category');
         $parentID = $this->tryGetValue($attributes, 'parentID');
-        return $this->commentModel->getCommentCount($category, $parentID);
+        return Comment::getCommentCount($parentID);
     }
 
     public function deleteComment(array $attributes): void

@@ -2,6 +2,9 @@
 
 namespace Server;
 
+use App\Models\Content;
+use Ramsey\Collection\Collection;
+
 class ContentController extends BaseController
 {
     private ContentModel $contentModel;
@@ -65,16 +68,15 @@ class ContentController extends BaseController
     public function getContent(array $attributes): array
     {
         $category = $this->tryGetValue($attributes, 'category');
+        $contentID = $this->tryGetValue($attributes, 'id');
 
-        $contentID = $this->tryGetValue($attributes, 'number');
-        $response = $this->contentModel->getContent($category, $contentID);
-        $response['body']=$response['body'][0];
-        //Creating empty gallery array
-        if ($response['result'] == 'success') {
-            $response['body']['GALLERY'] = FileManager::getImageLinks($category, $contentID);
-            $response['body']['FILE_LINKS'] = FileManager::getFileLinks($category, $contentID);
+        $requestResult = Content::getContent($category, $contentID);
+        if (count($requestResult) > 0) {
+            $requestResult = $requestResult[0];
+            $requestResult['GALLERY'] = FileManager::getImageLinks($category, $contentID);
+            $requestResult['FILE_LINKS'] = FileManager::getFileLinks($category, $contentID);
         }
-        return $response;
+        return $requestResult;
     }
 
     public function getContentPreviews(array $attributes): array
@@ -83,20 +85,12 @@ class ContentController extends BaseController
         $pageSize = $this->tryGetValue($attributes, 'page-size');
         $page = $this->tryGetValue($attributes, 'page');
         $nameFilter = $this->tryGetValue($attributes, 'name-filter');
-        $result = $this->contentModel->getContentPreviews($category, $nameFilter, $pageSize, $page);
+        if ($nameFilter == null) {
+            $nameFilter = '';
+        }
+        $result = Content::getContentPreviews($category != 'everything' ? $category : '', $nameFilter, $pageSize, $page);
 
-        FileManager::loadImagesForPreviews($result, $category);
-        return $result;
-    }
-
-    public function getAllContentPreviews(array $attributes): array
-    {
-        $pageSize = $this->tryGetValue($attributes, 'pageSize');
-        $page = $this->tryGetValue($attributes, 'page');
-        $nameFilter = $this->tryGetValue($attributes, 'nameFilter');
-        $result = $this->contentModel->getAllContentPreviews($nameFilter);
-        //Only assets will have previews
-        FileManager::loadImagesForPreviews($result, 'asset');
+        FileManager::loadImagesForPreviews($result, $category != 'everything' ? $category : 'asset');
         return $result;
     }
 }

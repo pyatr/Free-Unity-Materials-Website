@@ -32,16 +32,7 @@ Route::get('content/{any}', function ($wildcard) {
             echo json_encode($controller->getContent($parameters));
             break;
         case 'get-previews':
-            if (!array_key_exists('name-filter', $parameters)) {
-                $parameters['name-filter'] = '';
-            }
             echo json_encode($controller->getContentPreviews($parameters));
-            break;
-        case 'get-all-previews':
-            if (!array_key_exists('name-filter', $parameters)) {
-                $parameters['name-filter'] = '';
-            }
-            echo json_encode($controller->getAllContentPreviews($parameters));
             break;
         default:
             break;
