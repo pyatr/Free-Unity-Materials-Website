@@ -1,6 +1,6 @@
 <?php
 
-namespace Server;
+namespace App\Utilities;
 
 class CookieManager
 {

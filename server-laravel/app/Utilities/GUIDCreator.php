@@ -1,6 +1,8 @@
 <?php
 
-namespace Server;
+namespace App\Utilities;
+
+use function Server\com_create_guid;
 
 class GUIDCreator
 {
