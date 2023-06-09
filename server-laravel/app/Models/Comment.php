@@ -23,7 +23,7 @@ class Comment extends Model
     private const ENTRY_CREATION_DATE = 'CREATION_DATE';
     private const ENTRY_ID = 'ID';
 
-    public static function addComment(string $category, string $email, string $content, int $parentNumber): array
+    public static function addComment( string $email, string $content, int $parentNumber): array
     {
         /*
         $tableName = self::$tablesForCategories[$category];
@@ -47,21 +47,11 @@ class Comment extends Model
         return [];
     }
 
-    public static function updateComment(string $category, string $content, int $commentNumber): array
+    public static function updateComment(string $content, int $commentNumber): array
     {
-        /*
-        $tableName = self::$tablesForCategories[$category];
         $content = urlencode($content);
-
-        $updateQueryObject = new UpdateQueryBuilder();
-        $updateQueryObject->
-        update($tableName, [$this::ENTRY_CONTENT], [$content])->
-        where([$this::ENTRY_ID, '=', $commentNumber]);
-
-        $this->executeRequest($updateQueryObject->getQuery());
-
-        return $this->getComment($category, $commentNumber);*/
-        return [];
+        Comment::where([self::ENTRY_ID, '=', $commentNumber])->update([self::ENTRY_CONTENT => $content]);
+        return self::getComment($commentNumber);
     }
 
     public static function getComment(int $commentID): array
@@ -92,37 +82,18 @@ class Comment extends Model
     public static function getCommentCount(int $parentID): int
     {
         $conditions = [[self::ENTRY_PARENT_ID, '=', $parentID]];
-
         return Comment::where($conditions)->
         orderBy(self::ENTRY_CREATION_DATE)->
         get([self::ENTRY_EMAIL, self::ENTRY_CONTENT, self::ENTRY_CREATION_DATE, self::ENTRY_ID])->count();
     }
 
-    public static function deleteComment(string $category, int $commentID)
+    public static function deleteComment(int $commentID)
     {
-        /*
-        $tableName = self::$tablesForCategories[$category];
-
-        $deleteQueryObject = new DeleteQueryBuilder();
-        $deleteQueryObject->
-        delete($tableName)->
-        where([$this::ENTRY_ID, '=', $commentID]);
-
-        $this->executeRequest($deleteQueryObject->getQuery());*/
-        return [];
+        Comment::where([self::ENTRY_ID, '=', $commentID])->delete();
     }
 
-    public static function deleteCommentsFromContent(string $category, int $contentID)
+    public static function deleteCommentsFromContent(int $contentID)
     {
-        /*
-        $tableName = self::$tablesForCategories[$category];
-
-        $deleteQueryObject = new DeleteQueryBuilder();
-        $deleteQueryObject->
-        delete($tableName)->
-        where([$this::ENTRY_PARENT_ID, '=', $contentID]);
-
-        $this->executeRequest($deleteQueryObject->getQuery());*/
-        return [];
+        Comment::where([self::ENTRY_PARENT_ID, '=', $contentID])->delete();
     }
 }

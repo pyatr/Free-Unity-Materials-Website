@@ -83,7 +83,7 @@ class Content extends Model
         if (count($requestResult) > 0) {
             $requestResult[0]['TITLE'] = urldecode($requestResult[0]['TITLE']);
             $requestResult[0]['CONTENT'] = urldecode($requestResult[0]['CONTENT']);
-            //$requestResult[0]['last_id'] = Content::getLastPostID();
+            //$requestResult[0]['lastId'] = Content::getLastPostID();
         }
         return $requestResult;
     }
@@ -120,6 +120,8 @@ class Content extends Model
 
     public static function getLastPostID(): int
     {
-        return DB::getPdo()->lastInsertID();
+        $crutch = new Content();
+        $crutch->save();
+        return $crutch->id;
     }
 }

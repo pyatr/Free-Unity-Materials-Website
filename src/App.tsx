@@ -4,7 +4,7 @@ import "./assets/HomePage.css";
 import SiteAppBar from "./components/AppBar/SiteAppBar";
 import LoginPage from "./pages/Login/LoginPage";
 import MainContentLayout from "./components/Layouts/MainContentLayout";
-import {IsLoggedIn, TryCookieLogin} from "./utils/User/Login";
+import {IsLoggedIn, TryRememberLogin} from "./utils/User/Login";
 import {useEffect, useState} from "react";
 import {RegisterPage} from "./pages/Register/RegisterPage";
 import UserActivationRouter from "./pages/UserActivation/UserActivationRouter";
@@ -16,7 +16,7 @@ export default function App() {
     const [[width, height], setWidthHeight] = useState([window.innerWidth, window.innerHeight]);
     const [isLoggedIn, setLoggedInStatus] = useState(false);
 
-    TryCookieLogin().then(() => {
+    TryRememberLogin().then(() => {
         if (IsLoggedIn() != isLoggedIn) {
             setLoggedInStatus(IsLoggedIn());
         }

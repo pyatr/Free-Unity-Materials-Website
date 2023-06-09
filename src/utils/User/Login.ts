@@ -2,17 +2,12 @@ import Cookies from "universal-cookie";
 import ServerConnection from "../ServerConnection";
 import {GoToHomePage} from "../GoToHomePage";
 
-export async function TryCookieLogin() {
-    const cookie = new Cookies();
-    let loginCookie = cookie.get("userLogin");
-    if (loginCookie == null) {
-        ClearUserData();
-        return;
-    }
+export async function TryRememberLogin() {
     if (!IsLoggedIn()) {
         let serverConnection = new ServerConnection();
         sessionStorage.setItem("userLoginStatus", "loading");
-        const {data} = await serverConnection.SendPostRequestPromise("loginCookie", {});
+        const {data} = await serverConnection.SendPostRequestPromise("user/login-remember", {});
+        console.log(data);
         const loginStatus = data.loginStatus.toString();
         if (loginStatus !== "success") {
             //Delete login cookie if it failed to log us in

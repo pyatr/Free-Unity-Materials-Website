@@ -59,6 +59,14 @@ class UserController extends BaseController
         return $response;
     }
 
+    public static function tryLoginWithRememberWeb()
+    {
+        //auth()->login($newUser, true);
+        if (Auth::check()) {
+
+        }
+    }
+
     private static function encryptLoginPassword(string $email, string $hashedPassword): string
     {
         return openssl_encrypt(
@@ -259,40 +267,6 @@ Please follow this link to change your password <html>$verificationLink</html>";
         FileManager::saveUserAvatar($userFolderName, $avatarImageBase64);
     }
 
-    public static function activateUser($parameters): array
-    {
-        $email = self::tryGetValue($parameters, 'email');
-        $verificationCode = self::tryGetValue($parameters, 'verificationCode');
-        $result = EmailVerificationCodes::activateUser($email, $verificationCode);
-        if ($result['activationResult'] == 'success') {
-            $subject = 'Your address has been verified';
-            $userName = User::getUserName($email);
-            $body = "Dear $userName! Thank you for registering on Free Unity Materials.";
-            ServerMailer::sendEmail($email, $subject, $body);
-            $password = User::getUserPassword($email);
-            $result['loginCookie'] = self::encryptLoginPassword($email, $password);
-        }
-        return $result;
-    }
-
-    public static function sendActivationLink($parameters): bool
-    {
-        $email = self::tryGetValue($parameters, 'email');
-        $pathname = self::tryGetValue($parameters, 'pathname');
-        $verificationCode = GUIDCreator::GUIDv4();
-
-        EmailVerificationCodes::addUserVerificationCode($email, $verificationCode);
-        $subject = 'Verify your email address';
-        $serviceData = SiteInfo::getHostInfo();
-        $serviceHost = $serviceData[0];
-        $servicePort = $serviceData[1];
-        $verificationLink = "http://$serviceHost:$servicePort/$pathname/$verificationCode";
-        $body = "This email address was recently used to create an account on our website.<br/>
-            To activate your new account and verify your address click this link <href>$verificationLink</href>.<br/>
-            If you didn't use this address it means someone else entered it by mistake. In that case you don't have to take any action.";
-        return ServerMailer::sendEmail($email, $subject, $body);
-    }
-
     public static function createNewUser($parameters)
     {
         (new UserController())->validate(request(), [
@@ -309,20 +283,12 @@ Please follow this link to change your password <html>$verificationLink</html>";
         }
         $userFolderName = GUIDCreator::GUIDv4();
         $newUser = User::createNewUser($username, $password, $email, $userFolderName);
-
-        //FileManager::createUserFolder($userFolderName);
-        /*
-        auth()->login($newUser, true);
-        if (Auth::check()) {
-            return 'arf';
-        }
-        User::deleteUser($email);
-        $parameters['pathname'] = 'activate';
-        if (self::sendActivationLink($parameters)) {
+        if ($newUser != null) {
+            FileManager::createUserFolder($userFolderName);
             return ['registrationResult' => 'userCreated'];
         } else {
-            return ['registrationResult' => 'failedToSendEmail'];
-        }*/
+            return ['registrationResult' => 'failedToCreate'];
+        }
     }
 
     public static function deleteUser($parameters): array

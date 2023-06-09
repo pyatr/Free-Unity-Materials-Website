@@ -10,11 +10,11 @@ export default class ServerConnection {
     }
 
     public async SendPostRequestPromise(requestName: string, requestProperties: {}): Promise<AxiosResponse> {
-        const response = await axios.post(this.serverConnection, {
-            request: requestName,
-            attributes: requestProperties
+        return await axios.post(this.serverConnection + "/" + requestName, requestProperties, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
         });
-        return response;
     }
 
     public async SendGetRequestPromise(requestUrl: string): Promise<AxiosResponse> {

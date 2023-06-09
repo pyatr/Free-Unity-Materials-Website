@@ -7,7 +7,6 @@ export async function Register(email: string, username: string, password: string
         password: password,
         username: username
     }
-    const {data} = await serverConnection.SendPostRequestPromise("createNewUser", attributes);
-    console.log(data);
+    const {data} = await serverConnection.SendPostRequestPromise("user/register", attributes);
     return data.registrationResult;
 }
