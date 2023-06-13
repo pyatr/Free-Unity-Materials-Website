@@ -1,0 +1,47 @@
+.MainPage-header {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+
+body {
+    background-color: #F6F6F6;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow: scroll;
+}
+
+img {
+    max-width: 100%;
+    max-height: 100%;
+    justify-self: center;
+    align-self: center;
+}
+
+code {
+    display: block;
+    white-space: pre-wrap;
+}
+
+/*Alternative to code styling - pre{white-space: break-spaces;}*/
+
+mainContentGrid {
+    width: 70%;
+    gap: 32px;
+    padding-bottom: 96px;
+    display: grid;
+}
+
+mainContentBox {
+    width: 100%;
+    border: 2px solid #1976d2;
+    border-radius: 4px;
+    padding: 16px;
+}

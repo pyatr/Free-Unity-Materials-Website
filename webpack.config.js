@@ -13,12 +13,13 @@ const stylesHandler = MiniCssExtractPlugin.loader;
 
 const htmlWebpackPlugin = new HtmlWebpackPlugin({template: "./public/index.html",});
 //Костыль для экспорта файла как php вместо html
-htmlWebpackPlugin.userOptions.filename = "index.php";
+//htmlWebpackPlugin.userOptions.filename = "index.php";
 
 const config = {
     entry: "./src/index.tsx",
     output: {
         path: path.resolve(__dirname, "dist"),
+        publicPath: '/',
     },
     devServer: {
         open: true,
@@ -31,8 +32,7 @@ const config = {
             {
                 patterns: [
                     {from: "./public/assets", to: "assets"},
-                    //TODO: сделать копирование по типу ./public/*.php в dist, сейчас создает папку public
-                    {from: "./public/login.php"},
+                    {from: "./public/.htaccess"},
                     {from: "./public/manifest.json"},
                     {from: "./public/robots.txt"}
                 ]
